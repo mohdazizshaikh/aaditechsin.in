@@ -1,7 +1,7 @@
 name: Aaditechs source validation (no deployment)
 on:
   push:
-    branches: [main]
+    branches: [main, feature/v9-growth-engine]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -23,6 +23,8 @@ jobs:
         run: |
           set -e
           for file in public_html/assets/*.js; do node --check "$file"; done
+      - name: V9 service qualification contracts
+        run: node tests/v9_service_playbooks.test.js
       - name: Install isolated Python test dependency
         run: |
           python3 -m venv .ci-venv

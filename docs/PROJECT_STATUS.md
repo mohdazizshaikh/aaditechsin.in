@@ -1,6 +1,12 @@
 # Aaditechs — Verified progress / fresh-agent handoff
 
-## V9 branch planning (23 November 2026) — **documentation only**
+## V9 branch implementation (23 November 2026) — source-only feature branch
+
+V9-02 has begun as an **undeployed deterministic qualification guide** on `feature/v9-growth-engine`: seven named public service playbooks (IT AMC, VC, Auditorium AV, Professional Sound, Data Recovery, Hardware, Software), page-aware chat selection, edited/skip answers, review-before-consent and preserved V8 inquiry fallback. Added `tests/v9_service_playbooks.test.js`, an optional headless-browser suite, and feature-branch source-only CI trigger. Details, evidence and remaining gates: [V9-02 implementation](V9/10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md).
+
+**Tests observed here:** Node playbooks PASS; JavaScript syntax PASS; Python feature/security checks PASS. Local Python link checker needs `bs4`; headless Chromium test could not launch under socket sandbox policy. These are **BLOCKED**, not successes. No real-browser, Hostinger, database, SMTP, LLM or production verification. V9-02 acceptance remains **partial** and V9-03 is unimplemented. `main`, production feature flags and live site untouched. Confirm actual remote commit SHA against GitHub, do not assume this document is push proof.
+
+## V9 branch planning (23 November 2026) — historical documentation milestone
 
 **Latest V9-01 follow-up:** Read-only public-site inspection and Hostinger connection test were completed; authenticated Hostinger inspection is **BLOCKED** by missing integration and a read-only execution-environment config path. See [V9 staging readiness](V9/09_STAGING_READINESS_2026-11-23.md). No staging/database/SMTP/production change was performed, and live public service details still need owner verification.
 

@@ -1,7 +1,7 @@
 # Aaditechs V9 — start here
 
 **Branch:** `feature/v9-growth-engine` (created from verified V8 `main` at `a551761be4846eba905a4461e7a416d1389c2ef1`).  
-**Status:** product/design specification; **V9 capabilities are NOT implemented, enabled, or deployed.**  
+**Status:** design specifications plus an **undeployed V9-02 source-only service-guide pilot**. All other V9 modules remain planned; nothing new is enabled or live.  
 **Last planning review:** 23 November 2026.  
 **Owner:** Aaditechs (solo owner coordinating independent service partners).
 
@@ -35,6 +35,7 @@ Turn the existing Aaditechs website and V8 lead/partner portal into a simple, co
 7. [07_TEST_AND_ACCEPTANCE.md](07_TEST_AND_ACCEPTANCE.md) — test matrix, edge cases and release evidence.
 8. [08_BACKLOG_AND_DECISIONS.md](08_BACKLOG_AND_DECISIONS.md) — small deliverables, dependencies, decisions and explicit handoff.
 9. [09_STAGING_READINESS_2026-11-23.md](09_STAGING_READINESS_2026-11-23.md) — latest Hostinger connection blocker, read-only public-site observations and next safe checks.
+10. [10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md](10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md) — implemented public playbooks, qualification flow, local test evidence and still-open acceptance gates.
 
 ## Operational truth table
 
