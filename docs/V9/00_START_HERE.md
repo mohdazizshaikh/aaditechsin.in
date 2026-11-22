@@ -34,6 +34,7 @@ Turn the existing Aaditechs website and V8 lead/partner portal into a simple, co
 6. [06_DEPLOYMENT_AND_ROLLBACK.md](06_DEPLOYMENT_AND_ROLLBACK.md) — Hostinger, private secrets, staging, progressive release and rollback.
 7. [07_TEST_AND_ACCEPTANCE.md](07_TEST_AND_ACCEPTANCE.md) — test matrix, edge cases and release evidence.
 8. [08_BACKLOG_AND_DECISIONS.md](08_BACKLOG_AND_DECISIONS.md) — small deliverables, dependencies, decisions and explicit handoff.
+9. [09_STAGING_READINESS_2026-11-23.md](09_STAGING_READINESS_2026-11-23.md) — latest Hostinger connection blocker, read-only public-site observations and next safe checks.
 
 ## Operational truth table
 

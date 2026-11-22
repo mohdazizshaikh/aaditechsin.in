@@ -7,7 +7,7 @@
 | ID | Priority | Work package (scope deliberately small) | Dependencies | Acceptance gate |
 |---|---|---|---|---|
 | V9-00 | P0 | Establish V9 documentation branch, link all source truth, confirm V8 tests and main SHA | Verified V8 archive + repo | Docs complete; no V9 live claims |
-| V9-01 | P0 | Finish real V8 HTTPS staging, DB/mail/owner+partner acceptance and privacy text | Owner credentials/Hostinger access/legal copy | [V8 runbook](../../README_DEPLOYMENT.md) evidence; **blocks all V9 live intake** |
+| V9-01 | P0 | Finish real V8 HTTPS staging, DB/mail/owner+partner acceptance and privacy text | Authorized Hostinger session/legal copy; **BLOCKED as of 23 Nov 2026**, see [readiness report](09_STAGING_READINESS_2026-11-23.md) | [V8 runbook](../../README_DEPLOYMENT.md) evidence; **blocks all V9 live intake** |
 | V9-02 | P0 | Service playbook JSON/PHP config + mobile intake/qualification UX for IT AMC/VC | V9-01, owner service coverage | M01/M02 basic rule tests, no AI dependency |
 | V9-03 | P0 | Add migrations V9-001 CRM consent/event/attribution; safe API idempotency | V9-01, backup | T03-1..3; no changed V8 data semantics |
 | V9-04 | P0 | Owner lead inbox and scoring/next-action task UI | V9-03 | Role tests, audit and pending-lead visibility |

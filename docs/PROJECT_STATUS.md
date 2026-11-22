@@ -2,6 +2,8 @@
 
 ## V9 branch planning (23 November 2026) — **documentation only**
 
+**Latest V9-01 follow-up:** Read-only public-site inspection and Hostinger connection test were completed; authenticated Hostinger inspection is **BLOCKED** by missing integration and a read-only execution-environment config path. See [V9 staging readiness](V9/09_STAGING_READINESS_2026-11-23.md). No staging/database/SMTP/production change was performed, and live public service details still need owner verification.
+
 - **Confirmed verified V8 GitHub commit:** `a551761be4846eba905a4461e7a416d1389c2ef1` on `mohdazizshaikh/aaditechsin.in` `main` as inspected before branching.
 - **New branch:** `feature/v9-growth-engine`, created from the exact V8 commit, to isolate the proposed revenue/growth engine from production source.
 - **New planned documentation:** [V9 Start Here](V9/00_START_HERE.md) links eight V9 planning documents covering product, architecture, M01–M10 modules, schema/API contracts, privacy/approvals, deployment/rollback, testing, backlog and owner decisions.
