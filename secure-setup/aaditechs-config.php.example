@@ -1,0 +1,28 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * COPY TO: <domain-root>/secure/aaditechs-config.php (OUTSIDE public_html).
+ * Never commit the real copy or place it in a public web directory.
+ */
+return [
+    'google' => [
+        'enabled' => false,  // Only after 60-day eligibility, API approval, and access test.
+        'client_id' => 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID',
+        'client_secret' => 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_SECRET',
+        'refresh_token' => 'REPLACE_WITH_AUTHORIZED_OFFLINE_REFRESH_TOKEN',
+        'account_id' => 'REPLACE_WITH_APPROVED_BUSINESS_ACCOUNT_ID',
+        'location_id' => 'REPLACE_WITH_APPROVED_LOCATION_ID',
+    ],
+    'mail' => [
+        'enabled' => false, // Only after SMTP and privacy requirements are verified.
+        'host' => 'REPLACE_WITH_SMTP_HOST',
+        'port' => 587,
+        'username' => 'REPLACE_WITH_SMTP_USERNAME',
+        'password' => 'REPLACE_WITH_SMTP_PASSWORD',
+        'from_email' => 'info@aaditechs.in',
+        'inquiry_recipient' => 'info@aaditechs.in',
+    ],
+    // Generate a unique unpredictable value on the server; never copy a sample value.
+    'rate_limit_salt' => 'REPLACE_WITH_RANDOM_32_PLUS_CHARACTER_SECRET',
+];

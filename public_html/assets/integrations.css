@@ -1,0 +1,16 @@
+.review-owner-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:19px}
+.review-owner-actions a{display:inline-flex;align-items:center;justify-content:center;padding:11px 15px;border-radius:10px;background:#eef6ff;color:#145a98;font-weight:800;font-size:12px;border:1px solid #cfe4f9}
+.review-owner-actions a:hover,.review-owner-actions a:focus-visible{background:#dcefff}
+.review-owner-actions .review-write-link{background:#ffedd9;color:#8e4c06;border-color:#f5cb9c}
+.review-status-text{font-size:12px;line-height:1.65;color:#50647a;margin-top:16px}
+.review-real-list{display:grid;gap:14px;margin:19px 0 8px}
+.review-real-list article{border:1px solid #dce7f2;border-radius:13px;padding:17px;background:#fff}
+.review-real-list article header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.review-real-list article strong{font-size:13px;color:#0c2a49}
+.review-real-list article time{font-size:11px;color:#6b8093}
+.review-real-list article p{font-size:13px;line-height:1.65;color:#41576b;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.review-real-list .review-stars{color:#f49a25;letter-spacing:2px;font-size:14px;margin-bottom:6px}
+.review-live-rating{font-size:26px;font-weight:900;color:#164875}
+.lead-consent{display:block;margin:16px 0;font-size:12px;line-height:1.6;color:#41576b}
+.lead-consent input{margin-right:7px;vertical-align:middle}
+@media(max-width:620px){.review-owner-actions{display:grid}.review-owner-actions a{width:100%}}

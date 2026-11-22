@@ -1,0 +1,9 @@
+{
+  "name": "aaditechs/hostinger-backend",
+  "description": "Private SMTP dependency for Aaditechs Hostinger PHP endpoints",
+  "type": "project",
+  "require": {
+    "php": "^8.2",
+    "phpmailer/phpmailer": "^6.10"
+  }
+}
