@@ -1,0 +1,15 @@
+# Aaditechs: never commit live credentials, customer data, or local build output
+.env
+.env.*
+!.env.example
+**/aaditechs-config.php
+**/.user.ini
+**/vendor/
+**/node_modules/
+**/logs/
+**/tmp/
+**/cache/
+**/uploads/
+*.log
+.DS_Store
+Thumbs.db
