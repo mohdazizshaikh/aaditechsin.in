@@ -2,5 +2,4 @@ User-agent: *
 Disallow: /portal/
 Disallow: /track/
 Disallow: /api/
-Disallow: /privacy/
 Sitemap: https://aaditechs.in/sitemap.xml

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 // Shared operations helpers. Server side only; never expose sensitive configuration.
+require_once __DIR__ . '/workflow.php';
 function opsConfig(): array {
     $base = dirname(__DIR__, 2);
     $path = $base . '/secure/aaditechs-config.php';
@@ -45,6 +46,9 @@ function opsHeaders(): void {
 function opsSession(): void {
     if (session_status() === PHP_SESSION_ACTIVE) return;
     if (!opsSsl()) throw new RuntimeException('HTTPS required');
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.cookie_httponly', '1');
     session_name('aaditechs_ops');
     session_set_cookie_params(['lifetime'=>0,'path'=>'/portal/','secure'=>true,'httponly'=>true,'samesite'=>'Strict']);
     session_start();

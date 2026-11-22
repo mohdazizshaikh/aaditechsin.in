@@ -6,6 +6,10 @@ declare(strict_types=1);
  * Keep permissions restricted. Replace all REPLACE_ values privately.
  */
 return [
+    // HTTPS origin for customer tracking links. Use the *staging origin* in staging.
+    'public_base_url' => 'https://aaditechs.in',
+    // Customer tracking links expire automatically; owner can rotate anytime.
+    'tracking_ttl_days' => 90,
     'google' => [
         'enabled' => false,  // Only after eligibility, API approval, and access tests.
         'client_id' => 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID',

@@ -1,6 +1,16 @@
 # Aaditechs — Verified progress / fresh-agent handoff
 
-**Source version:** V7, implemented in project code 23 November 2026. Previous V6 GitHub baseline SHA `43bba82c0d75fb842c1e928eec5d9aa85ab7dbf0`. This file describes source completeness, **not production uptime**. Read the repository and confirm the actual Git HEAD before coding or deploying.
+**Source version:** V8 gap-audit remediation implemented in project code 23 November 2026. Previous V7 SHA `ea67fa26c558d01640139ac5eecd00c5c2a45623`. Previous V6 GitHub baseline SHA `43bba82c0d75fb842c1e928eec5d9aa85ab7dbf0`. This file describes source completeness, **not production uptime**. Read the repository and confirm the actual Git HEAD before coding or deploying.
+
+## V8 audit additions (local source, not live acceptance)
+
+- [x] Partner cannot start `in_progress` without owner-recorded customer approval; assessment-only notes now work.
+- [x] Admin approval evidence method/reference and a positive quoted amount are enforced server-side; staged progression controls and audit events added.
+- [x] Partner password reset/disable invalidates live sessions on next request; owner admin hash changes invalidate owner sessions.
+- [x] Customer tracking token TTL and origin validation; preexisting V7 DB requires documented V8 schema migration.
+- [x] New standalone Data Recovery and IT AMC pages; local service routes and sitemap updated.
+- [x] `tests/workflow_rules.php`, `tests/site_integrity.py`, `tests/http_smoke.py` plus prior browser/static tests; not substitutes for Hostinger DB end-to-end acceptance.
+- [x] Updated V8 architecture, security checklist, deployment runbook and gap audit; no real secrets or user records in source.
 
 ## Implemented in source
 
@@ -42,6 +52,14 @@
 - Run PHP/JS syntax and `tests/browser_smoke.py`; check all links and frontend demo-mode behavior.
 - Confirm Git tree SHA and every changed file's Git blob SHA matches local files after push; avoid force pushes.
 - Before any live deploy: reproduce staging setup; perform negative tests with public flags off; back up production and rollback assets.
+
+## Still-open gaps after V8 fixes
+
+- Hostinger staging and live PDO MySQL/SMTP/role tests not performed. Privacy page is still a DRAFT.
+- No real Google OAuth integration approval, interactive LLM, 2FA or automatic financial/customer approval workflow.
+- Owner must confirm actual business contact/address and policy, partner availability and service SLAs.
+- Public Git repository contains templates only; no real credential files.
+- Reference `docs/GAP_AUDIT_V8.md` for exact source fixes and negative tests.
 
 ## Next action for future AI agent
 

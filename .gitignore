@@ -13,3 +13,15 @@
 .DS_Store
 Thumbs.db
 **/.user.ini
+
+# Hostinger private runtime and backups must never enter public Git history.
+/secure/
+*.pem
+*.key
+*.p12
+*.pfx
+*.sql.gz
+*.dump
+*.sqlite*
+**/secrets/
+**/credentials.json

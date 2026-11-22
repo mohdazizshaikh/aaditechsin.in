@@ -1,4 +1,4 @@
-# Aaditechs — Website & Partner Operations Hub (V7)
+# Aaditechs — Website & Partner Operations Hub (V8)
 
 **Source repository** for Aaditechs' modern website, Audio Visual (AV) solutions, guided assessment chatbot, consent-based Lead Engine, and a private owner/partner work-order portal.
 
@@ -8,11 +8,11 @@ Production: `https://aaditechs.in/` — **not deployed by this source commit**. 
 
 - Original Aaditechs logo retained; Data Recovery, IT Infrastructure, Software, Support, Cloud, Security and Procurement retained.
 - **Audio Visual division:** Video Conferencing, Auditorium AV, Professional Sound & PA, AV Installation/Maintenance with homepage category filter.
-- SEO-oriented service pages at `/video-conferencing-solutions/`, `/auditorium-av-solutions/`, `/professional-sound-systems/`.
+- SEO-oriented service pages at `/video-conferencing-solutions/`, `/auditorium-av-solutions/`, `/professional-sound-systems/`, `/data-recovery/` and `/it-amc/`.
 - `/av-project-planner/`: room type, capacity, components, site, project stage, timeline, optional budget and customer consent; preliminary scope preview, no fake automated price.
 - **Smart Guide v2:** English/Hinglish keyword-based service routing, 3-step requirements discovery for five service classes, optional consent-based inquiry, accessible mobile chat. **Not a generative AI model or live agent.**
 - **Lead Engine:** secure JSON endpoint `/api/lead.php`; validation, throttling, consent, MySQL storage and optional SMTP notification. Returns lead reference only after successful storage. Disabled by default.
-- **Owner/partner portal:** `/portal/` PHP session login, role permissions, owner lead triage, partner creation/access controls, case creation/assignment, owner-only quotation/cost entries, audit trail, partner status updates. Disabled by default.
+- **Owner/partner portal:** `/portal/` PHP session login, role permissions, owner lead triage, partner creation/access controls, case creation/assignment, owner-only quotation/cost entries, manual approval evidence audit, restricted partner state transitions and partner session revocation. Disabled by default.
 - **Customer case tracking:** `/track/` accepts unguessable one-time-generated link, displays only limited case information; token stored as SHA-256 hash. Disabled by default.
 - Google Reviews API integration remains present but disabled until Google grants access; no invented reviews.
 - Updated Hostinger secrets templates, SQL schema, SEO sitemap, security headers and deployment guide.
@@ -29,6 +29,8 @@ public_html/
   auditorium-av-solutions/       AV landing page
   professional-sound-systems/    AV landing page
   av-project-planner/            self-service scoping
+  data-recovery/                 safety-first recovery landing page
+  it-amc/                        office maintenance landing page
   privacy/                       DRAFT NOTICE: owner/legal review required
   api/{bootstrap,operations,lead,google-reviews}.php
   portal/index.php               private owner/partner operations
@@ -38,6 +40,7 @@ secure-setup/                    TEMPLATE ONLY, never upload under webroot
   aaditechs-config.php.example
   schema.sql
   composer.json
+  migrations/2026-11-23-v8.sql   existing V7 staging DB upgrade (review before importing)
   maintenance/prune.php
 README_DEPLOYMENT.md              Hostinger step-by-step runbook
 PROJECT_STATUS.md                 verified implementation vs external blockers
@@ -54,7 +57,11 @@ Source implementation and offline smoke tests are available. **Live SMTP, databa
 ```bash
 for f in public_html/assets/*.js; do node --check "$f"; done
 find public_html secure-setup -name '*.php' -exec php -l {} \;
+php tests/workflow_rules.php
+python tests/site_integrity.py
+python tests/http_smoke.py
+python tests/security_static.py
 python tests/browser_smoke.py  # requires Python playwright + local Chromium; uses in-memory page preview
 ```
 
-See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/SECURITY_CHECKLIST.md](docs/SECURITY_CHECKLIST.md). Keep new work scoped; do not reintroduce Zenith Soles / Robotics Lab, invent customer reviews, or change the original brand logo without owner approval.
+See [docs/GAP_AUDIT_V8.md](docs/GAP_AUDIT_V8.md) and [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/SECURITY_CHECKLIST.md](docs/SECURITY_CHECKLIST.md). Keep new work scoped; do not reintroduce Zenith Soles / Robotics Lab, invent customer reviews, or change the original brand logo without owner approval.

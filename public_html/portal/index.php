@@ -6,6 +6,8 @@ try {
     $cfg=opsConfig();
     if (($cfg['portal']['enabled']??false)!==true || !opsSsl()) throw new RuntimeException('Operations portal is not enabled or HTTPS is unavailable');
     opsSession();
+    opsPublicBaseUrl($cfg);
+    opsTrackingTtlDays($cfg);
     $pdo=opsDb($cfg);
     // 30-minute inactivity expiration and immediate disabled-partner revocation.
     if(isset($_SESSION['role']) && time()-(int)($_SESSION['last_seen']??0)>1800) {
@@ -13,9 +15,19 @@ try {
     }
     $_SESSION['last_seen']=time();
     if(($_SESSION['role']??null)==='partner') {
-        $check=$pdo->prepare('SELECT id FROM partners WHERE id=? AND is_active=1');
+        $check=$pdo->prepare('SELECT session_version FROM partners WHERE id=? AND is_active=1');
         $check->execute([(int)($_SESSION['partner_id']??0)]);
-        if(!$check->fetch()) {$_SESSION=[];session_regenerate_id(true);}
+        $version=$check->fetchColumn();
+        if($version===false || !isset($_SESSION['partner_session_version'])
+            || (int)$version !== (int)$_SESSION['partner_session_version']) {
+            $_SESSION=[];session_regenerate_id(true);
+        }
+    } elseif(($_SESSION['role']??null)==='admin') {
+        // Owner changing the private admin password hash invalidates old sessions.
+        $fingerprint=hash('sha256',(string)($cfg['portal']['admin_password_hash']??''));
+        if(!hash_equals($fingerprint,(string)($_SESSION['admin_fingerprint']??''))) {
+            $_SESSION=[];session_regenerate_id(true);
+        }
     }
 } catch(Throwable $e) {
     http_response_code(503);exit('Aaditechs operations portal is not configured.');
@@ -57,7 +69,7 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             && password_verify($password,(string)($cfg['portal']['admin_password_hash']??''))) {
             $role='admin';
         } elseif($email!=='') {
-            $stmt=$pdo->prepare('SELECT id,display_name,password_hash FROM partners WHERE login_email=? AND is_active=1 LIMIT 1');
+            $stmt=$pdo->prepare('SELECT id,display_name,password_hash,session_version FROM partners WHERE login_email=? AND is_active=1 LIMIT 1');
             $stmt->execute([$email]);$partner=$stmt->fetch();
             if($partner && password_verify($password,(string)$partner['password_hash']))$role='partner';
         }
@@ -65,6 +77,8 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
         rewind($fp);ftruncate($fp,0);fwrite($fp,json_encode(['started'=>time(),'count'=>0]));fflush($fp);flock($fp,LOCK_UN);fclose($fp);
         session_regenerate_id(true);
         $_SESSION['role']=$role;$_SESSION['account_email']=$email;$_SESSION['partner_id']=$role==='partner'?(int)$partner['id']:null;
+        $_SESSION['partner_session_version']=$role==='partner'?(int)$partner['session_version']:null;
+        $_SESSION['admin_fingerprint']=$role==='admin'?hash('sha256',(string)$cfg['portal']['admin_password_hash']):null;
         redirectPortal('Signed in successfully');
     }
     requireSignedIn();
@@ -73,7 +87,7 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             requireAdmin();
             $name=trim((string)($_POST['name']??''));$email=strtolower(trim((string)($_POST['email']??'')));
             $specialties=trim((string)($_POST['specialties']??''));$password=(string)($_POST['password']??'');
-            if($name===''||opsLen($name)>120||!filter_var($email,FILTER_VALIDATE_EMAIL)||opsLen($email)>160||opsLen($specialties)>250||strlen($password)<12||strlen($password)>200)throw new InvalidArgumentException('Check partner name, email, and 12+ character password');
+            if($name===''||opsLen($name)>120||!filter_var($email,FILTER_VALIDATE_EMAIL)||opsLen($email)>160||opsLen($specialties)>250||strlen($password)<12||strlen($password)>200 || $email===strtolower((string)$cfg['portal']['admin_email']))throw new InvalidArgumentException('Check partner name, email (different from owner), and 12+ character password');
             $hash=password_hash($password,PASSWORD_DEFAULT);
             $stmt=$pdo->prepare('INSERT INTO partners(display_name,login_email,password_hash,specialties) VALUES(?,?,?,?)');
             $stmt->execute([$name,$email,$hash,$specialties]);
@@ -87,10 +101,10 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             if($mode==='password') {
                 $pass=(string)($_POST['new_password']??'');
                 if(strlen($pass)<12||strlen($pass)>200)throw new InvalidArgumentException('Use a password of at least 12 characters');
-                $stmt=$pdo->prepare('UPDATE partners SET password_hash=? WHERE id=?');
+                $stmt=$pdo->prepare('UPDATE partners SET password_hash=?,session_version=session_version+1 WHERE id=?');
                 $stmt->execute([password_hash($pass,PASSWORD_DEFAULT),$id]);
             } else {
-                $stmt=$pdo->prepare('UPDATE partners SET is_active=? WHERE id=?');
+                $stmt=$pdo->prepare('UPDATE partners SET is_active=?,session_version=session_version+1 WHERE id=?');
                 $stmt->execute([$mode==='enable'?1:0,$id]);
             }
             redirectPortal('Partner access updated. Disabling a partner blocks their next authenticated request.');
@@ -107,13 +121,14 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             $partnerId=($_POST['partner_id']??'')===''?null:filter_var($_POST['partner_id'],FILTER_VALIDATE_INT);
             $title=trim((string)($_POST['title']??''));$description=trim((string)($_POST['description']??''));
             if(!$leadId||$title===''||opsLen($title)>160||opsLen($description)>2000||($partnerId!==null&&!$partnerId))throw new InvalidArgumentException('Invalid case information');
+            if($partnerId!==null && ($_POST['partner_scope_checked']??'')!=='yes')throw new InvalidArgumentException('Confirm customer authorization and sanitized partner scope before assignment');
             $pdo->beginTransaction();
             $check=$pdo->prepare('SELECT id FROM leads WHERE id=? FOR UPDATE');$check->execute([$leadId]);
             if(!$check->fetch())throw new InvalidArgumentException('Lead not found');
             if($partnerId!==null){$check=$pdo->prepare('SELECT id FROM partners WHERE id=? AND is_active=1');$check->execute([$partnerId]);if(!$check->fetch())throw new InvalidArgumentException('Partner not found');}
             $token=bin2hex(random_bytes(32));$case=opsRef('ATC');
-            $stmt=$pdo->prepare('INSERT INTO jobs(case_code,lead_id,partner_id,title,description,tracking_token_hash) VALUES(?,?,?,?,?,?)');
-            $stmt->execute([$case,$leadId,$partnerId,$title,$description,hash('sha256',$token)]);
+            $stmt=$pdo->prepare('INSERT INTO jobs(case_code,lead_id,partner_id,title,description,tracking_token_hash,tracking_expires_at) VALUES(?,?,?,?,?,?,?)');
+            $stmt->execute([$case,$leadId,$partnerId,$title,$description,hash('sha256',$token),opsTrackingExpiry($cfg)]);
             $job=(int)$pdo->lastInsertId();
             $stmt=$pdo->prepare("UPDATE leads SET status='converted' WHERE id=?");$stmt->execute([$leadId]);
             opsEvent($pdo,$job,'admin',(string)$_SESSION['account_email'],'created','Initial case created');
@@ -128,16 +143,36 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             $status=(string)($_POST['status']??'');
             $partnerId=($_POST['partner_id']??'')===''?null:filter_var($_POST['partner_id'],FILTER_VALIDATE_INT);
             $quote=($_POST['customer_quote']??'')===''?null:(string)$_POST['customer_quote'];
+            $approvalMethod=(string)($_POST['approval_method']??'');
+            $approvalReference=trim((string)($_POST['approval_reference']??''));
             $cost=($_POST['partner_cost']??'')===''?null:(string)$_POST['partner_cost'];
             $note=trim((string)($_POST['note']??''));
             foreach([$quote,$cost] as $v){if($v!==null&&(!preg_match('/^\d{1,10}(?:\.\d{1,2})?$/',$v)||(float)$v>9999999999.99))throw new InvalidArgumentException('Invalid amount');}
             if(!$id||!in_array($status,$states,true)||($partnerId!==null&&!$partnerId)||opsLen($note)>1500)throw new InvalidArgumentException('Invalid case update');
-            if($partnerId!==null){$stmt=$pdo->prepare('SELECT id FROM partners WHERE id=? AND is_active=1');$stmt->execute([$partnerId]);if(!$stmt->fetch())throw new InvalidArgumentException('Partner not found');}
+            if($partnerId!==null){$stmt=$pdo->prepare('SELECT id FROM partners WHERE id=? AND (is_active=1 OR id=(SELECT partner_id FROM jobs WHERE id=?))');$stmt->execute([$partnerId,$id]);if(!$stmt->fetch())throw new InvalidArgumentException('Partner not found');}
             $pdo->beginTransaction();
+            $oldStmt=$pdo->prepare('SELECT status,customer_quote,partner_id FROM jobs WHERE id=? FOR UPDATE');
+            $oldStmt->execute([$id]);$old=$oldStmt->fetch();
+            if(!$old)throw new InvalidArgumentException('Case not found');
+            $previous=(string)$old['status'];
+            if($partnerId!==null && $partnerId!==(int)($old['partner_id']??0) && ($_POST['partner_scope_checked']??'')!=='yes')throw new InvalidArgumentException('Confirm customer authorization before assigning a different partner');
+            if(!opsCanAdminTransition($previous,$status))throw new InvalidArgumentException('Invalid case status transition');
+            if(in_array($status,['awaiting_customer_approval','approved','in_progress','work_completed','closed'],true)
+                && ($quote===null || (float)$quote<=0))throw new InvalidArgumentException('Set a reviewed positive customer quotation before proceeding');
+            if($status==='approved' && $previous!=='approved'
+                && !opsValidApprovalProof($approvalMethod,$approvalReference))throw new InvalidArgumentException('Record a customer approval method and evidence reference');
+            if(in_array($previous,['approved','in_progress','work_completed','closed'],true)
+                && $old['customer_quote']!==null && $quote!==null
+                && (float)$quote!==(float)$old['customer_quote']
+                && $status!=='quote_pending')throw new InvalidArgumentException('Return case to quote pending before changing an approved customer quotation');
             $stmt=$pdo->prepare('UPDATE jobs SET status=?,partner_id=?,customer_quote=?,partner_cost=? WHERE id=?');
             $stmt->execute([$status,$partnerId,$quote,$cost,$id]);
             if($stmt->rowCount()===0){$check=$pdo->prepare('SELECT id FROM jobs WHERE id=?');$check->execute([$id]);if(!$check->fetch())throw new InvalidArgumentException('Case not found');}
-            opsEvent($pdo,$id,'admin',(string)$_SESSION['account_email'],'updated',$note?:'Case information updated');
+            opsEvent($pdo,$id,'admin',(string)$_SESSION['account_email'],'updated',$note?:('Case status: '.$previous.' → '.$status));
+            if($status==='approved' && $previous!=='approved') {
+                opsEvent($pdo,$id,'admin',(string)$_SESSION['account_email'],'customer_approval_recorded',
+                    'Method: '.$approvalMethod.'; evidence: '.$approvalReference.'; entered by owner (not verified by system)');
+            }
             $pdo->commit();
             redirectPortal('Case updated; customer approval is never inferred from a website status');
         }
@@ -145,7 +180,7 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             requireAdmin();$id=filter_var($_POST['job_id']??'',FILTER_VALIDATE_INT);
             if(!$id)throw new InvalidArgumentException('Invalid case');
             $token=bin2hex(random_bytes(32));
-            $stmt=$pdo->prepare('UPDATE jobs SET tracking_token_hash=? WHERE id=?');$stmt->execute([hash('sha256',$token),$id]);
+            $stmt=$pdo->prepare('UPDATE jobs SET tracking_token_hash=?,tracking_expires_at=? WHERE id=?');$stmt->execute([hash('sha256',$token),opsTrackingExpiry($cfg),$id]);
             if(!$stmt->rowCount())throw new InvalidArgumentException('Case not found');
             opsEvent($pdo,$id,'admin',(string)$_SESSION['account_email'],'tracking_token_rotated');
             $_SESSION['new_tracking_link']='/track/?token='.$token;
@@ -156,17 +191,21 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             $id=filter_var($_POST['job_id']??'',FILTER_VALIDATE_INT);
             $status=(string)($_POST['status']??'');$note=trim((string)($_POST['note']??''));
             if(!$id||!in_array($status,['assessment','in_progress','work_completed'],true)||opsLen($note)>1500)throw new InvalidArgumentException('Invalid status update');
-            $allowedCurrent=match($status) {
-                'assessment'=>['assessment'],
-                'in_progress'=>['assessment','approved','in_progress'],
-                'work_completed'=>['in_progress','work_completed'],
-            };
-            $qmarks=implode(',',array_fill(0,count($allowedCurrent),'?'));
-            $stmt=$pdo->prepare("UPDATE jobs SET status=? WHERE id=? AND partner_id=? AND status IN ($qmarks)");
-            $stmt->execute(array_merge([$status,$id,(int)$_SESSION['partner_id']],$allowedCurrent));
-            if(!$stmt->rowCount())throw new InvalidArgumentException('Case not assignable or already in this status');
-            opsEvent($pdo,$id,'partner',(string)$_SESSION['account_email'],'partner_update',$note?:'Partner updated work status');
-            redirectPortal('Work status sent to Aaditechs. Final customer acceptance and pricing remain owner-controlled.');
+            if($note==='')throw new InvalidArgumentException('Please provide a brief work note');
+            $pdo->beginTransaction();
+            $check=$pdo->prepare('SELECT status FROM jobs WHERE id=? AND partner_id=? FOR UPDATE');
+            $check->execute([$id,(int)$_SESSION['partner_id']]);$previous=$check->fetchColumn();
+            if($previous===false || !opsCanPartnerUpdate((string)$previous,$status)) {
+                throw new InvalidArgumentException('Case not assigned or customer approval not recorded');
+            }
+            if($status!==$previous) {
+                $stmt=$pdo->prepare('UPDATE jobs SET status=? WHERE id=? AND partner_id=?');
+                $stmt->execute([$status,$id,(int)$_SESSION['partner_id']]);
+            }
+            opsEvent($pdo,$id,'partner',(string)$_SESSION['account_email'],'partner_update',
+                $previous.' → '.$status.': '.$note);
+            $pdo->commit();
+            redirectPortal('Work update recorded. Customer quote approval remains owner-controlled.');
         }
         throw new InvalidArgumentException('Unknown action');
     } catch(Throwable $e) {
@@ -179,6 +218,8 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
 $role=(string)($_SESSION['role']??'');
 $flash=(string)($_SESSION['flash']??'');unset($_SESSION['flash']);
 $tracking=(string)($_SESSION['new_tracking_link']??'');unset($_SESSION['new_tracking_link']);
+$trackingOrigin='';
+try {$trackingOrigin=opsPublicBaseUrl($cfg);}catch(Throwable $e){$tracking='';}
 $partners=[];$leads=[];$jobs=[];$activityByJob=[];
 if($role==='admin') {
     $partners=$pdo->query('SELECT id,display_name,login_email,specialties,is_active FROM partners ORDER BY display_name LIMIT 200')->fetchAll();
@@ -200,23 +241,23 @@ if($role==='admin') {
 <main class="shell">
 <h1><?= $role==='admin'?'Owner Dashboard':($role==='partner'?'Assigned Partner Jobs':'Secure Sign-in') ?></h1><p class="sub">This portal is separate from the public website. Partner accounts see assigned work only, not customer contact details or owner financials.</p>
 <?php if($flash): ?><p class="alert" role="status"><?=h($flash)?></p><?php endif; ?>
-<?php if($tracking): ?><section class="panel alert"><h2>Customer tracking link — copy now</h2><p>The token is shown once and only a SHA-256 hash is saved. Send privately to the correct customer; anyone with this link can view the limited case status.</p><code><?=h('https://'.($_SERVER['HTTP_HOST']??'aaditechs.in').$tracking)?></code></section><?php endif; ?>
+<?php if($tracking): ?><section class="panel alert"><h2>Customer tracking link — copy now</h2><p>The token is shown once; a SHA-256 hash and an expiry time are saved. Send privately to the correct customer. Anyone with the link can view limited case status until expiry/revocation.</p><code><?=h($trackingOrigin.$tracking)?></code></section><?php endif; ?>
 <?php if(!$role): ?>
 <section class="panel narrow"><h2>Sign in</h2><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><label>Email<input name="email" type="email" maxlength="160" required autocomplete="username"></label><label>Password<input name="password" type="password" required autocomplete="current-password"></label><button name="action" value="login">Sign in</button></form><p class="small">Accounts are provisioned by Aaditechs. No public registration. Contact the owner for account access.</p></section>
 <?php elseif($role==='admin'): ?>
 <section class="panel"><h2>Recent leads <span class="count"><?=count($leads)?></span></h2><p class="small">Newest 75 leads. Review requirements before quoting. Do not share customer personal details with a partner without an appropriate basis.</p>
 <?php if(!$leads): ?><p>No leads yet. The website lead feature is disabled until Hostinger database and privacy setup are complete.</p><?php endif; ?>
 <?php foreach($leads as $lead): ?><details class="entry"><summary><strong><?=h($lead['reference'])?></strong> · <?=h($lead['service'])?> · <?=h($lead['status'])?> <span><?=h($lead['created_at'])?></span></summary><p>Name: <?=h($lead['full_name'])?> · <?=h($lead['email'])?> · <?=h($lead['phone'])?></p><p>Device: <?=h($lead['device'])?> · Source: <?=h($lead['source'])?></p><pre><?=h($lead['message'])?></pre><form class="inline" method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="lead_id" value="<?=h($lead['id'])?>"><label>Lead status<select name="status"><?php foreach(['new','qualified','responded','converted','closed'] as $s): ?><option value="<?=h($s)?>" <?= $lead['status']===$s?'selected':'' ?>><?=h($s)?></option><?php endforeach; ?></select></label><button name="action" value="set_lead_status">Update</button></form>
-<details class="nested"><summary>Create case / work order</summary><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="lead_id" value="<?=h($lead['id'])?>"><label>Title<input name="title" maxlength="160" required value="<?=h($lead['service'])?> assessment"></label><label>Scope summary (no unnecessary customer data)<textarea name="description" maxlength="2000"></textarea></label><label>Partner<select name="partner_id"><option value="">Not assigned</option><?php foreach($partners as $partner):if(!$partner['is_active'])continue; ?><option value="<?=h($partner['id'])?>"><?=h($partner['display_name'])?></option><?php endforeach; ?></select></label><button name="action" value="create_job">Create case and tracking token</button></form></details></details><?php endforeach; ?></section>
+<details class="nested"><summary>Create case / work order</summary><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="lead_id" value="<?=h($lead['id'])?>"><label>Title<input name="title" maxlength="160" required value="<?=h($lead['service'])?> assessment"></label><label>Scope summary (no unnecessary customer data)<textarea name="description" maxlength="2000"></textarea></label><label>Partner<select name="partner_id"><option value="">Not assigned</option><?php foreach($partners as $partner):if(!$partner['is_active'])continue; ?><option value="<?=h($partner['id'])?>"><?=h($partner['display_name'])?></option><?php endforeach; ?></select></label><label><input type="checkbox" name="partner_scope_checked" value="yes"> I verified the scope is safe to share with any assigned partner and have a valid basis to coordinate the service.</label><button name="action" value="create_job">Create case and tracking token</button></form></details></details><?php endforeach; ?></section>
 <section class="panel"><h2>Service cases <span class="count"><?=count($jobs)?></span></h2>
-<?php foreach($jobs as $job): ?><details class="entry"><summary><strong><?=h($job['case_code'])?></strong> · <?=h($job['title'])?> · <?=h($job['status'])?> <span><?=h($job['updated_at'])?></span></summary><p>Lead: <?=h($job['lead_reference'])?> · Assigned: <?=h($job['partner_name']??'Unassigned')?></p><pre><?=h($job['description'])?></pre><form method="post" class="edit-grid"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="job_id" value="<?=h($job['id'])?>"><label>Status<select name="status"><?php foreach($states as $s): ?><option value="<?=h($s)?>" <?= $job['status']===$s?'selected':'' ?>><?=h(str_replace('_',' ',$s))?></option><?php endforeach; ?></select></label><label>Assigned partner<select name="partner_id"><option value="">Unassigned</option><?php foreach($partners as $partner):if(!$partner['is_active'])continue; ?><option value="<?=h($partner['id'])?>" <?= (int)$job['partner_id']===(int)$partner['id']?'selected':'' ?>><?=h($partner['display_name'])?></option><?php endforeach; ?></select></label><label>Customer quote (INR)<input name="customer_quote" inputmode="decimal" value="<?=h($job['customer_quote'])?>" placeholder="After manual review"></label><label>Partner cost (INR)<input name="partner_cost" inputmode="decimal" value="<?=h($job['partner_cost'])?>" placeholder="Internal only"></label><label class="full">Internal activity note<textarea name="note" maxlength="1500" placeholder="Notes for owner and assigned partner; not shared with customer"></textarea></label><button name="action" value="update_job">Save reviewed update</button></form>
+<?php foreach($jobs as $job): ?><details class="entry"><summary><strong><?=h($job['case_code'])?></strong> · <?=h($job['title'])?> · <?=h($job['status'])?> <span><?=h($job['updated_at'])?></span></summary><p>Lead: <?=h($job['lead_reference'])?> · Assigned: <?=h($job['partner_name']??'Unassigned')?></p><pre><?=h($job['description'])?></pre><form method="post" class="edit-grid"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="job_id" value="<?=h($job['id'])?>"><label>Status<select name="status"><?php foreach($states as $s): ?><option value="<?=h($s)?>" <?= $job['status']===$s?'selected':'' ?>><?=h(str_replace('_',' ',$s))?></option><?php endforeach; ?></select></label><label>Assigned partner<select name="partner_id"><option value="">Unassigned</option><?php foreach($partners as $partner):if(!$partner['is_active'] && (int)$job['partner_id']!==(int)$partner['id'])continue; ?><option value="<?=h($partner['id'])?>" <?= (int)$job['partner_id']===(int)$partner['id']?'selected':'' ?>><?=h($partner['display_name'])?><?= $partner['is_active']?'':' (inactive — reassign)' ?></option><?php endforeach; ?></select></label><label>Customer quote (INR)<input name="customer_quote" inputmode="decimal" value="<?=h($job['customer_quote'])?>" placeholder="After manual review"></label><label>Partner cost (INR)<input name="partner_cost" inputmode="decimal" value="<?=h($job['partner_cost'])?>" placeholder="Internal only"></label><label class="full">Owner-only activity note<textarea name="note" maxlength="1500" placeholder="Internal note; partner and customer cannot see this"></textarea></label><label>Customer approval method<select name="approval_method"><option value="">Not applicable unless approving</option><option value="signed_document">Signed document</option><option value="customer_email">Customer email</option><option value="recorded_call">Recorded call/consent record</option><option value="other_record">Other documented approval</option></select></label><label>Approval evidence reference<input name="approval_reference" maxlength="300" placeholder="Required when moving to Approved; email ID, dated record, etc."></label><label class="full"><input type="checkbox" name="partner_scope_checked" value="yes"> If assigning/reassigning a partner, I checked their scope and customer authorization.</label><button name="action" value="update_job">Save reviewed update</button></form>
 <form method="post" class="inline"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="job_id" value="<?=h($job['id'])?>"><button class="secondary" name="action" value="rotate_link">Rotate customer tracking token</button></form>
 <details class="nested"><summary>Audit history</summary><?php foreach(($activityByJob[(int)$job['id']]??[]) as $activity): ?><p class="small"><?=h($activity['created_at'])?> · <?=h($activity['actor_role'])?> · <?=h($activity['event_type'])?> · <?=h($activity['note'])?></p><?php endforeach; ?></details></details><?php endforeach; ?>
 <?php if(!$jobs): ?><p>No service cases have been created yet.</p><?php endif; ?></section>
 <section class="panel"><h2>Partner accounts</h2><p class="small">Only the owner can create partner accounts. Account passwords are stored as secure hashes and never emailed by the application.</p><form method="post" class="edit-grid"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><label>Partner display name<input name="name" maxlength="120" required></label><label>Partner login email<input name="email" type="email" maxlength="160" required></label><label>Specialties<input name="specialties" maxlength="250" placeholder="AV, data recovery, IT support"></label><label>Initial password (12+ chars)<input name="password" type="password" minlength="12" required autocomplete="new-password"></label><button name="action" value="add_partner">Add partner</button></form>
 <div class="list"><?php foreach($partners as $partner): ?><details class="entry"><summary><?=h($partner['display_name'])?> — <?=h($partner['login_email'])?> · <?=h($partner['specialties'])?> <?= $partner['is_active']?'(active)':'(inactive)' ?></summary><form method="post" class="inline"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="partner_id" value="<?=h($partner['id'])?>"><input type="hidden" name="mode" value="<?= $partner['is_active']?'disable':'enable' ?>"><button class="secondary" name="action" value="manage_partner"><?= $partner['is_active']?'Disable partner access':'Enable partner access' ?></button></form><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="partner_id" value="<?=h($partner['id'])?>"><input type="hidden" name="mode" value="password"><label>Reset partner password (12+ characters)<input name="new_password" type="password" minlength="12" required autocomplete="new-password"></label><button name="action" value="manage_partner">Update password hash</button></form></details><?php endforeach; ?></div></section>
 <?php else: ?>
-<section class="panel"><h2>Your assigned jobs</h2><p class="small">You can report assessment, work-in-progress and work completed. Aaditechs owner approves quotes and all customer commitments.</p>
+<section class="panel"><h2>Your assigned jobs</h2><p class="small">You can report assessment notes, start work only after the owner records customer approval, and report completion. Aaditechs controls all quotations.</p>
 <?php if(!$jobs): ?><p>No work has been assigned to your account.</p><?php endif; ?>
 <?php foreach($jobs as $job): ?><details class="entry"><summary><strong><?=h($job['case_code'])?></strong> · <?=h($job['title'])?> · <?=h($job['status'])?></summary><pre><?=h($job['description'])?></pre><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="job_id" value="<?=h($job['id'])?>"><label>Report status<select name="status"><option>assessment</option><option>in_progress</option><option>work_completed</option></select></label><label>Work note<textarea name="note" maxlength="1500" placeholder="Status, blockers or parts needed; no sensitive data"></textarea></label><button name="action" value="partner_update">Submit work update</button></form></details><?php endforeach; ?></section>
 <?php endif; ?>

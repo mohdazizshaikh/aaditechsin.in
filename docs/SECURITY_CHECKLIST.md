@@ -19,3 +19,16 @@
 - [ ] Test backup and restore on staging; write rollback procedure for web assets and DB migrations.
 - [ ] Confirm actual services, phone numbers, office location, partner scopes, terms, pricing model and warranty disclosures before public launch.
 - [ ] Keep Google API feature disabled until official approval and authorized Google OAuth credentials; never commit tokens.
+
+
+## V8 additional acceptance checks (23 November 2026)
+
+- [ ] Apply fresh V8 DB schema OR the documented one-time V7→V8 migration after a verified backup; never both.
+- [ ] Configure private `public_base_url` to the correct HTTPS origin; never trust request Host to construct customer links.
+- [ ] Confirm customer tracking links expire at `tracking_ttl_days`, rotate properly, and only display generic case information.
+- [ ] Confirm partner cannot move `assessment` to `in_progress` or bypass `awaiting_customer_approval`.
+- [ ] Confirm positive quote + owner-entered evidence ID required for `approved`, audit history saved, and change to approved price reopens quote workflow.
+- [ ] Confirm partner can add assessment notes without changing status and cannot see customer PII/owner costs.
+- [ ] Password reset/disable revokes existing partner sessions; admin password hash change revokes owner sessions.
+- [ ] Do not turn on public lead submission until privacy notice has been reviewed and real DB/SMTP fallback behavior validated.
+- [ ] Independent pen test/2FA/WAF decision before exposing admin portal to a large customer base.

@@ -57,7 +57,13 @@ with sync_playwright() as p:
         assert page.locator('link[rel=canonical]').get_attribute('href')=='https://aaditechs.in/'+slug+'/'
         assert page.locator('a[href^="../av-project-planner/"]').count()>0
         assert 'Aaditechs' in page.title()
-    print('3 dedicated AV pages: PASS')
+    for slug in ('data-recovery','it-amc'):
+        page.set_content(self_contained(slug+'/index.html'))
+        assert page.locator('h1').count()==1
+        assert page.locator('link[rel=canonical]').get_attribute('href')=='https://aaditechs.in/'+slug+'/'
+        assert page.get_by_role('link',name='Call Aaditechs').is_visible()
+        assert 'Aaditechs' in page.title()
+    print('3 dedicated AV + 2 new service pages: PASS')
     page.set_content(self_contained('av-project-planner/index.html'))
     page.locator('#projectType').select_option(label='Video Conferencing')
     page.locator('#capacity').select_option(label='11–25')

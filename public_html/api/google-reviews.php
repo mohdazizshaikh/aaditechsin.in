@@ -35,15 +35,20 @@ $path = 'https://mybusiness.googleapis.com/v4/accounts/' . $google['account_id']
     . '/locations/' . $google['location_id'] . '/reviews?pageSize=6&orderBy=updateTime%20desc';
 $source = httpJson($path, null, (string)$token['access_token']);
 $starMap = ['ONE'=>1,'TWO'=>2,'THREE'=>3,'FOUR'=>4,'FIVE'=>5];
+// Hostinger plans may not include mbstring; preserve a safe UTF-8 fallback.
+$truncate = static function(string $value, int $limit): string {
+    if (function_exists('mb_substr')) return mb_substr($value, 0, $limit, 'UTF-8');
+    return substr($value, 0, $limit * 4);
+};
 $reviews = [];
 foreach (($source['reviews'] ?? []) as $item) {
     if (!is_array($item)) continue;
     $rating = $starMap[$item['starRating'] ?? ''] ?? 0;
     if ($rating < 1) continue;
     $reviews[] = [
-        'author' => mb_substr((string)($item['reviewer']['displayName'] ?? 'Google reviewer'), 0, 100),
+        'author' => $truncate((string)($item['reviewer']['displayName'] ?? 'Google reviewer'), 100),
         'rating' => $rating,
-        'comment' => mb_substr((string)($item['comment'] ?? ''), 0, 2000),
+        'comment' => $truncate((string)($item['comment'] ?? ''), 2000),
         'date' => substr((string)($item['updateTime'] ?? ''), 0, 10),
     ];
 }
