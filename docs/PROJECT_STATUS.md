@@ -75,3 +75,13 @@ Keep V8 source status below unchanged as historical baseline. Each V9 implementa
 ## Next action for future AI agent
 
 Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY_CHECKLIST.md`, and this status. **Do not claim Hostinger deployment, OAuth approval, email delivery or database tests without evidence.** Obtain infrastructure access/credentials securely; do not request secrets in chat. Introduce new coding functionality only against a verified backlog and preserve existing service content/logo.
+
+## 23 Nov 2026 staging continuation: source-only preflight
+
+- [x] Separate V8 maintenance work on `main` re-ran PHP/JavaScript syntax, workflow, security, local-HTTP and browser smoke suites (source/offline; did not test live hosting).
+- [x] Added server-side CLI preflight (`secure-setup/maintenance/preflight.php`) with an optional **read-only** DB check; avoids revealing secrets and fails closed on missing live configuration.
+- [x] Added GitHub read-only `source-validation.yml` checks, plus `docs/STAGING_ACCEPTANCE.md` with specific test evidence and no-premature-production release gates.
+- [ ] Hostinger authenticated integration not available to that run; **no staging/production Hostinger deployment, DB creation or SMTP delivery took place**. This must be verified separately once a Hostinger session is connected.
+- [x] CI first run identified missing `beautifulsoup4` in the clean runner; workflow now installs a pinned dependency in an isolated venv. This is CI-only environment remediation, not live Hostinger acceptance.
+
+**V9 branch reconciliation:** V9 design must retain the above `main` changes when merged. Source status is branch-specific; do not treat the preflight checks as proof of a deployed V9 module.

@@ -1,0 +1,39 @@
+name: Aaditechs source validation (no deployment)
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versions
+        run: |
+          php --version | head -n 1
+          node --version
+          python3 --version
+      - name: PHP lint
+        run: find public_html secure-setup tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: JavaScript syntax
+        run: |
+          set -e
+          for file in public_html/assets/*.js; do node --check "$file"; done
+      - name: Install isolated Python test dependency
+        run: |
+          python3 -m venv .ci-venv
+          .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3
+      - name: Security, links and workflow tests
+        run: |
+          set -e
+          .ci-venv/bin/python tests/security_static.py
+          .ci-venv/bin/python tests/site_integrity.py
+          php tests/workflow_rules.php
+          .ci-venv/bin/python tests/http_smoke.py
+          php secure-setup/maintenance/preflight.php --source-only
+      - name: Scope statement
+        run: echo 'Source checks only; no Hostinger deployment, MySQL, SMTP, Google API or production permission test.'
