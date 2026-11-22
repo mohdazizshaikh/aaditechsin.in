@@ -1,10 +1,12 @@
-# Aaditechs — Website & Partner Operations Hub (V8)
+# Aaditechs — Website, Partner Operations & V9 Growth Planning
 
-**Source repository** for Aaditechs' modern website, Audio Visual (AV) solutions, guided assessment chatbot, consent-based Lead Engine, and a private owner/partner work-order portal.
+> **Version clarity:** `main` is the V8 implemented-source baseline. New branch `feature/v9-growth-engine` was created from V8 commit `a551761be4846eba905a4461e7a416d1389c2ef1` for V9 **planning and future incremental development**. The V9 module documents do **not** mean any AI, ads, autonomous marketing, CRM upgrades or growth automation is currently built or live. Start at [V9 Start Here](docs/V9/00_START_HERE.md).
+
+**Source repository** for Aaditechs' modern website, Audio Visual (AV) solutions, guided assessment chatbot, consent-based Lead Engine, and a private owner/partner work-order portal. V9 plans to extend it into a single-owner, partner-coordinated sales and growth engine without moving away from lightweight PHP + MySQL hosting.
 
 Production: `https://aaditechs.in/` — **not deployed by this source commit**. Previous hosted *static* concept preview: `https://aaditechs-modern-concept-2026.tiledparrot.chatgpt.site` — may still show an earlier V6 until explicitly updated. No CRM data, credentials or production customer records are included in Git.
 
-## What's implemented
+## What's implemented in V8 source
 
 - Original Aaditechs logo retained; Data Recovery, IT Infrastructure, Software, Support, Cloud, Security and Procurement retained.
 - **Audio Visual division:** Video Conferencing, Auditorium AV, Professional Sound & PA, AV Installation/Maintenance with homepage category filter.
@@ -51,6 +53,10 @@ PROJECT_STATUS.md                 verified implementation vs external blockers
 ## Deployment status
 
 Source implementation and offline smoke tests are available. **Live SMTP, database persistence, user permissions, OAuth and Hostinger staging have not been tested against real infrastructure.** All production-sensitive feature flags start `false`. Do not turn them on until the checklist in [README_DEPLOYMENT.md](README_DEPLOYMENT.md) is complete.
+
+## V9 development documentation — new branch, NOT running software
+
+The clean-scope V9 plan is in [`docs/V9/00_START_HERE.md`](docs/V9/00_START_HERE.md), followed by product requirements, architecture, **ten detailed module specs**, proposed schema and API contracts, security/approvals, Hostinger deployment/rollback, tests, and a staged delivery backlog. Do not confuse a documented proposed endpoint (`/api/v9/`) with an implemented endpoint. Only approved V8 code can run until each V9 release slice is written, tested and enabled in staging.
 
 ## Verification
 

@@ -1,5 +1,7 @@
 # Aaditechs preproduction security & data handling checklist
 
+> For **proposed** AI chat, marketing, paid ads, campaign approvals and follow-up security requirements, consult [V9 safety and approval gates](V9/05_SECURITY_PRIVACY_APPROVALS.md). Those V9 safeguards remain design requirements, not passing production checks.
+
 > No box below should be assumed complete merely because code exists. Execute against Hostinger staging, save evidence privately and obtain owner approval.
 
 - [ ] Confirm site and portal serve HTTPS with valid certificate; HTTP to HTTPS redirect before exposing any forms.

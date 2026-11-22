@@ -1,5 +1,7 @@
 # Aaditechs V8 — Hostinger deployment, secrets and security runbook
 
+> **V9 planning note:** `feature/v9-growth-engine` includes [V9 deployment and rollback design](docs/V9/06_DEPLOYMENT_AND_ROLLBACK.md). This V8 runbook remains the authority for the currently implemented code. **Do not deploy the V9 documentation branch or apply proposed V9 migrations as if V9 was built.**
+
 **Updated:** 23 November 2026 · **GitHub source:** `mohdazizshaikh/aaditechsin.in` → `main` · **Domain:** `aaditechs.in`.
 
 > **Current status:** V8 source is implemented and local/offline tests exist. **No production overwrite, Hostinger staging acceptance, live MySQL or SMTP verification, Google API approval, legal review or customer production traffic are claimed.** The pre-existing private ChatGPT Site preview may still be on an older version. All live lead/portal/Google flags start **OFF**.

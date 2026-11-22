@@ -1,5 +1,7 @@
 # Aaditechs Lead Engine & Partner Operations — architecture
 
+> **Version boundary:** This file describes the **existing V8 source architecture**, not the proposed V9 implementation. The new branch's modular PHP/MySQL growth-engine architecture is specified in [V9 architecture](V9/02_ARCHITECTURE.md) and [V9 module specs](V9/03_MODULE_SPECS.md). No V9 endpoint is live yet.
+
 ## Trust boundaries
 
 1. Public static HTML: homepage, AV pages, guided chat, AV planner; `site-config.js` contains *only public* flags and nonsecret link values.

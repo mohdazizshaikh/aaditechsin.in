@@ -1,5 +1,16 @@
 # Aaditechs — Verified progress / fresh-agent handoff
 
+## V9 branch planning (23 November 2026) — **documentation only**
+
+- **Confirmed verified V8 GitHub commit:** `a551761be4846eba905a4461e7a416d1389c2ef1` on `mohdazizshaikh/aaditechsin.in` `main` as inspected before branching.
+- **New branch:** `feature/v9-growth-engine`, created from the exact V8 commit, to isolate the proposed revenue/growth engine from production source.
+- **New planned documentation:** [V9 Start Here](V9/00_START_HERE.md) links eight V9 planning documents covering product, architecture, M01–M10 modules, schema/API contracts, privacy/approvals, deployment/rollback, testing, backlog and owner decisions.
+- **Actual V9 implementation:** NOT STARTED. No `/api/v9/` endpoints, migrations, live AI provider, auto-marketing, automatic ads or revenue reporting are included in this planning milestone. Do not mark these features complete or imply a Hostinger deployment.
+- **Git push verification:** record the actual V9 branch commit SHA after commit and verify remote tree; this document alone does not assert a push happened.
+- **Unchanged blockers:** V8 live Hostinger staging, private MySQL/SMTP tests, owner/legal privacy review, Google Business Profile API approval, service/pricing facts and explicit live cutover consent.
+
+Keep V8 source status below unchanged as historical baseline. Each V9 implementation commit must update this section with evidence rather than overwriting it with aspiration.
+
 **Source version:** V8 gap-audit remediation implemented in project code 23 November 2026. Previous V7 SHA `ea67fa26c558d01640139ac5eecd00c5c2a45623`. Previous V6 GitHub baseline SHA `43bba82c0d75fb842c1e928eec5d9aa85ab7dbf0`. This file describes source completeness, **not production uptime**. Read the repository and confirm the actual Git HEAD before coding or deploying.
 
 ## V8 audit additions (local source, not live acceptance)
