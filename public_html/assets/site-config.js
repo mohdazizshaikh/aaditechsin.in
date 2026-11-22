@@ -6,7 +6,7 @@ window.AADITECHS_PUBLIC_CONFIG = Object.freeze({
   googleReviewRequestUrl: '',
   features: Object.freeze({
     googleReviewsApi: false, // Enable only after API access and usage approval.
-    leadSubmission: false, // Enable only after secure Hostinger SMTP is verified.
+    leadSubmission: false, // Enable only after DB schema, privacy notice, SMTP (optional), security and staging validation.
   }),
   googleReviewsEndpoint: '/api/google-reviews.php',
   leadEndpoint: '/api/lead.php',

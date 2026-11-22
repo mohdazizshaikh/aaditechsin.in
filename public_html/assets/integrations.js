@@ -77,7 +77,7 @@
     if (note) note.textContent = 'Your inquiry is sent securely to Aaditechs. Do not include passwords or confidential files.';
     const agreement = document.createElement('label'); agreement.className = 'lead-consent';
     const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.name = 'contactConsent'; checkbox.required = true; checkbox.value = 'yes';
-    agreement.append(checkbox,document.createTextNode(' I agree to be contacted by Aaditechs about this inquiry.'));
+    agreement.append(checkbox,document.createTextNode(' I agree to be contacted by Aaditechs about this inquiry and have read the '));const privacyLink=document.createElement('a');privacyLink.href='/privacy/';privacyLink.target='_blank';privacyLink.rel='noopener';privacyLink.textContent='privacy notice';agreement.append(privacyLink,document.createTextNode('.'));
     submit.before(agreement);
     const honeypot = document.createElement('input');
     honeypot.type = 'text'; honeypot.name = 'company_website'; honeypot.tabIndex = -1; honeypot.autocomplete = 'off'; honeypot.setAttribute('aria-hidden', 'true');
@@ -91,7 +91,8 @@
         const data = Object.fromEntries(new FormData(form));
         const response = await fetch(cfg.leadEndpoint, { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(data) });
         if (!response.ok) throw new Error('Could not send inquiry');
-        if (message) message.textContent='Thank you. Your inquiry has been sent to Aaditechs.';
+        const result=await response.json();if(result.ok!==true)throw new Error('Could not save inquiry');
+        if (message) message.textContent='Thank you. Your inquiry has been received'+(result.reference?' (reference '+result.reference+')':'')+'.';
         form.reset();
       } catch {
         if (message) message.textContent='We could not submit your inquiry. Please email info@aaditechs.in or call +91 97736 93440.';

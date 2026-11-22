@@ -208,3 +208,87 @@ Do not paste authorization headers, OAuth secrets, email passwords, or token res
 Canonical business domain: `aaditechs.in`; private redesign Site ID `appgprj_6afaca6db15081918cf21e927b08040d`. Main public logo asset: `dist/assets/aaditechs-original-logo.png`, **must not be replaced**. Current stage is **pre-production**. Current public JS flags are OFF. Google Business Profile first-live email: 4 October 2026. Google Project number: `465361008630`. OAuth client created, OAuth scope configured, but API approval denied by eligibility gate as of 18 Nov 2026. There is **no** authenticated external Google API session and **no** SMTP config accessible to this project. Do not assert that contacts, chats or reviews are connected. Keep `Zenith Soles` and `Robotics Lab` out of group companies. Do not fabricate customer testimonials, location photos, business statistics, or certification claims.
 
 Pending inputs from owner: verified direct Google review link, exact profile URL destination, correct phone/address confirmation, actual Hostinger target/backup and authorized production cutover, SMTP provider settings (configured privately), and API approval + OAuth server credentials (configured privately).
+
+---
+
+# V7 ADDENDUM — AV, Lead Engine & Partner Operations (23 November 2026)
+
+**This addendum supersedes any V6-only statements that live inquiries require SMTP alone.** V7 persists leads in MySQL first, with SMTP as optional notification. Nothing has been deployed to production as part of this code update.
+
+## A. New public routes and assets
+
+- `/` homepage now includes **Audio Visual & Collaboration** with conference room, auditorium and PA offerings.
+- `/video-conferencing-solutions/`, `/auditorium-av-solutions/`, `/professional-sound-systems/` each have service-specific copy, FAQ and AV planner link.
+- `/av-project-planner/` builds a scope with customer contact consent; does not quote prices.
+- The enhanced Smart Guide is loaded from `assets/chat-v2.js`/`.css` on homepage and AV routes; it is deterministic, **not** an Ollama/AI API or live agent.
+- `/privacy/` contains a **DRAFT**, not yet an approved legal notice. Verify and finalize before enabling leads.
+- `/portal/` and `/track/` are backend endpoints; they must return unavailable until private configuration is complete.
+
+## B. Hostinger safe directory layout
+
+```text
+<domain-root>/
+  public_html/           <-- upload ONLY repository public_html contents here after staging backup
+    index.html, assets/, api/, portal/, track/,
+    av-project-planner/, video-conferencing-solutions/,
+    auditorium-av-solutions/, professional-sound-systems/,
+    privacy/, .htaccess, sitemap.xml, robots.txt
+  secure/                <-- never reachable over web
+    aaditechs-config.php <-- copy template and configure privately; never in Git
+    vendor/              <-- Composer install from composer.json
+    rate/                <-- private writable 0700; created automatically
+    login-attempts/      <-- private writable 0700; created automatically
+    maintenance/prune.php (optional CLI job)
+```
+
+The PHP endpoint paths assume `public_html` and `secure` are sibling folders. Confirm the real Hostinger document root before uploading. Do not replace the existing website until full staging tests and owner approval.
+
+## C. Database provisioning
+
+1. Create a new MySQL/MariaDB database and restricted user using Hostinger hPanel. Do not reuse unrelated production DBs.
+2. Confirm PHP 8.1+, `PDO_MYSQL`, TLS and privileges. Import `secure-setup/schema.sql` with hPanel phpMyAdmin / approved database import tool. Back up any existing DB before migrations.
+3. Copy `secure-setup/aaditechs-config.php.example` to `<domain-root>/secure/aaditechs-config.php` using Hostinger private File Manager / SFTP; enter `database.host`, `port`, `name`, `username`, `password` there, **never in Git/chat/public JS**. Set `database.enabled=true` after verifying connection.
+4. Choose a strong private random `rate_limit_salt` of at least 32 characters and restrict private `secure/rate`/`secure/login-attempts` directory permissions.
+5. Keep `leads.enabled=false` until privacy review and lead endpoint staging tests. In `public_html/assets/site-config.js`, `features.leadSubmission` remains `false` until the server-side feature works; then change and deploy on staging only first.
+
+## D. Owner and partner authentication
+
+1. Choose a unique administrator email not shared publicly. Generate a strong password and hash *on a trusted server* (do not paste raw passwords in ChatGPT). For example:
+
+   ```bash
+   php -r 'echo password_hash(readline("Admin password: "), PASSWORD_DEFAULT), PHP_EOL;'
+   ```
+
+   Enter `portal.admin_email` and `portal.admin_password_hash` into the **private** config, set `portal.enabled=true` only after HTTPS and DB checks.
+2. Sign in at `https://staging.example/portal/`; test invalid password, per-IP throttling, CSRF, successful login, logout, admin/partner role isolation and idle session expiry. URL is an **example**, not an asserted staging domain.
+3. Add each partner manually in admin dashboard with verified contact and 12+ character password. Share credentials via a trusted private channel. Disable and reset partner access from admin dashboard when needed.
+4. Partner sees only assigned work, not customer contact fields or prices. Before assigning sensitive business scopes, make sure summary excludes personal or confidential customer data. Partner status updates do not auto-approve customer quotes.
+5. Admin can create a case from a lead and assign a partner. It shows a tracking URL **once**; copy privately to the correct customer. URL is a bearer capability and only displays high-level status. Lost/exposed URL should be rotated by admin.
+6. Owner must obtain actual customer quotation approval outside this portal before marking the case `approved`. There is no integrated signature, invoicing, payment gateway or automatic acceptance.
+
+## E. Email notification
+
+Install dependencies from `secure-setup/composer.json` using `composer install --no-dev --optimize-autoloader` **inside `<domain-root>/secure`**, or upload the Composer `vendor/` folder generated on a trusted machine if Hostinger shell lacks Composer. This is an example command; verify actual Hostinger shell permissions first. Set `mail.enabled=true` and private SMTP settings only after real sending tests. SMTP failures must not suppress stored lead references; inspect dashboard and server mail logs.
+
+## F. Privacy, retention and partner coordination
+
+Review `/privacy/` draft and replace with approved actual notice. Confirm legitimate purposes, exact retention, access, deletion and partner handling of customer data. Assign a retention policy, then set `retention_days` in the private config. Optional `secure/maintenance/prune.php` is **CLI-only**, checks `retention_days` and deletes only unassigned old leads. Do not schedule until approved and tested on staging. For projects/cases, manually close and review retention before deleting associated leads.
+
+## G. Staging acceptance test checklist
+
+- [ ] Verify original logo and all service pages load on mobile and desktop; service filter and chat flow work.
+- [ ] Test AV planner in default mode: it must say **no submission or storage**.
+- [ ] Verify contact form and chat still use demo mode while feature flag OFF.
+- [ ] Test invalid content, spam/honeypot, consent handling, rate limit and JSON response when enabling staging leads.
+- [ ] Submit one synthetic test lead; verify `leads` row, reference ID and optional SMTP notification.
+- [ ] Admin login, partner creation, job assignment and status changes persist; password reset/disable removes access.
+- [ ] Partner sees only assigned job without PII, owner quotes or partner costs.
+- [ ] Customer tracker displays only code/title/status; rotate token invalidates old link.
+- [ ] Verify direct HTTP access to `secure/`, `.env`, SQL backups is blocked. Inspect error logs for secrets/PII leakage.
+- [ ] Test backup restoration and rollback before replacing `aaditechs.in`.
+
+## H. Rollback / external dependency boundaries
+
+Keep old `public_html` backup and DB snapshot in a protected location, not under webroot or Git. For a failed static deployment, restore previous web files and reset `assets/site-config.js` feature flags OFF. For a failed DB migration, restore from verified backup rather than dropping live tables blindly. Confirm Google API access separately; `google.enabled` and `googleReviewsApi` stay false until authorization is approved and tested. No changes here grant Google API permission.
+
+**For code audit:** see `docs/PROJECT_STATUS.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY_CHECKLIST.md`, and `tests/browser_smoke.py`.

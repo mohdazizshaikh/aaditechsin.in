@@ -1,21 +1,38 @@
 <?php
 declare(strict_types=1);
-
 /**
  * COPY TO: <domain-root>/secure/aaditechs-config.php (OUTSIDE public_html).
  * Never commit the real copy or place it in a public web directory.
+ * Keep permissions restricted. Replace all REPLACE_ values privately.
  */
 return [
     'google' => [
-        'enabled' => false,  // Only after 60-day eligibility, API approval, and access test.
+        'enabled' => false,  // Only after eligibility, API approval, and access tests.
         'client_id' => 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID',
         'client_secret' => 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_SECRET',
         'refresh_token' => 'REPLACE_WITH_AUTHORIZED_OFFLINE_REFRESH_TOKEN',
         'account_id' => 'REPLACE_WITH_APPROVED_BUSINESS_ACCOUNT_ID',
         'location_id' => 'REPLACE_WITH_APPROVED_LOCATION_ID',
     ],
+    'database' => [
+        'enabled' => false, // Enable after schema import, PDO MySQL checks and privacy approval.
+        'host' => 'REPLACE_WITH_DATABASE_HOST',
+        'port' => 3306,
+        'name' => 'REPLACE_WITH_DATABASE_NAME',
+        'username' => 'REPLACE_WITH_DATABASE_USER',
+        'password' => 'REPLACE_WITH_DATABASE_PASSWORD',
+    ],
+    'leads' => [
+        'enabled' => false, // Enables real lead storage only with database + approved privacy notice.
+    ],
+    'portal' => [
+        'enabled' => false, // Enable after HTTPS, admin hash, database and staging tests.
+        'admin_email' => 'REPLACE_WITH_PRIVATE_ADMIN_EMAIL',
+        // Generate on trusted server: php -r 'echo password_hash(readline("Password: "), PASSWORD_DEFAULT), PHP_EOL;'
+        'admin_password_hash' => 'REPLACE_WITH_PASSWORD_HASH',
+    ],
     'mail' => [
-        'enabled' => false, // Only after SMTP and privacy requirements are verified.
+        'enabled' => false, // Optional notification after database commit, never sole source of a lead.
         'host' => 'REPLACE_WITH_SMTP_HOST',
         'port' => 587,
         'username' => 'REPLACE_WITH_SMTP_USERNAME',
@@ -23,6 +40,5 @@ return [
         'from_email' => 'info@aaditechs.in',
         'inquiry_recipient' => 'info@aaditechs.in',
     ],
-    // Generate a unique unpredictable value on the server; never copy a sample value.
     'rate_limit_salt' => 'REPLACE_WITH_RANDOM_32_PLUS_CHARACTER_SECRET',
 ];

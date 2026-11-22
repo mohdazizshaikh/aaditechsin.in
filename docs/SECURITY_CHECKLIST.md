@@ -1,0 +1,21 @@
+# Aaditechs preproduction security & data handling checklist
+
+> No box below should be assumed complete merely because code exists. Execute against Hostinger staging, save evidence privately and obtain owner approval.
+
+- [ ] Confirm site and portal serve HTTPS with valid certificate; HTTP to HTTPS redirect before exposing any forms.
+- [ ] Place `secure/aaditechs-config.php`, `vendor/`, rate files and maintenance script **outside** `public_html` and verify direct HTTP requests cannot reach them.
+- [ ] Protect production file permissions, disable directory listing and restrict backups/logs; no customer data in repository.
+- [ ] Use a database account with only necessary CRUD permissions; import schema into isolated staging database first.
+- [ ] Set admin `password_hash()` and unique partner passwords; test weak/incorrect password, throttling, disabled partner session revocation, logout and 30-minute idle expiration.
+- [ ] Verify partner cannot view another partner's jobs, view customer email/phone, or update quote/partner cost; admin-only UI and backend authorization.
+- [ ] CSRF tokens required on portal POST; verify rejected missing/invalid tokens; session cookies Secure/HttpOnly/SameSite=Strict.
+- [ ] Owner verifies each partner's authorization, quote prices and scope before sending customer promises; do not auto-approve a work order.
+- [ ] Review privacy notice and establish purpose, retention, contact point, processor agreements and lawfully permitted partner data sharing.
+- [ ] Enable `database.enabled`, `leads.enabled` only after testing, then enable *public* `leadSubmission`; use a synthetic test inquiry and confirm record exists once with correct consent and reference.
+- [ ] Test invalid origin, malformed JSON, oversized payload, missing consent, honeypot, duplicate/flood and rate cooldown.
+- [ ] Test notification delivery on SMTP failure: lead should still be stored, dashboard visible; no false lost lead.
+- [ ] Test tracking link lookup with valid, expired/rotated and malformed tokens; verify no customer PII/cost accessible.
+- [ ] Consider access logs containing tracking URLs; redact query strings and minimize log retention if supported.
+- [ ] Test backup and restore on staging; write rollback procedure for web assets and DB migrations.
+- [ ] Confirm actual services, phone numbers, office location, partner scopes, terms, pricing model and warranty disclosures before public launch.
+- [ ] Keep Google API feature disabled until official approval and authorized Google OAuth credentials; never commit tokens.
