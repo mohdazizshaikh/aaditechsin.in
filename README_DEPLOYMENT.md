@@ -114,3 +114,9 @@ Before production cutover: record original website backup, restoration test, dat
 6. The separate ChatGPT Site private preview may still show V6; this repository source is authoritative for V8. No unattended production deployment is part of this release.
 
 Read `docs/ARCHITECTURE.md`, `docs/PROJECT_STATUS.md`, `docs/SECURITY_CHECKLIST.md`, and `docs/GAP_AUDIT_V8.md` to hand off work to another coding agent without guessing.
+
+## 9 — Hostinger staging preflight and CI (23 Nov 2026)
+
+- New read-only CLI check: `secure-setup/maintenance/preflight.php` (copy privately to `secure/maintenance/preflight.php` on Hostinger). It checks PHP/extensions, `secure` placement, placeholder/flag states and optional `--check-db` read-only SQL/schema access **without printing credentials**. Run local/CI `php secure-setup/maintenance/preflight.php --source-only` only to validate source structure.
+- Exact staging verification and release gates: [`docs/STAGING_ACCEPTANCE.md`](docs/STAGING_ACCEPTANCE.md). The document reports staging **not yet deployed**. Do not interpret offline results as live MySQL/SMTP acceptance.
+- `.github/workflows/source-validation.yml` runs source checks on pushes/PRs but **never deploys**; the real Hostinger account connection and target-site confirmation remain prerequisites.
