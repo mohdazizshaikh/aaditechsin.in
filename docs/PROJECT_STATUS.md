@@ -6,6 +6,10 @@ V9-02 has begun as an **undeployed deterministic qualification guide** on `featu
 
 **V9-03 second isolated source slice:** added `secure-setup/migrations/2026-11-23-v9-001.sql` (five additive tables), `public_html/api/v9/lead_rules.php` (pure validation, salted hashes, safe attribution), and an independently disabled `public_html/api/v9/leads.php` (transactional lead/consent/events and idempotent replay). V8 `/api/lead.php` and public form routing remain unchanged. Private config defaults OFF. Source-only Node/Python tests pass; PHP lint and rules are pending environment/CI evidence; no V9 SQL applied. See [V9-03 implementation](V9/11_V9_03_LEAD_FOUNDATION.md).
 
+The V8 CLI `prune.php` now conservatively detects an all-or-nothing V9-001 schema. With V9 installed, it skips leads carrying audit/consent/request records; partial V9 schema blocks pruning rather than deleting around foreign keys. This is source-only and has **not** been run against a database. Full retention and idempotency expiry cleanup still require owner/legal policy and staging tests.
+
+**Verified source CI on V9-03 baseline:** [run 45087157567](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45087157567) succeeded on commit `88672a97532f5bf344a061d57ce5d7ec0454f6b5`, including PHP lint, PHP pure rules, JS checks, Python security/links and HTTP source smoke. This **does not** validate the later prune compatibility patch until its own feature-branch CI run completes, and never substitutes for MySQL/Hostinger staging.
+
 **Tests observed here:** Node playbooks PASS; JavaScript syntax PASS; Python feature/security and V9 migration source checks PASS. Local PHP interpreter and `bs4` are absent; headless Chromium test could not launch under socket sandbox policy. These are **BLOCKED**, not successes. No real-browser, Hostinger, database, SMTP, LLM or production verification. V9-02 and V9-03 acceptance remain **partial**. `main`, production feature flags and live site untouched. Confirm actual remote commit SHA against GitHub, do not assume this document is push proof.
 
 ## V9 branch planning (23 November 2026) — historical documentation milestone

@@ -27,4 +27,9 @@ for required in ("Idempotency-Key", "lead_requests", "lead_events", "lead_consen
         assert required in endpoint, required
 assert not re.search(r"\b(mail|curl_exec|exec|shell_exec)\s*\(", endpoint)
 assert not (root / "public_html/api/v9/lead-config.php").exists()
+prune = (root / "secure-setup/maintenance/prune.php").read_text()
+for table in ("lead_events", "lead_attribution", "lead_consent", "contact_suppression", "lead_requests"):
+    assert table in prune, f"prune must detect {table} before deletion"
+assert "V9 schema is partial; prune blocked" in prune
+assert "ev.id IS NULL" in prune and "r.id IS NULL" in prune
 print("V9-001 migration, disabled endpoint, transactional consent/idempotency checks: PASS")
