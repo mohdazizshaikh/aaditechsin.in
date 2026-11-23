@@ -32,3 +32,13 @@
 - [ ] Password reset/disable revokes existing partner sessions; admin password hash change revokes owner sessions.
 - [ ] Do not turn on public lead submission until privacy notice has been reviewed and real DB/SMTP fallback behavior validated.
 - [ ] Independent pen test/2FA/WAF decision before exposing admin portal to a large customer base.
+
+## V8.2 owner MFA and tracking minimization (not yet activated)
+
+- [x] Optional owner-only RFC 6238 TOTP with validated private base32 secret and unit tests; **disabled by default**.
+- [x] Owner session fingerprint incorporates password hash, TOTP enablement and secret, revoking sessions after either changes.
+- [x] Anonymous CSRF token is rotated after successful login.
+- [x] Bearer-token tracking page no longer renders free-form job title; case code/status/date only.
+- [ ] Enroll owner authenticator securely, verify server clock and recovery on **HTTPS staging**, then enable MFA in private config if approved.
+- [ ] Add or evaluate second factor for partners according to risk; currently their sign-in is password-only.
+- [ ] Complete staging DB/SMTP/auth tests, audit privacy copy and verify backup before public launch.

@@ -36,4 +36,22 @@ foreach ([0,366,'30',null] as $ttl) {
     try {opsTrackingTtlDays(['tracking_ttl_days'=>$ttl]);check(false,'reject invalid ttl');}
     catch (RuntimeException $ignored) {}
 }
-echo "Workflow security / approval / tracking rules: PASS\n";
+// RFC 6238 SHA1 20-byte test secret; T=59s generates 6-digit 287082.
+$testSecret='GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
+check(opsVerifyTotp($testSecret,'287082',59),'RFC 6238 six-digit known answer');
+check(opsVerifyTotp($testSecret,'287082',30),'adjacent valid time step');
+check(!opsVerifyTotp($testSecret,'287082',120),'reject stale OTP outside skew window');
+check(!opsVerifyTotp($testSecret,'28708x',59),'reject malformed OTP');
+check(!opsVerifyTotp('REPLACE_WITH_PRIVATE_BASE32_TOTP_SECRET','287082',59),'reject placeholder secret');
+check(!opsVerifyTotp('AAA','287082',59),'reject short secret');
+$cfgFingerprint=['portal'=>['admin_password_hash'=>'hash1','admin_totp_enabled'=>false,'admin_totp_secret'=>'AAAA']];
+$f0=opsAdminSessionFingerprint($cfgFingerprint);
+$cfgFingerprint['portal']['admin_totp_enabled']=true;
+check(!hash_equals($f0,opsAdminSessionFingerprint($cfgFingerprint)),'TOTP enrollment revokes owner sessions');
+$f1=opsAdminSessionFingerprint($cfgFingerprint);
+$cfgFingerprint['portal']['admin_totp_secret']='BBBB';
+check(!hash_equals($f1,opsAdminSessionFingerprint($cfgFingerprint)),'TOTP rotation revokes owner sessions');
+$f2=opsAdminSessionFingerprint($cfgFingerprint);
+$cfgFingerprint['portal']['admin_password_hash']='hash2';
+check(!hash_equals($f2,opsAdminSessionFingerprint($cfgFingerprint)),'Password rotation revokes owner sessions');
+echo "Workflow security / approval / tracking / owner TOTP rules: PASS\n";

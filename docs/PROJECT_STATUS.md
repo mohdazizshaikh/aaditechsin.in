@@ -73,3 +73,11 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - [ ] Hostinger authenticated integration not available in the current execution environment; **no staging/production Hostinger deployment, DB creation or SMTP delivery took place**. This must be verified separately once a Hostinger session is connected.
 
 - [x] CI first run identified missing `beautifulsoup4` in the clean runner; workflow now installs a pinned dependency in an isolated venv. This is CI-only environment remediation, not live Hostinger acceptance.
+
+
+## V8.2 source security refinement (pending hosting verification)
+
+- Added optional native PHP owner TOTP (RFC 6238) using an offline/private base32 secret and negative/known-answer tests. **Default OFF** until owner enrollment; partner MFA not yet implemented.
+- Removed potentially sensitive free-text job title from customer tracking page; public token shows only minimal status fields.
+- Regenerated anonymous CSRF token on successful sign-in.
+- Added local/CI tests, private-config preflight checks and deployment instructions. Hostinger staging, real SQL, SMTP, recovery and OAuth approval still pending.

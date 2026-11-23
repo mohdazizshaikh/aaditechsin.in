@@ -34,7 +34,7 @@ php secure-setup/maintenance/preflight.php --source-only
 | Security boundary | `/secure/`, `.env`, SQL, backup and config inaccessible externally; restricted staging indexing | 403/404 results, response headers |
 | Database | Fresh staging `schema.sql`, or backed-up V7 DB with V8 migration exactly once; 4 tables | Preflight pass and applied migration ID |
 | Lead consent | Without consent / invalid payload / rate-limit fails; valid synthetic lead inserts exactly once | Test case ID, DB row count |
-| Admin access | CSRF rejects, wrong password rejects, login/out works, password change invalidates old session | Redacted test log |
+| Admin access | CSRF rejects, wrong password rejects, login/out works, password change invalidates old session; owner TOTP setup, fresh code, stale code and loss/recovery drill if MFA enabled | Redacted test log |
 | Partner access | Unauthorized cases and PII inaccessible; disabled partner loses access; cannot start work pre-approval | Redacted test case transitions |
 | Quote / approval | Positive approved quote plus minimal external evidence method/reference required; audit event present | Synthetic case ID and event type |
 | Customer link | Minimal status, no PII or prices; expiry and rotation invalidate link | Status codes, **not tokens** |
@@ -47,3 +47,5 @@ The business owner must review the still-draft `/privacy/` content and authorize
 ## Release gating
 
 Do **not** enable `database.enabled`, `leads.enabled`, `portal.enabled` or public `leadSubmission` until relevant staging tests pass; keep `google.enabled` / `googleReviewsApi` OFF until approved. Do **not** deploy or overwrite production without a verified backup and explicit approval for the exact live target.
+
+Before production: explicitly confirm whether owner TOTP is enabled (default OFF). If enabled, check server clock, fresh/stale OTP behavior and an offline recovery drill without exposing the private secret. Partner MFA remains an open requirement for higher-assurance partner access.

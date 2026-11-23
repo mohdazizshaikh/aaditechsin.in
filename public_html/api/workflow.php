@@ -47,3 +47,48 @@ function opsPublicBaseUrl(array $cfg): string {
     }
     return $url;
 }
+
+
+/**
+ * Verify an RFC 6238 TOTP code (HMAC-SHA1, 6 digits, 30-second interval).
+ * Use only with a private per-owner base32 secret stored OUTSIDE the webroot.
+ * Clock skew: one step before/after; requires reliable server clock.
+ * The timestamp parameter is for deterministic offline tests only.
+ */
+function opsVerifyTotp(string $base32Secret, string $submitted, ?int $timestamp = null): bool {
+    if (!preg_match('/^[0-9]{6}$/D', $submitted)) return false;
+    $secret = strtoupper(str_replace(' ', '', trim($base32Secret)));
+    if (strlen($secret) < 32 || !preg_match('/^[A-Z2-7]+$/D', $secret)) return false;
+    $bits = 0; $value = 0; $decoded = '';
+    foreach (str_split($secret) as $character) {
+        $digit = strpos('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567', $character);
+        if ($digit === false) return false;
+        $value = ($value << 5) | $digit;
+        $bits += 5;
+        if ($bits >= 8) {
+            $bits -= 8;
+            $decoded .= chr(($value >> $bits) & 0xff);
+            $value &= (1 << $bits) - 1;
+        }
+    }
+    if (strlen($decoded) < 20) return false;
+    $counter = intdiv($timestamp ?? time(), 30);
+    for ($offset = -1; $offset <= 1; $offset++) {
+        $step = $counter + $offset;
+        if ($step < 0) continue;
+        $message = pack('N2', ($step >> 32) & 0xffffffff, $step & 0xffffffff);
+        $hash = hash_hmac('sha1', $message, $decoded, true);
+        $position = ord($hash[strlen($hash) - 1]) & 0x0f;
+        $number = (unpack('N', substr($hash, $position, 4))[1] & 0x7fffffff) % 1000000;
+        if (hash_equals(str_pad((string)$number, 6, '0', STR_PAD_LEFT), $submitted)) return true;
+    }
+    return false;
+}
+
+/** Revoke owner sessions when password hash, TOTP enrollment or TOTP secret changes. */
+function opsAdminSessionFingerprint(array $cfg): string {
+    $portal = $cfg['portal'] ?? [];
+    return hash('sha256', (string)($portal['admin_password_hash'] ?? '')
+        . "\0" . (($portal['admin_totp_enabled'] ?? false) === true ? '1' : '0')
+        . "\0" . (string)($portal['admin_totp_secret'] ?? ''));
+}

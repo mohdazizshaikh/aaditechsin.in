@@ -15,6 +15,11 @@ assert re.search(r'leadSubmission:\s*false',public)
 assert not list(root.glob('**/aaditechs-config.php')), 'Real config detected'
 assert not list(root.glob('**/.env')), 'Environment secrets detected'
 assert 'original-logo.png' in (root/'public_html/index.html').read_text()
+track=(root/'public_html/track/index.php').read_text()
+assert 'case_code,status,updated_at FROM jobs' in track
+assert "job['title']" not in track, 'Public tracking page must not display arbitrary case titles'
+assert "'admin_totp_enabled' => false" in config
+assert 'opsVerifyTotp(' in (root/'public_html/portal/index.php').read_text()
 for term in ('Zenith Soles','Robotics Lab'):
     assert term not in (root/'public_html/index.html').read_text()
 print('Static security + public feature flags: PASS')

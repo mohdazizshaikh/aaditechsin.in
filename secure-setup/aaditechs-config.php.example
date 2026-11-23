@@ -34,6 +34,9 @@ return [
         'admin_email' => 'REPLACE_WITH_PRIVATE_ADMIN_EMAIL',
         // Generate on trusted server: php -r 'echo password_hash(readline("Password: "), PASSWORD_DEFAULT), PHP_EOL;'
         'admin_password_hash' => 'REPLACE_WITH_PASSWORD_HASH',
+        // Optional owner-only TOTP; keep OFF until privately enrolled & recovery planned.
+        'admin_totp_enabled' => false,
+        'admin_totp_secret' => 'REPLACE_WITH_PRIVATE_BASE32_TOTP_SECRET',
     ],
     'mail' => [
         'enabled' => false, // Optional notification after database commit, never sole source of a lead.

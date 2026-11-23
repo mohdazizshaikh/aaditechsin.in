@@ -24,7 +24,7 @@ try {
         }
     } elseif(($_SESSION['role']??null)==='admin') {
         // Owner changing the private admin password hash invalidates old sessions.
-        $fingerprint=hash('sha256',(string)($cfg['portal']['admin_password_hash']??''));
+        $fingerprint=opsAdminSessionFingerprint($cfg);
         if(!hash_equals($fingerprint,(string)($_SESSION['admin_fingerprint']??''))) {
             $_SESSION=[];session_regenerate_id(true);
         }
@@ -63,10 +63,13 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
         if((int)$attempts['count']>=8){flock($fp,LOCK_UN);fclose($fp);http_response_code(429);exit('Too many attempts; try again later');}
         $email=strtolower(trim((string)($_POST['email']??'')));
         $password=(string)($_POST['password']??'');
+        $totp=(string)($_POST['totp']??'');
         $role=null;$partner=null;
         if($email!=='' && hash_equals(strtolower((string)($cfg['portal']['admin_email']??'')),$email)
             && !str_starts_with((string)($cfg['portal']['admin_password_hash']??''),'REPLACE_')
-            && password_verify($password,(string)($cfg['portal']['admin_password_hash']??''))) {
+            && password_verify($password,(string)($cfg['portal']['admin_password_hash']??''))
+            && (($cfg['portal']['admin_totp_enabled']??false)!==true
+                || opsVerifyTotp((string)($cfg['portal']['admin_totp_secret']??''), $totp))) {
             $role='admin';
         } elseif($email!=='') {
             $stmt=$pdo->prepare('SELECT id,display_name,password_hash,session_version FROM partners WHERE login_email=? AND is_active=1 LIMIT 1');
@@ -76,9 +79,10 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
         if(!$role){$attempts['count']++;rewind($fp);ftruncate($fp,0);fwrite($fp,json_encode($attempts));fflush($fp);flock($fp,LOCK_UN);fclose($fp);$_SESSION['flash']='Invalid sign-in details';header('Location: /portal/',true,303);exit;}
         rewind($fp);ftruncate($fp,0);fwrite($fp,json_encode(['started'=>time(),'count'=>0]));fflush($fp);flock($fp,LOCK_UN);fclose($fp);
         session_regenerate_id(true);
+        unset($_SESSION['csrf']); // Rotate pre-authentication CSRF secret on privilege elevation.
         $_SESSION['role']=$role;$_SESSION['account_email']=$email;$_SESSION['partner_id']=$role==='partner'?(int)$partner['id']:null;
         $_SESSION['partner_session_version']=$role==='partner'?(int)$partner['session_version']:null;
-        $_SESSION['admin_fingerprint']=$role==='admin'?hash('sha256',(string)$cfg['portal']['admin_password_hash']):null;
+        $_SESSION['admin_fingerprint']=$role==='admin'?opsAdminSessionFingerprint($cfg):null;
         redirectPortal('Signed in successfully');
     }
     requireSignedIn();
@@ -243,7 +247,7 @@ if($role==='admin') {
 <?php if($flash): ?><p class="alert" role="status"><?=h($flash)?></p><?php endif; ?>
 <?php if($tracking): ?><section class="panel alert"><h2>Customer tracking link — copy now</h2><p>The token is shown once; a SHA-256 hash and an expiry time are saved. Send privately to the correct customer. Anyone with the link can view limited case status until expiry/revocation.</p><code><?=h($trackingOrigin.$tracking)?></code></section><?php endif; ?>
 <?php if(!$role): ?>
-<section class="panel narrow"><h2>Sign in</h2><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><label>Email<input name="email" type="email" maxlength="160" required autocomplete="username"></label><label>Password<input name="password" type="password" required autocomplete="current-password"></label><button name="action" value="login">Sign in</button></form><p class="small">Accounts are provisioned by Aaditechs. No public registration. Contact the owner for account access.</p></section>
+<section class="panel narrow"><h2>Sign in</h2><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><label>Email<input name="email" type="email" maxlength="160" required autocomplete="username"></label><label>Password<input name="password" type="password" required autocomplete="current-password"></label><label>Authenticator code (owner, if enabled)<input name="totp" inputmode="numeric" type="text" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="6-digit code"></label><button name="action" value="login">Sign in</button></form><p class="small">Accounts are provisioned by Aaditechs. No public registration. Contact the owner for account access.</p></section>
 <?php elseif($role==='admin'): ?>
 <section class="panel"><h2>Recent leads <span class="count"><?=count($leads)?></span></h2><p class="small">Newest 75 leads. Review requirements before quoting. Do not share customer personal details with a partner without an appropriate basis.</p>
 <?php if(!$leads): ?><p>No leads yet. The website lead feature is disabled until Hostinger database and privacy setup are complete.</p><?php endif; ?>

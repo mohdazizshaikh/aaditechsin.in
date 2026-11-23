@@ -134,6 +134,13 @@ if (setValue($config, ['portal', 'enabled']) === true) {
     $hash = setValue($config, ['portal', 'admin_password_hash']);
     outcome('Owner portal password hash configured', hasPrivateValue($hash) && password_get_info($hash)['algo'] !== null);
     outcome('Owner portal email configured', filter_var(setValue($config, ['portal', 'admin_email']), FILTER_VALIDATE_EMAIL) !== false);
+    if (setValue($config, ['portal', 'admin_totp_enabled']) === true) {
+        $secret = setValue($config, ['portal', 'admin_totp_secret']);
+        outcome('Owner TOTP secret is private 32+ character base32', is_string($secret) && (bool)preg_match('/^[A-Z2-7]{32,}$/D', $secret));
+        warning('Confirm correct server clock, secure TOTP enrollment and offline recovery before enabling owner 2FA');
+    } else {
+        warning('Owner TOTP 2FA is OFF; do not mark production admin authentication as fully hardened');
+    }
 }
 if (setValue($config, ['mail', 'enabled']) === true) {
     foreach (['host', 'username', 'password', 'from_email', 'inquiry_recipient'] as $field) {
