@@ -1,6 +1,6 @@
 # Aaditechs — Verified progress / fresh-agent handoff
 
-**Source version:** V8 gap-audit remediation implemented in project code 23 November 2026. Previous V7 SHA `ea67fa26c558d01640139ac5eecd00c5c2a45623`. Previous V6 GitHub baseline SHA `43bba82c0d75fb842c1e928eec5d9aa85ab7dbf0`. This file describes source completeness, **not production uptime**. Read the repository and confirm the actual Git HEAD before coding or deploying.
+**Source version:** V8.5 code and disposable-MariaDB tests verified on 23 November 2026; see current GitHub `main` for the exact latest commit. Previous V7 SHA `ea67fa26c558d01640139ac5eecd00c5c2a45623`. Previous V6 GitHub baseline SHA `43bba82c0d75fb842c1e928eec5d9aa85ab7dbf0`. This file describes source completeness, **not production uptime**. Read the repository and confirm the actual Git HEAD before coding or deploying.
 
 ## V8 audit additions (local source, not live acceptance)
 
@@ -106,4 +106,4 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - [x] Raw DB/PHP exception content no longer printed to cron stderr.
 - [x] Disposable MariaDB integration test covers dry-run, explicit delete and protected rows.
 - [ ] Real Hostinger retention, restore and scheduled deletion still **not accepted**; staging evidence and privacy review required.
-- [ ] GitHub CI result for the latest V8.5 commit must be checked, not assumed from local lint.
+- [x] GitHub Actions run [45197506078](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45197506078) completed successfully: offline source checks and disposable MariaDB integration both passed. This is **not** Hostinger, SMTP or recovery acceptance.
