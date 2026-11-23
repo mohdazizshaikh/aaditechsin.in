@@ -7,10 +7,14 @@ runs a local PHP server, then removes all generated secrets and test sessions.
 from __future__ import annotations
 
 import contextlib
+from http.client import HTTPConnection
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 from pathlib import Path
 import re
 import shutil
+import ssl
+import threading
 import socket
 import subprocess
 import tempfile
@@ -20,6 +24,10 @@ from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
 import pymysql
 import requests
+import urllib3
+
+# Test-only self-signed loopback TLS. Never disable validation for external hosts.
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / 'public_html'
@@ -69,6 +77,56 @@ def setup_schema(cursor: pymysql.cursors.Cursor) -> None:
             cursor.execute(statement)
 
 
+def start_test_tls_proxy(php_port: int):
+    """Serve real TLS to browser clients; forward internally to local PHP test server.
+
+    Hostinger TLS is not tested here. The localhost-only PHP router simulates the
+    backend HTTPS flag after our disposable TLS terminator.
+    """
+    cert_dir = Path(tempfile.mkdtemp(prefix='aaditechs-ci-tls-'))
+    key_path = cert_dir / 'key.pem'
+    cert_path = cert_dir / 'cert.pem'
+    subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+                    '-keyout', str(key_path), '-out', str(cert_path), '-days', '1',
+                    '-subj', '/CN=localhost', '-addext', 'subjectAltName=IP:127.0.0.1'],
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+
+    class ProxyHandler(BaseHTTPRequestHandler):
+        def do_GET(self): self.forward()
+        def do_POST(self): self.forward()
+        def log_message(self, *args): pass
+        def forward(self):
+            length = int(self.headers.get('Content-Length', '0'))
+            if length > 16384:
+                self.send_error(413)
+                return
+            body = self.rfile.read(length) if length else None
+            forward_headers = {k: v for k, v in self.headers.items()
+                               if k.lower() not in ('connection', 'transfer-encoding')}
+            conn = HTTPConnection('127.0.0.1', php_port, timeout=5)
+            try:
+                conn.request(self.command, self.path, body=body, headers=forward_headers)
+                response = conn.getresponse()
+                data = response.read()
+                self.send_response(response.status)
+                for key, value in response.getheaders():
+                    if key.lower() not in ('connection', 'transfer-encoding', 'content-length'):
+                        self.send_header(key, value)
+                self.send_header('Content-Length', str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+            finally:
+                conn.close()
+
+    server = ThreadingHTTPServer(('127.0.0.1', 0), ProxyHandler)
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(str(cert_path), str(key_path))
+    server.socket = context.wrap_socket(server.socket, server_side=True)
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    return server, worker, cert_dir, f'https://127.0.0.1:{server.server_address[1]}'
+
+
 def run() -> None:
     assert DB_PASSWORD, 'Test DB credentials missing'
     db = pymysql.connect(host=DB_HOST, port=DB_PORT, user=DB_USER,
@@ -91,21 +149,27 @@ def run() -> None:
         with socket.socket() as sock:
             sock.bind(('127.0.0.1', 0))
             port = sock.getsockname()[1]
-        base = f'http://127.0.0.1:{port}'
         with tempfile.TemporaryFile() as server_log:
             server = subprocess.Popen(['php', '-S', f'127.0.0.1:{port}', '-t', str(WEB),
                                        str(ROOT / 'tests/ci_https_router.php')],
                                       cwd=str(ROOT), stdout=server_log, stderr=server_log)
+            proxy = None
+            cert_dir = None
+            worker = None
             try:
+                proxy, worker, cert_dir, base = start_test_tls_proxy(port)
                 for _ in range(40):
                     try:
-                        if requests.get(base + '/portal/', timeout=1).status_code == 200:
+                        if requests.get(base + '/portal/', verify=False, timeout=1).status_code == 200:
                             break
                     except requests.RequestException:
                         time.sleep(.1)
                 else:
                     raise AssertionError('Local PHP server not ready')
                 public = requests.Session()
+                public.verify = False
+                reviews = public.get(base + '/api/google-reviews.php', timeout=5)
+                assert reviews.status_code == 503, 'Unapproved Google review API unexpectedly active'
                 payload = {
                     'fullName': 'CI Synthetic Alice', 'email': 'alice-ci@example.invalid',
                     'phone': '0000000000', 'service': 'Data Recovery',
@@ -128,12 +192,15 @@ def run() -> None:
                 assert cursor.fetchone()[0] == 1, 'Duplicate lead unexpectedly persisted'
 
                 owner = requests.Session()
+                owner.verify = False
                 before = csrf(owner, base)
                 wrong = form(owner, base, {'action':'login', 'email':OWNER_EMAIL,'password':'incorrect'})
                 assert 'Invalid sign-in details' in wrong.text, 'Invalid owner password not rejected'
                 logged = form(owner, base, {'action':'login', 'email':OWNER_EMAIL,'password':OWNER_PASSWORD})
                 assert 'Owner Dashboard' in logged.text, 'Owner login unsuccessful'
                 assert csrf(owner, base) != before, 'CSRF did not rotate after privilege elevation'
+                invalid_csrf = owner.post(base + '/portal/', data={'csrf':'bad', 'action':'set_lead_status', 'lead_id':'1', 'status':'closed'}, timeout=5)
+                assert invalid_csrf.status_code == 403, 'CSRF bypass in owner portal'
                 for index in (1, 2):
                     created = form(owner, base, {'action':'add_partner', 'name':f'CI Partner {index}',
                                              'email':f'partner{index}-ci@example.invalid',
@@ -157,11 +224,19 @@ def run() -> None:
                 assert 'CI PRIVATE project title' not in status_page.text and payload['fullName'] not in status_page.text, 'Tracking leaked private details'
 
                 partner = requests.Session()
+                partner.verify = False
                 partner_login = form(partner, base, {'action':'login', 'email':'partner1-ci@example.invalid','password':PARTNER_PASSWORD})
                 assert 'Your assigned jobs' in partner_login.text and case_code in partner_login.text, 'Partner cannot view assigned case'
                 other = requests.Session()
+                other.verify = False
                 other_login = form(other, base, {'action':'login', 'email':'partner2-ci@example.invalid','password':PARTNER_PASSWORD})
                 assert 'Your assigned jobs' in other_login.text and case_code not in other_login.text, 'Partner isolation failed'
+                forged = form(other, base, {'action':'partner_update', 'job_id':str(job_id),
+                                           'status':'assessment','note':'Unauthorized partner attempt'})
+                assert 'not assigned' in forged.text, 'Partner changed another partner job'
+                admin_only = partner.post(base + '/portal/', data={'csrf':csrf(partner, base), 'action':'set_lead_status',
+                                                                       'lead_id':str(lead[0]), 'status':'closed'}, timeout=5)
+                assert admin_only.status_code == 403, 'Partner accessed admin-only operation'
                 illegal = form(partner, base, {'action':'partner_update', 'job_id':str(job_id),
                                                'status':'in_progress','note':'Try bypassing approval'})
                 assert 'approval not recorded' in illegal.text, 'Partner bypass was not refused'
@@ -182,6 +257,10 @@ def run() -> None:
                 require_status(cursor, job_id, 'awaiting_customer_approval')
                 owner_update('approved', proof=True)
                 require_status(cursor, job_id, 'approved')
+                changed_quote = owner_update('approved', quote='1500.00')
+                assert 'Return case to quote pending' in changed_quote.text, 'Approved quote changed without reopening approval'
+                cursor.execute('SELECT customer_quote FROM jobs WHERE id=%s', (job_id,))
+                assert float(cursor.fetchone()[0]) == 1200.00, 'Approved quote was modified'
                 cursor.execute("SELECT COUNT(*) FROM job_activity WHERE job_id=%s AND event_type='customer_approval_recorded'", (job_id,))
                 assert cursor.fetchone()[0] == 1, 'Approval audit event missing'
                 started = form(partner, base, {'action':'partner_update', 'job_id':str(job_id),
@@ -199,6 +278,12 @@ def run() -> None:
                 assert expired.status_code == 404, f'Expired tracking link accepted: {expired.status_code}'
                 print('Synthetic MariaDB + HTTP lead/portal/partner/approval/tracking E2E: PASS')
             finally:
+                if proxy is not None:
+                    proxy.shutdown()
+                    proxy.server_close()
+                    worker.join(timeout=5)
+                if cert_dir is not None:
+                    shutil.rmtree(cert_dir)
                 server.terminate()
                 try: server.wait(timeout=5)
                 except subprocess.TimeoutExpired: server.kill(); server.wait()
