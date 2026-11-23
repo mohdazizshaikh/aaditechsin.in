@@ -111,5 +111,5 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 ## V8.6 notification failure-path test hardening (source-only)
 
 - [x] Added disposable PHPMailer test double to synthetic MariaDB workflow: six failed attempts, retry backoff/terminal state, authenticated owner requeue and eventual fake success. No network SMTP delivery.
-- [ ] The new GitHub CI run must pass on the actual pushed SHA before treating this test extension as verified.
+- [x] GitHub CI passed for V8.6 notification failure-path extension on commit `a47ea9121ed91ee254bb755de0fdd922fd7fc05f`; offline checks and disposable MariaDB integration both passed. Run: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45209185309
 - [ ] Hostinger staging, real SMTP inbox delivery, backup/restore, privacy authorization and production release remain pending.
