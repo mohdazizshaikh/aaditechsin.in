@@ -107,3 +107,9 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - [x] Disposable MariaDB integration test covers dry-run, explicit delete and protected rows.
 - [ ] Real Hostinger retention, restore and scheduled deletion still **not accepted**; staging evidence and privacy review required.
 - [x] GitHub Actions run [45197506078](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45197506078) completed successfully: offline source checks and disposable MariaDB integration both passed. This is **not** Hostinger, SMTP or recovery acceptance.
+
+## V8.6 notification failure-path test hardening (source-only)
+
+- [x] Added disposable PHPMailer test double to synthetic MariaDB workflow: six failed attempts, retry backoff/terminal state, authenticated owner requeue and eventual fake success. No network SMTP delivery.
+- [ ] The new GitHub CI run must pass on the actual pushed SHA before treating this test extension as verified.
+- [ ] Hostinger staging, real SMTP inbox delivery, backup/restore, privacy authorization and production release remain pending.

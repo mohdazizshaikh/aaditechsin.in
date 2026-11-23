@@ -150,6 +150,7 @@ def run() -> None:
         with socket.socket() as sock:
             sock.bind(('127.0.0.1', 0))
             port = sock.getsockname()[1]
+        test_vendor_created = False
         with tempfile.TemporaryFile() as server_log:
             server = subprocess.Popen(['php', '-S', f'127.0.0.1:{port}', '-t', str(WEB),
                                        str(ROOT / 'tests/ci_https_router.php')],
@@ -232,6 +233,69 @@ def run() -> None:
                 assert 'Notification requeued' in retried.text, 'Owner could not requeue dead alert'
                 cursor.execute('SELECT status,attempts FROM notification_outbox WHERE id=%s', (notification_id,))
                 assert cursor.fetchone() == ('pending',0), 'Dead alert retry state was not reset'
+                # Use a disposable PHPMailer double with ZERO network access.
+                # The private test configuration and stub live under secure/ and
+                # are removed in finally. This exercises real SQL queue behavior
+                # without pretending we delivered an SMTP message.
+                vendor = ROOT / 'secure-setup/vendor'
+                assert not vendor.exists(), 'Refusing to overwrite an installed Composer vendor directory'
+                vendor.mkdir(mode=0o700)
+                test_vendor_created = True
+                mail_mode = vendor / 'ci_mail_mode'
+                mail_mode.write_text('fail', encoding='utf-8')
+                (vendor / 'autoload.php').write_text(r'''<?php
+namespace PHPMailer\PHPMailer;
+class PHPMailer {
+    public const ENCRYPTION_STARTTLS = 'tls';
+    public string $Host = '', $Username = '', $Password = '', $SMTPSecure = '';
+    public string $CharSet = '', $Subject = '', $Body = '';
+    public int $Port = 0, $Timeout = 0;
+    public bool $SMTPAuth = false;
+    public function __construct(bool $exceptions = true) {}
+    public function isSMTP(): void {}
+    public function isHTML(bool $flag): void {}
+    public function setFrom(string $address, string $name = ''): void {}
+    public function addAddress(string $address, string $name = ''): void {}
+    public function addReplyTo(string $address, string $name = ''): void {}
+    public function send(): bool {
+        $mode = trim((string)file_get_contents(__DIR__ . '/ci_mail_mode'));
+        if ($mode === 'fail') throw new \RuntimeException('CI injected simulated SMTP failure');
+        if ($mode !== 'success') throw new \RuntimeException('CI mailer mode missing');
+        return true;
+    }
+}
+''', encoding='utf-8')
+                cfg_before = CONFIG.read_text(encoding='utf-8')
+                assert "'mail' => ['enabled'=>true]" in cfg_before
+                cfg_after = cfg_before.replace("'mail' => ['enabled'=>true]", 
+                    "'mail' => ['enabled'=>true, 'host'=>'127.0.0.1', "
+                    "'username'=>'ci-fake', 'password'=>'CI_INERT_MAILER_ONLY', "
+                    "'from_email'=>'no-reply@example.invalid', 'inquiry_recipient'=>'owner@example.invalid']")
+                CONFIG.write_text(cfg_after, encoding='utf-8')
+                # Six failed attempts must back off and finally become 'dead'.
+                # No real SMTP service or internet is contacted by the fake.
+                for attempt in range(1, 7):
+                    cursor.execute("UPDATE notification_outbox SET next_attempt_at=UTC_TIMESTAMP() WHERE id=%s", (notification_id,))
+                    result = subprocess.run(['php', str(ROOT / 'secure-setup/maintenance/notification-worker.php'), '--run'],
+                                            cwd=str(ROOT), text=True, capture_output=True, timeout=15)
+                    assert result.returncode == 0, f'Worker run failed on attempt {attempt}'
+                    cursor.execute('SELECT status,attempts,last_error_code,locked_at FROM notification_outbox WHERE id=%s', (notification_id,))
+                    state = cursor.fetchone()
+                    expected = 'dead' if attempt == 6 else 'pending'
+                    assert state[0] == expected and state[1] == attempt and state[2] == 'smtp_unavailable' and state[3] is None, \
+                        f'Wrong worker backoff/terminal behavior: {attempt}, {state}'
+                    assert 'CI injected simulated SMTP failure' not in result.stdout + result.stderr, 'SMTP exception leaked'
+                mail_mode.write_text('success', encoding='utf-8')
+                revived = form(owner, base, {'action':'retry_notification','notification_id':str(notification_id)})
+                assert 'Notification requeued' in revived.text, 'Owner could not revive simulated terminal SMTP failure'
+                result = subprocess.run(['php', str(ROOT / 'secure-setup/maintenance/notification-worker.php'), '--run'],
+                                        cwd=str(ROOT), text=True, capture_output=True, timeout=15)
+                assert result.returncode == 0 and 'processed sent=1' in result.stdout, 'Successful fake delivery not acknowledged'
+                cursor.execute('SELECT status,attempts,sent_at,locked_at FROM notification_outbox WHERE id=%s', (notification_id,))
+                state = cursor.fetchone()
+                assert state[0] == 'sent' and state[1] == 1 and state[2] is not None and state[3] is None, \
+                    f'Successful fake send not persisted: {state}'
+                print('Synthetic failure, bounded retries, dead-letter, owner requeue, success: PASS (no SMTP network)')
                 for index in (1, 2):
                     created = form(owner, base, {'action':'add_partner', 'name':f'CI Partner {index}',
                                              'email':f'partner{index}-ci@example.invalid',
@@ -339,6 +403,9 @@ def run() -> None:
                 server.terminate()
                 try: server.wait(timeout=5)
                 except subprocess.TimeoutExpired: server.kill(); server.wait()
+                # Only remove the mailer fake if this test created its directory.
+                if test_vendor_created:
+                    shutil.rmtree(ROOT / 'secure-setup/vendor')
                 # Directory was created solely by this test (exist_ok=False above).
                 shutil.rmtree(CONFIG.parent)
 

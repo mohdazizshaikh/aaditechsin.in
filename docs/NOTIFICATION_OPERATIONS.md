@@ -32,4 +32,6 @@ The worker claims up to 20 alerts per run with an atomic compare-and-swap update
 - Negative case: when the migration is omitted and mail enabled, lead insert must roll back rather than silently omit notification.
 - Backup and restore tested for both leads and queue, not just static HTML.
 
+The synthetic CI test exercises six simulated mail failures, bounded retries to `dead`, an owner-only requeue, and a fake successful send using a disposable PHPMailer test double. **No external SMTP connection or real mail delivery occurs in CI.** This validates database state transitions only; live SMTP acceptance/delivery remains an explicit staging release gate.
+
 The private retention prune deliberately **does not delete leads with pending, sending or dead notifications**. Owner must resolve failures before an unrelated retention job removes their diagnostic record.
