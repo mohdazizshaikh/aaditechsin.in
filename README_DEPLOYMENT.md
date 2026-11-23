@@ -1,6 +1,6 @@
 # Aaditechs V8 — Hostinger deployment, secrets and security runbook
 
-> **V9 planning note:** `feature/v9-growth-engine` includes [V9 deployment and rollback design](docs/V9/06_DEPLOYMENT_AND_ROLLBACK.md). This V8 runbook remains the authority for the currently implemented code. **Do not deploy the V9 documentation branch or apply proposed V9 migrations as if V9 was built.**
+> **V9 feature-branch note:** `feature/v9-growth-engine` now contains **undeployed, OFF-by-default source pilots** for [V9-02 service qualification](docs/V9/10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md) and [V9-03 CRM consent/idempotency intake](docs/V9/11_V9_03_LEAD_FOUNDATION.md), alongside [V9 deployment and rollback design](docs/V9/06_DEPLOYMENT_AND_ROLLBACK.md). This V8 runbook remains authoritative for V8. **Do not import V9-001, enable V9 intake or overwrite Hostinger until the separate staging/backups/approval gates pass.**
 
 **Updated:** 23 November 2026 · **GitHub source:** `mohdazizshaikh/aaditechsin.in` → `main` · **Domain:** `aaditechs.in`.
 

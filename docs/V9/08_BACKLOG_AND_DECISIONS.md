@@ -1,6 +1,6 @@
 # V9 delivery backlog, dependencies and fresh-agent handoff
 
-**Status:** actionable plan with a **source-only V9-02 qualification pilot**, not a claim of deployed functionality. New branch `feature/v9-growth-engine` isolates V9 work; V8 `main` remains stable until reviewed merge. See [V9-02 implementation and test evidence](10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md). Use **small reviewable commits and migrations**, not one huge implementation.
+**Status:** actionable plan with **source-only V9-02/V9-03 pilots**, not a claim of deployed functionality. New branch `feature/v9-growth-engine` isolates V9 work; V8 `main` remains stable until reviewed merge. See [V9-02](10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md) and [V9-03](11_V9_03_LEAD_FOUNDATION.md) for implementation and test evidence. Use **small reviewable commits and migrations**, not one huge implementation.
 
 ## 1. Ordered backlog — one person can operate it
 
@@ -9,7 +9,7 @@
 | V9-00 | P0 | Establish V9 documentation branch, link all source truth, confirm V8 tests and main SHA | Verified V8 archive + repo | Docs complete; no V9 live claims |
 | V9-01 | P0 | Finish real V8 HTTPS staging, DB/mail/owner+partner acceptance and privacy text | Authorized Hostinger session/legal copy; **BLOCKED as of 23 Nov 2026**, see [readiness report](09_STAGING_READINESS_2026-11-23.md) | [V8 runbook](../../README_DEPLOYMENT.md) evidence; **blocks all V9 live intake** |
 | V9-02 | P0 | Service playbook config + mobile intake/qualification UX for IT AMC/VC and 5 other services | Source pilot built; V9-01/owner signoff deferred | Node contracts PASS; browser/Hostinger acceptance pending — **PARTIAL** |
-| V9-03 | P0 | Add migrations V9-001 CRM consent/event/attribution; safe API idempotency | V9-01, backup | T03-1..3; no changed V8 data semantics |
+| V9-03 | P0 | Add migration V9-001 CRM consent/event/attribution and OFF-by-default retry-safe intake | Source built; V9-01/backup/PHP/DB gates deferred | Static tests PASS; PHP lint/transaction/replay/staging still pending — **PARTIAL** |
 | V9-04 | P0 | Owner lead inbox and scoring/next-action task UI | V9-03 | Role tests, audit and pending-lead visibility |
 | V9-05 | P0 | M04 owner task reminders + email outbox, contact consent and suppression | V9-03/04, SMTP validation | T04-1..3, kill switch OFF by default |
 | V9-06 | P1 | Partner quote scope draft and existing approval gate UX; actual cost capture | V9-01, V9-04 | M05 V8 regression + T05-* and no auto-authorize |
@@ -94,5 +94,6 @@ Don't ask the owner for passwords or OAuth secrets inside GitHub issues, ChatGPT
 - [x] Proposed DB migrations, API envelopes, state machines and idempotency explained.
 - [x] Privacy, explicit commercial approvals, licensing/consent and secrets boundaries captured.
 - [x] Staging, backups, rollback, tests, dependencies, KPIs and owner decisions specified.
-- [x] Implement initial V9 service-playbook/chat source (V9-02 subset); no V9 SQL or new endpoints yet. See [implementation report](10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md).
+- [x] Implement initial V9 service-playbook/chat source (V9-02 subset), see [implementation report](10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md).
+- [x] Implement V9-001 SQL and an independent, disabled V9 intake endpoint source with idempotency/consent tests; **not migrated/deployed or staging-accepted**, see [implementation report](11_V9_03_LEAD_FOUNDATION.md).
 - [ ] Hostinger acceptance and customer production launch — **not authorized by this docs milestone**.

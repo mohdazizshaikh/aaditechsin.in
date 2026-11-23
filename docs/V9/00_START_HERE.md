@@ -1,7 +1,7 @@
 # Aaditechs V9 — start here
 
 **Branch:** `feature/v9-growth-engine` (created from verified V8 `main` at `a551761be4846eba905a4461e7a416d1389c2ef1`).  
-**Status:** design specifications plus an **undeployed V9-02 source-only service-guide pilot**. All other V9 modules remain planned; nothing new is enabled or live.  
+**Status:** design specifications plus **undeployed V9-02 and V9-03 source pilots**. CRM UI, follow-ups, revenue, marketing, AI and ads remain planned; nothing V9 is enabled or live.  
 **Last planning review:** 23 November 2026.  
 **Owner:** Aaditechs (solo owner coordinating independent service partners).
 
@@ -36,6 +36,7 @@ Turn the existing Aaditechs website and V8 lead/partner portal into a simple, co
 8. [08_BACKLOG_AND_DECISIONS.md](08_BACKLOG_AND_DECISIONS.md) — small deliverables, dependencies, decisions and explicit handoff.
 9. [09_STAGING_READINESS_2026-11-23.md](09_STAGING_READINESS_2026-11-23.md) — latest Hostinger connection blocker, read-only public-site observations and next safe checks.
 10. [10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md](10_V9_02_SERVICE_GUIDE_IMPLEMENTATION.md) — implemented public playbooks, qualification flow, local test evidence and still-open acceptance gates.
+11. [11_V9_03_LEAD_FOUNDATION.md](11_V9_03_LEAD_FOUNDATION.md) — additive source-only SQL migration, disabled intake, consent/idempotency contract and staging blockers.
 
 ## Operational truth table
 

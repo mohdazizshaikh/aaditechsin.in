@@ -29,6 +29,12 @@ return [
     'leads' => [
         'enabled' => false, // Enables real lead storage only with database + approved privacy notice.
     ],
+    'v9' => [
+        // Independent kill switch: never enable until V9-001 is imported on staging
+        // and idempotency/consent, rollback and privacy checks are documented.
+        'lead_intake_enabled' => false,
+        'privacy_notice_version' => 'REPLACE_WITH_OWNER_APPROVED_NOTICE_VERSION',
+    ],
     'portal' => [
         'enabled' => false, // Enable after HTTPS, admin hash, database and staging tests.
         'admin_email' => 'REPLACE_WITH_PRIVATE_ADMIN_EMAIL',

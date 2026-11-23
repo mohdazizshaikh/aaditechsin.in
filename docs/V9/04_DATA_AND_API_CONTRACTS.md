@@ -1,6 +1,6 @@
 # V9 database and API contracts
 
-**Status: PROPOSAL ONLY — DO NOT IMPORT AS SQL.** Keep V8 schema unmodified until each numbered, reversible V9 migration is reviewed, tested and backed up. No live endpoint under `/api/v9/` exists yet. Amounts are decimal INR, never floating-point JavaScript-derived authoritative totals. Store UTC timestamps; display Asia/Kolkata.
+**Status:** V9-001 and `/api/v9/leads.php` now exist in **disabled feature-branch source**, **NOT imported, deployed or accepted on a database**. Other schema/API routes below remain proposals. See [implementation status and exact live gates](11_V9_03_LEAD_FOUNDATION.md). Keep V8 schema unmodified until each numbered V9 migration is reviewed, staged, tested and backed up. Amounts are decimal INR, never floating-point JavaScript-derived authoritative totals. Store UTC timestamps; display Asia/Kolkata.
 
 ## A. Existing authoritative V8 tables and fields
 
@@ -15,7 +15,7 @@ Before adding anything, confirm V8 staging migration `secure-setup/migrations/20
 
 ## B. Small additive migrations — order and minimum schema
 
-Implement as separately reviewed versioned migrations. Columns below are **proposed**, not assertions that the DB already has them. All tables require InnoDB, utf8mb4, prepared SQL, indexes on foreign keys/due timestamps and appropriate retention policies. Foreign keys to V8 `leads`/`jobs` use RESTRICT for business records; avoid cascade-deleting auditable transactions.
+Implement as separately reviewed versioned migrations. V9-001 has source SQL; other columns below remain **proposed**, not assertions that the DB already has them. All tables require InnoDB, utf8mb4, prepared SQL, indexes on foreign keys/due timestamps and appropriate retention policies. Foreign keys to V8 `leads`/`jobs` use RESTRICT for business records; avoid cascade-deleting auditable transactions.
 
 ### Migration V9-001 — CRM/events and attribution (P0)
 
@@ -29,9 +29,11 @@ Implement as separately reviewed versioned migrations. Columns below are **propo
 | `public_safe_note` | VARCHAR(500) nullable | Minimal internal note; no secrets |
 | `created_at` | DATETIME UTC | Audit/time measurement |
 
-`lead_attribution`: `lead_id` UNIQUE FK, `landing_path` VARCHAR(180), allowlisted `source`, `medium`, `campaign`, `content` (VARCHAR bounded), `referrer_host` (not full sensitive URL), `first_seen_at`, `last_touch_at`. Do not collect raw IP as marketing identity; store validated values only after consented lead creation.
+`lead_attribution`: `lead_id` UNIQUE FK, `landing_path` VARCHAR(180), `source` is validated lead touchpoint, separate sanitized `utm_source`, `medium`, `campaign`, `content` (VARCHAR bounded), `referrer_host` (not full sensitive URL), `first_seen_at`, `last_touch_at`. Do not collect raw IP as marketing identity; store validated values only after consented lead creation.
 
 `lead_consent`: `id`, `lead_id`, `purpose` ENUM(`inquiry_contact`,`marketing_email`,`review_request`), `decision` ENUM(`granted`,`withdrawn`), `notice_version`, `source`, `occurred_at`, `evidence_ref` nullable. **Inquiry contact permission does not automatically permit marketing email.** Latest decision by purpose is authoritative. Add per-channel `contact_suppression` (`contact_hash`, `channel`, `reason`, `created_at`, `expires_at` nullable) with protected salt outside Git.
+
+**Source addition:** V9-001 also creates `lead_requests` for HMAC-hashed idempotency key/payload, lead FK and expiry marker. The new POST source endpoint requires a random `Idempotency-Key` and independently disabled `v9.lead_intake_enabled`. No requests are routed here by the V8 frontend. Seven-day expiry does not imply an enabled cleanup job.
 
 ### Migration V9-002 — tasks and delivery outbox (P0)
 
@@ -82,7 +84,7 @@ Error envelope; use safe codes `VALIDATION_ERROR`, `NOT_AUTHORIZED`, `CONSENT_RE
 | Route (planned) | Auth | Request core fields | Success | Side effects / restrictions |
 |---|---|---|---|---|
 | `POST /api/v9/chat/qualify` | Public, rate-limited | `service_code`, bounded `answers`, session nonce | `questions`/`summary`/`needs_owner_review` | No lead persistence until explicit consent |
-| `POST /api/v9/leads` | Public, consent + idempotency | V8 fields + `service_code`, `contact_consent`, `notice_version` | `reference`, `next_step` | Validated DB transaction; **no** marketing opt-in by default |
+| `POST /api/v9/leads.php` | Public, consent + idempotency; source-only, OFF | V8 fields + `service_code`, `contact_consent`, `notice_version`, per-submit `Idempotency-Key` header | `reference`, `next_step` | Additive V9-001 transaction; **no** marketing opt-in by default; NOT DEPLOYED |
 | `GET /api/v9/leads` | Owner | page/filter | Redacted list as necessary | No partner/public access |
 | `PATCH /api/v9/leads/{id}` | Owner + CSRF + version | `status`, owner notes, version | Updated record/version | Audit, optimistic conflict check |
 | `POST /api/v9/tasks` | Owner | lead/job, type, due date | task ID | No external send |

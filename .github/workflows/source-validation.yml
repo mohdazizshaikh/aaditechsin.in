@@ -25,6 +25,8 @@ jobs:
           for file in public_html/assets/*.js; do node --check "$file"; done
       - name: V9 service qualification contracts
         run: node tests/v9_service_playbooks.test.js
+      - name: V9 backend migration and endpoint source checks
+        run: python3 tests/v9_backend_source_check.py
       - name: Install isolated Python test dependency
         run: |
           python3 -m venv .ci-venv
@@ -35,6 +37,7 @@ jobs:
           .ci-venv/bin/python tests/security_static.py
           .ci-venv/bin/python tests/site_integrity.py
           php tests/workflow_rules.php
+          php tests/v9_lead_rules.php
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only
       - name: Scope statement

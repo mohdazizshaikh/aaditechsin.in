@@ -20,11 +20,11 @@
 | Public playbooks | Safe JS config loaded with chat on relevant pages | Owner-approved copy/localities; optional versioned server delivery |
 | Intent detection | First matching ordered word/phrase rule, explicit menu fallback | More language examples and owner-reviewed terms |
 | Assessment answers | Ephemeral browser state before consent; no chat transcript API | Schema-validated structured output in V9-03, with minimization |
-| Lead submission | Existing `/api/lead.php`, only if dual server/public flags intentionally enabled later | V9-03 idempotency, canonical service code and event/consent migration |
+| Lead submission | Existing `/api/lead.php`, only if dual server/public flags intentionally enabled later | V9-03 separate OFF-by-default endpoint now exists in source, not connected to this chat; see [V9-03](11_V9_03_LEAD_FOUNDATION.md) |
 | AI generation | OFF; none present | V9-09 optional protected adapter with deterministic fallback |
 | Partner quote/dispatch | Never triggered by the chat | V9-06 owner-approved workflows |
 
-**Design choice:** No extra PHP route or duplicated JSON catalogue was introduced for the source-only pilot. The JS playbook is presentation data, **not server authorization**. In V9-03, the server must accept only canonical `service_code` values and verify them independently; it must not trust this browser catalogue for authorization or lead classification. Until then V8 receives the existing human-readable `service` string.
+**Design choice:** No extra PHP route or duplicated JSON catalogue was introduced *as part of V9-02*. The JS playbook is presentation data, **not server authorization**. The separate [V9-03 source-only endpoint](11_V9_03_LEAD_FOUNDATION.md) validates canonical service codes independently; it is not yet wired to the chat. The V8 chat continues to send the existing human-readable `service` string when deliberately enabled after staging.
 
 ## Reproducible checks
 
@@ -50,4 +50,4 @@ node tests/v9_chat_browser.test.js
 4. Complete postponed V9-01 staging/backup; do not activate public lead flags earlier.
 5. Record a rollback-ready Hostinger deployment decision separately. This source commit contains **no deployment**.
 
-Next independent coding item is **V9-03 server-side lead safety foundation**, still behind a staging-migration/owner-consent gate. Keep migrations additive and do not alter production data from this branch.
+The subsequent independent coding slice is the [V9-03 server-side lead safety foundation](11_V9_03_LEAD_FOUNDATION.md), now implemented as source with an independent OFF switch. Its database/live acceptance still requires a staging migration and owner consent gates; do not alter production data from this branch.
