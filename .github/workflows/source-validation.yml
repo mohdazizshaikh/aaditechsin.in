@@ -37,3 +37,45 @@ jobs:
           php secure-setup/maintenance/preflight.php --source-only
       - name: Scope statement
         run: echo 'Source checks only; no Hostinger deployment, MySQL, SMTP, Google API or production permission test.'
+
+  disposable-mariadb-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    # Synthetic data only. This job does NOT touch Hostinger or any real database.
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: aaditechs_ci
+          MARIADB_USER: aaditechs_ci
+          MARIADB_PASSWORD: ci_only_not_real_password
+          MARIADB_ROOT_PASSWORD: ci_only_not_real_root_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      AADITECHS_DISPOSABLE_TEST: 'yes'
+      CI_DB_HOST: '127.0.0.1'
+      CI_DB_PORT: '3306'
+      CI_DB_NAME: 'aaditechs_ci'
+      CI_DB_USER: 'aaditechs_ci'
+      CI_DB_PASSWORD: ci_only_not_real_password
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ephemeral MySQL/PHP dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq php8.3-mysql
+          php -m | grep -iq pdo_mysql
+      - name: Install isolated Python dependencies
+        run: |
+          python3 -m venv .ci-venv
+          .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 PyMySQL==1.1.1 requests==2.32.3
+      - name: Synthetic MySQL + HTTP full workflow
+        run: .ci-venv/bin/python tests/integration_mysql_http.py
+      - name: Scope statement
+        run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'

@@ -49,3 +49,7 @@ The business owner must review the still-draft `/privacy/` content and authorize
 Do **not** enable `database.enabled`, `leads.enabled`, `portal.enabled` or public `leadSubmission` until relevant staging tests pass; keep `google.enabled` / `googleReviewsApi` OFF until approved. Do **not** deploy or overwrite production without a verified backup and explicit approval for the exact live target.
 
 Before production: explicitly confirm whether owner TOTP is enabled (default OFF). If enabled, check server clock, fresh/stale OTP behavior and an offline recovery drill without exposing the private secret. Partner MFA remains an open requirement for higher-assurance partner access.
+
+## Additional V8.3 evidence source
+
+The GitHub Actions `disposable-mariadb-integration` job provides reproducible **synthetic test-only** MariaDB/PHP behavior and owner/partner transition evidence. The job's `tests/ci_https_router.php` **simulates TLS** solely within localhost: this is NOT a real TLS/SSL test. It cannot replace the separate Hostinger staging acceptance items above. No CI test password is a production credential, and the ignored `secure/aaditechs-config.php` generated during CI must never be uploaded or committed.

@@ -81,3 +81,11 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - Removed potentially sensitive free-text job title from customer tracking page; public token shows only minimal status fields.
 - Regenerated anonymous CSRF token on successful sign-in.
 - Added local/CI tests, private-config preflight checks and deployment instructions. Hostinger staging, real SQL, SMTP, recovery and OAuth approval still pending.
+
+## V8.3 disposable integration test milestone (23 November 2026)
+
+- [x] Added a second GitHub Actions job with a disposable MariaDB 10.11 service and PHP PDO MySQL, separate from existing offline source checks.
+- [x] Added `tests/integration_mysql_http.py` and a localhost-only, test-only HTTPS simulation router. Tests use **synthetic** contacts, generated owner password hash and a temporary ignored private configuration; this router is NEVER deployed.
+- [x] Script covers lead consent/origin/duplicate rate limit, SQL persistence, owner/partner login and session isolation, job creation, blocked pre-approval partner start, recorded owner approval, partner completion, disabled-partner session revocation, customer tracking privacy and expiration.
+- [ ] GitHub-hosted integration run must pass on the latest commit before marking these new database/HTTP tests successful. Even when green, it does NOT prove Hostinger staging is deployed, authenticated, backed up or able to deliver email.
+- [ ] Hostinger connector/privileged staging access still required for private config, real hosted PDO MySQL, authenticated HTTPS, SMTP delivery, backup/rollback and privacy signoff.
