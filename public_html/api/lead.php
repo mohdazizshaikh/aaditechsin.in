@@ -49,31 +49,25 @@ try {
     $pdo=opsDb($cfg);
     $ref=opsRef('ATL');
     $sql='INSERT INTO leads(reference,full_name,email,phone,service,device,message,source,consent_at) VALUES(?,?,?,?,?,?,?,?,UTC_TIMESTAMP())';
+    // Persist the customer inquiry and notification intent atomically. If the
+    // outbox migration has not been applied, fail closed rather than silently
+    // accepting a lead that cannot be alerted to the owner.
+    $pdo->beginTransaction();
     $stmt=$pdo->prepare($sql);$stmt->execute([$ref,$name,$email,$phone,$service,$device,$message,$source]);
+    $leadId=(int)$pdo->lastInsertId();
+    if (($cfg['mail']['enabled']??false)===true) {
+        $stmt=$pdo->prepare("INSERT INTO notification_outbox (lead_id) VALUES (?)");
+        $stmt->execute([$leadId]);
+    }
+    $pdo->commit();
     rewind($handle);ftruncate($handle,0);fwrite($handle,(string)time());fflush($handle);
     flock($handle,LOCK_UN);fclose($handle);
 } catch(Throwable $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) $pdo->rollBack();
     flock($handle,LOCK_UN);fclose($handle);
-    error_log('Aaditechs lead persistence failed');
+    error_log('Aaditechs lead persistence or queue commit failed');
     jsonResponse(503,['error'=>'Could not save inquiry']);
 }
-// Email notification is best effort. The stored lead is the system of record.
-$mailCfg=$cfg['mail']??[];
-if (($mailCfg['enabled']??false)===true) {
-    try {
-        $autoload=dirname(__DIR__,2).'/secure/vendor/autoload.php';
-        if (!is_file($autoload)) throw new RuntimeException('Mail dependency missing');
-        require_once $autoload;
-        $mail=new PHPMailer\PHPMailer\PHPMailer(true);
-        $mail->isSMTP();$mail->Host=(string)$mailCfg['host'];$mail->Port=(int)$mailCfg['port'];
-        $mail->SMTPAuth=true;$mail->Username=(string)$mailCfg['username'];$mail->Password=(string)$mailCfg['password'];
-        $mail->SMTPSecure=PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;$mail->CharSet='UTF-8';
-        $mail->setFrom((string)$mailCfg['from_email'],'Aaditechs Lead Engine');
-        $mail->addAddress((string)$mailCfg['inquiry_recipient']);
-        $mail->addReplyTo($email,$name);$mail->isHTML(false);
-        $mail->Subject='New Aaditechs inquiry '. $ref;
-        $mail->Body="Reference: {$ref}\nName: {$name}\nEmail: {$email}\nPhone: {$phone}\nService: {$service}\nDevice: {$device}\nSource: {$source}\n\nMessage:\n{$message}\n\nContact consent: yes";
-        $mail->send();
-    } catch(Throwable $e) {error_log('Aaditechs notification failed for reference '.$ref);}
-}
+// Notifications are sent by the private, authenticated-by-filesystem CLI
+// outbox worker; no SMTP call runs during a public HTTP request.
 jsonResponse(201,['ok'=>true,'reference'=>$ref]);

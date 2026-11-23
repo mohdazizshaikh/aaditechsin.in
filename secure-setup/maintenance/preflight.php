@@ -75,6 +75,8 @@ foreach ($outstanding as $file) outcome('File present: ' . $file, is_file($root 
 if ($sourceOnly) {
     outcome('Local schema template present', is_file($root . '/secure-setup/schema.sql'));
     outcome('Private example config present', is_file($root . '/secure-setup/aaditechs-config.php.example'));
+    outcome('V8.4 queued-mail schema migration present', is_file($root . '/secure-setup/migrations/2026-11-23-v84.sql'));
+    outcome('Private notification worker source present', is_file($root . '/secure-setup/maintenance/notification-worker.php'));
     warning('Source-only check: no Hostinger, SQL, HTTPS or SMTP readiness is asserted');
     exit($failures === 0 ? 0 : 1);
 }
@@ -147,6 +149,8 @@ if (setValue($config, ['mail', 'enabled']) === true) {
         outcome('SMTP configuration present: ' . $field, hasPrivateValue(setValue($config, ['mail', $field])));
     }
     outcome('PHPMailer private vendor/autoload.php present', is_file($private . '/vendor/autoload.php'));
+    outcome('Private notification CLI worker present', is_file($private . '/maintenance/notification-worker.php'));
+    warning('Schedule private notification-worker.php --run with Hostinger Cron Jobs after mail acceptance; dry-run first');
     warning('SMTP values present is not proof of accepted or delivered email');
 }
 if (setValue($config, ['google', 'enabled']) === true) {
@@ -165,7 +169,7 @@ if ($checkDb) {
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
             outcome('Read-only DB SELECT 1', $pdo->query('SELECT 1')->fetchColumn() !== false);
-            foreach (['leads', 'partners', 'jobs', 'job_activity'] as $table) {
+            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox'] as $table) {
                 $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?');
                 $stmt->execute([$table]);
                 outcome('Database table present: ' . $table, (int)$stmt->fetchColumn() >= 1);

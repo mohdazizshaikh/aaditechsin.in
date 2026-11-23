@@ -133,3 +133,15 @@ Read `docs/ARCHITECTURE.md`, `docs/PROJECT_STATUS.md`, `docs/SECURITY_CHECKLIST.
 ## V8.3: disposable database/HTTP integration tests (no deployment)
 
 The `source-validation.yml` workflow has a separate `disposable-mariadb-integration` job. It runs a MariaDB container with synthetic records, PHP 8.3 PDO MySQL and `tests/integration_mysql_http.py`. A disposable, self-signed localhost TLS proxy carries browser Secure cookies; a localhost-only PHP router simulates the backend `HTTPS` flag. This certificate is only for synthetic loopback testing. **This does not test a real SSL certificate, Hostinger infrastructure, email delivery, Google API approval or backup.** Never deploy `tests/` to public webroot. Source `secure/aaditechs-config.php` is test-generated, gitignored, and created only in an isolated CI workspace; real Hostinger private config must be provisioned separately.
+
+
+## V8.4 — Durable owner alert delivery (code implemented, hosting NOT yet tested)
+
+- **Fresh staging DB:** import the current `secure-setup/schema.sql` (includes `notification_outbox`).
+- **Existing V8.x DB:** back up first and apply `secure-setup/migrations/2026-11-23-v84.sql` once. Do not import the full schema over live data.
+- In private `secure/aaditechs-config.php`, leave `mail.enabled=false` until SMTP, privacy, database and cron acceptance pass. Public lead submissions only enqueue an alert when mail is enabled; alerts are **not** sent in the HTTP request. No historical backfill happens when toggling mail ON.
+- Place `secure-setup/maintenance/notification-worker.php` in the private `secure/maintenance/` directory, **not** public_html. Install PHPMailer privately at `secure/vendor/` with Composer.
+- Run **read-only** `php secure/maintenance/notification-worker.php --dry-run` then verify configuration and controlled test mailbox before activating scheduled `php secure/maintenance/notification-worker.php --run` with Hostinger Cron Jobs (every 5–15 minutes, only after staging approval).
+- Each successful lead transaction stores its alert intention in MySQL. Cron claims up to 20 due alerts, retries temporary SMTP failures up to six attempts with backoff, and marks permanent failures `dead`. Owner-only portal shows aggregate delivery states and offers manual dead-alert requeue. Never claim mail delivery until test inbox confirms.
+- Delivery is **at least once**, not exactly once: after a crash between SMTP acceptance and DB acknowledgement, duplicate email may occur. The persistent reference lets the owner deduplicate. Cron must be configured and monitored separately.
+- No real SMTP credentials, user contact details, logs or queue exports belong in public GitHub.

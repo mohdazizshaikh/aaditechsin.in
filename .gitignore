@@ -25,3 +25,8 @@ Thumbs.db
 *.sqlite*
 **/secrets/
 **/credentials.json
+
+# Python offline/CI test artifacts
+**/__pycache__/
+*.py[cod]
+.ci-venv/

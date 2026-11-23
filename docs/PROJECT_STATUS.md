@@ -89,3 +89,12 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - [x] Script covers lead consent/origin/duplicate rate limit, SQL persistence, owner/partner login and session isolation, job creation, blocked pre-approval partner start, recorded owner approval, partner completion, disabled-partner session revocation, customer tracking privacy and expiration.
 - [ ] GitHub-hosted integration run must pass on the latest commit before marking these new database/HTTP tests successful. Even when green, it does NOT prove Hostinger staging is deployed, authenticated, backed up or able to deliver email.
 - [ ] Hostinger connector/privileged staging access still required for private config, real hosted PDO MySQL, authenticated HTTPS, SMTP delivery, backup/rollback and privacy signoff.
+
+
+## 23 Nov 2026 V8.4 code-only continuation
+
+- [x] Added transactional lead + optional notification intent persistence and private CLI retry worker (default no SMTP operations without `--run` and private flags).
+- [x] Added `notification_outbox` to full SQL schema and a separate additive V8.4 migration.
+- [x] Added owner-only delivery counters and manual requeue for failed alerts.
+- [x] Extended synthetic MariaDB CI to verify enqueue, dry-run no-write behavior, and owner dashboard summary.
+- [ ] **Not deployed:** Hostinger cron installation, real SMTP acceptance/delivery/duplicate handling, production privacy approval and actual backups remain external blockers.

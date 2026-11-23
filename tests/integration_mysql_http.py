@@ -143,7 +143,7 @@ def run() -> None:
   'leads' => ['enabled'=>true],
   'portal' => ['enabled'=>true, 'admin_email'=>%s, 'admin_password_hash'=>%s,
                'admin_totp_enabled'=>false, 'admin_totp_secret'=>''],
-  'mail' => ['enabled'=>false], 'google' => ['enabled'=>false]
+  'mail' => ['enabled'=>true], 'google' => ['enabled'=>false]
 ];\n''' % tuple(map(php_quote, [DB_HOST, str(DB_PORT), DB_NAME, DB_USER, DB_PASSWORD, OWNER_EMAIL, hashed])), encoding='utf-8')
         CONFIG.chmod(0o600)
         with socket.socket() as sock:
@@ -186,6 +186,19 @@ def run() -> None:
                 cursor.execute('SELECT id,consent_at FROM leads WHERE reference=%s', (ref,))
                 lead = cursor.fetchone()
                 assert lead and lead[1] is not None, 'Lead/consent not persisted'
+                cursor.execute('SELECT status,attempts FROM notification_outbox WHERE lead_id=%s', (lead[0],))
+                outbox = cursor.fetchone()
+                assert outbox == ('pending', 0), f'Email alert was not atomically queued: {outbox}'
+                dry = subprocess.run(['php', str(ROOT / 'secure-setup/maintenance/notification-worker.php'), '--dry-run'],
+                                     cwd=str(ROOT), text=True, capture_output=True, timeout=10)
+                assert dry.returncode == 0 and 'pending: 1' in dry.stdout and 'READ-ONLY' in dry.stdout, 'Dry-run worker failed'
+                cursor.execute('SELECT status,attempts FROM notification_outbox WHERE lead_id=%s', (lead[0],))
+                assert cursor.fetchone() == ('pending', 0), 'Dry-run unexpectedly changed queue state'
+                blocked = subprocess.run(['php', str(ROOT / 'secure-setup/maintenance/notification-worker.php'), '--run'],
+                                         cwd=str(ROOT), text=True, capture_output=True, timeout=10)
+                assert blocked.returncode == 1 and 'BLOCKED' in blocked.stderr, 'Worker accepted incomplete private SMTP config'
+                cursor.execute('SELECT status,attempts FROM notification_outbox WHERE lead_id=%s', (lead[0],))
+                assert cursor.fetchone() == ('pending', 0), 'Invalid SMTP worker unexpectedly consumed notification'
                 rejected = public.post(base + '/api/lead.php', json=payload, timeout=5)
                 assert rejected.status_code == 429, 'Duplicate/flood guard failed'
                 cursor.execute('SELECT COUNT(*) FROM leads')
@@ -198,9 +211,26 @@ def run() -> None:
                 assert 'Invalid sign-in details' in wrong.text, 'Invalid owner password not rejected'
                 logged = form(owner, base, {'action':'login', 'email':OWNER_EMAIL,'password':OWNER_PASSWORD})
                 assert 'Owner Dashboard' in logged.text, 'Owner login unsuccessful'
+                assert 'Owner notification delivery' in logged.text and 'pending: 1' in logged.text, 'Owner queue summary missing'
                 assert csrf(owner, base) != before, 'CSRF did not rotate after privilege elevation'
                 invalid_csrf = owner.post(base + '/portal/', data={'csrf':'bad', 'action':'set_lead_status', 'lead_id':'1', 'status':'closed'}, timeout=5)
                 assert invalid_csrf.status_code == 403, 'CSRF bypass in owner portal'
+                # An owner can recover a dead mail alert only via an authenticated,
+                # CSRF-protected portal action. Sending remains CLI-only.
+                cursor.execute("UPDATE notification_outbox SET status='dead',attempts=6,last_error_code='smtp_unavailable' WHERE lead_id=%s", (lead[0],))
+                cursor.execute('SELECT id FROM notification_outbox WHERE lead_id=%s', (lead[0],))
+                notification_id=cursor.fetchone()[0]
+                guest = requests.Session()
+                guest.verify = False
+                unauth = guest.post(base + '/portal/', data={'action':'retry_notification',
+                                           'csrf':csrf(guest, base),'notification_id':str(notification_id)}, timeout=5)
+                assert unauth.status_code == 403, 'Guest could requeue a private notification'
+                cursor.execute('SELECT status FROM notification_outbox WHERE id=%s', (notification_id,))
+                assert cursor.fetchone()[0] == 'dead', 'Unauthenticated guest changed notification status'
+                retried = form(owner, base, {'action':'retry_notification','notification_id':str(notification_id)})
+                assert 'Notification requeued' in retried.text, 'Owner could not requeue dead alert'
+                cursor.execute('SELECT status,attempts FROM notification_outbox WHERE id=%s', (notification_id,))
+                assert cursor.fetchone() == ('pending',0), 'Dead alert retry state was not reset'
                 for index in (1, 2):
                     created = form(owner, base, {'action':'add_partner', 'name':f'CI Partner {index}',
                                              'email':f'partner{index}-ci@example.invalid',

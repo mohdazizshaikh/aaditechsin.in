@@ -113,6 +113,17 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
             }
             redirectPortal('Partner access updated. Disabling a partner blocks their next authenticated request.');
         }
+        if($action==='retry_notification') {
+            requireAdmin();
+            $id=filter_var($_POST['notification_id']??'',FILTER_VALIDATE_INT);
+            if(!$id || ($cfg['mail']['enabled']??false)!==true)throw new InvalidArgumentException('Notification retry unavailable');
+            // Only explicitly failed alerts can be requeued; no SMTP in web requests.
+            $stmt=$pdo->prepare("UPDATE notification_outbox SET status='pending',attempts=0,
+                next_attempt_at=UTC_TIMESTAMP(),locked_at=NULL,last_error_code='' WHERE id=? AND status='dead'");
+            $stmt->execute([$id]);
+            if($stmt->rowCount()!==1)throw new InvalidArgumentException('Failed notification not found');
+            redirectPortal('Notification requeued for the scheduled private worker');
+        }
         if($action==='set_lead_status') {
             requireAdmin();$id=filter_var($_POST['lead_id']??'',FILTER_VALIDATE_INT);$status=(string)($_POST['status']??'');
             if(!$id||!in_array($status,['new','qualified','responded','converted','closed'],true))throw new InvalidArgumentException('Invalid lead status');
@@ -224,9 +235,11 @@ $flash=(string)($_SESSION['flash']??'');unset($_SESSION['flash']);
 $tracking=(string)($_SESSION['new_tracking_link']??'');unset($_SESSION['new_tracking_link']);
 $trackingOrigin='';
 try {$trackingOrigin=opsPublicBaseUrl($cfg);}catch(Throwable $e){$tracking='';}
-$partners=[];$leads=[];$jobs=[];$activityByJob=[];
+$partners=[];$leads=[];$jobs=[];$activityByJob=[];$notificationCounts=[];$failedNotifications=[];
 if($role==='admin') {
     $partners=$pdo->query('SELECT id,display_name,login_email,specialties,is_active FROM partners ORDER BY display_name LIMIT 200')->fetchAll();
+    $notificationCounts=$pdo->query('SELECT status,COUNT(*) AS total FROM notification_outbox GROUP BY status')->fetchAll();
+    $failedNotifications=$pdo->query("SELECT o.id,l.reference,o.attempts,o.last_error_code,o.updated_at FROM notification_outbox o JOIN leads l ON l.id=o.lead_id WHERE o.status='dead' ORDER BY o.updated_at DESC LIMIT 30")->fetchAll();
     $leads=$pdo->query('SELECT id,reference,full_name,email,phone,service,device,message,source,status,created_at FROM leads ORDER BY created_at DESC LIMIT 75')->fetchAll();
     $jobs=$pdo->query('SELECT j.*,p.display_name AS partner_name,l.reference AS lead_reference FROM jobs j JOIN leads l ON l.id=j.lead_id LEFT JOIN partners p ON p.id=j.partner_id ORDER BY j.updated_at DESC LIMIT 75')->fetchAll();
     if($jobs) {
@@ -249,6 +262,12 @@ if($role==='admin') {
 <?php if(!$role): ?>
 <section class="panel narrow"><h2>Sign in</h2><form method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><label>Email<input name="email" type="email" maxlength="160" required autocomplete="username"></label><label>Password<input name="password" type="password" required autocomplete="current-password"></label><label>Authenticator code (owner, if enabled)<input name="totp" inputmode="numeric" type="text" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="6-digit code"></label><button name="action" value="login">Sign in</button></form><p class="small">Accounts are provisioned by Aaditechs. No public registration. Contact the owner for account access.</p></section>
 <?php elseif($role==='admin'): ?>
+<section class="panel"><h2>Owner notification delivery</h2><p class="small">Inquiries are saved to MySQL; optional email alerts are queued and delivered by the private Hostinger cron worker. A database lead is not proof that an email was delivered.</p>
+<p class="small">Email feature: <?=($cfg['mail']['enabled']??false)===true?'Enabled (requires configured cron)':'Disabled'?>.</p>
+<?php foreach($notificationCounts as $item): ?><p class="small"><?=h($item['status'])?>: <?=h($item['total'])?></p><?php endforeach; ?>
+<?php if($failedNotifications): ?><h3>Needs attention</h3><p class="small">Only failed messages can be manually requeued. Check SMTP configuration first.</p><?php foreach($failedNotifications as $notification): ?>
+<form class="inline" method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="notification_id" value="<?=h($notification['id'])?>"><span><?=h($notification['reference'])?> · attempts <?=h($notification['attempts'])?> · <?=h($notification['last_error_code'])?></span><button name="action" value="retry_notification">Queue retry</button></form>
+<?php endforeach; ?><?php endif; ?></section>
 <section class="panel"><h2>Recent leads <span class="count"><?=count($leads)?></span></h2><p class="small">Newest 75 leads. Review requirements before quoting. Do not share customer personal details with a partner without an appropriate basis.</p>
 <?php if(!$leads): ?><p>No leads yet. The website lead feature is disabled until Hostinger database and privacy setup are complete.</p><?php endif; ?>
 <?php foreach($leads as $lead): ?><details class="entry"><summary><strong><?=h($lead['reference'])?></strong> · <?=h($lead['service'])?> · <?=h($lead['status'])?> <span><?=h($lead['created_at'])?></span></summary><p>Name: <?=h($lead['full_name'])?> · <?=h($lead['email'])?> · <?=h($lead['phone'])?></p><p>Device: <?=h($lead['device'])?> · Source: <?=h($lead['source'])?></p><pre><?=h($lead['message'])?></pre><form class="inline" method="post"><input type="hidden" name="csrf" value="<?=h($csrf)?>"><input type="hidden" name="lead_id" value="<?=h($lead['id'])?>"><label>Lead status<select name="status"><?php foreach(['new','qualified','responded','converted','closed'] as $s): ?><option value="<?=h($s)?>" <?= $lead['status']===$s?'selected':'' ?>><?=h($s)?></option><?php endforeach; ?></select></label><button name="action" value="set_lead_status">Update</button></form>

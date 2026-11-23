@@ -39,7 +39,7 @@ return [
         'admin_totp_secret' => 'REPLACE_WITH_PRIVATE_BASE32_TOTP_SECRET',
     ],
     'mail' => [
-        'enabled' => false, // Optional notification after database commit, never sole source of a lead.
+        'enabled' => false, // When ON, inquiries enqueue an alert; private cron worker sends/retries.
         'host' => 'REPLACE_WITH_SMTP_HOST',
         'port' => 587,
         'username' => 'REPLACE_WITH_SMTP_USERNAME',

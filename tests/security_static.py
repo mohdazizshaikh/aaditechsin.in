@@ -23,3 +23,9 @@ assert 'opsVerifyTotp(' in (root/'public_html/portal/index.php').read_text()
 for term in ('Zenith Soles','Robotics Lab'):
     assert term not in (root/'public_html/index.html').read_text()
 print('Static security + public feature flags: PASS')
+
+assert 'notification_outbox' in (root/'secure-setup/schema.sql').read_text()
+assert 'beginTransaction()' in (root/'public_html/api/lead.php').read_text()
+assert 'queueMail($cfg,$row)' in (root/'secure-setup/maintenance/notification-worker.php').read_text()
+assert "PHP_SAPI !== 'cli'" in (root/'secure-setup/maintenance/notification-worker.php').read_text()
+assert "o.status <> 'sent'" in (root/'secure-setup/maintenance/prune.php').read_text()

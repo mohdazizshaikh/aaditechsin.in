@@ -53,3 +53,14 @@ Before production: explicitly confirm whether owner TOTP is enabled (default OFF
 ## Additional V8.3 evidence source
 
 The GitHub Actions `disposable-mariadb-integration` job provides reproducible **synthetic test-only** MariaDB/PHP behavior and owner/partner transition evidence. The job uses a disposable self-signed localhost TLS proxy plus `tests/ci_https_router.php` to **simulate hosting TLS termination**: this is NOT a real TLS/SSL test. It cannot replace the separate Hostinger staging acceptance items above. No CI test password is a production credential, and the ignored `secure/aaditechs-config.php` generated during CI must never be uploaded or committed.
+
+
+## V8.4 queued SMTP release gate (additional to existing tests)
+
+- [ ] Apply the V8.4 `notification_outbox` migration to a backed-up staging database; run read-only `preflight.php --check-db`.
+- [ ] **Before enabling `mail.enabled=true`**, install PHPMailer privately and configure a test SMTP recipient privately. No send occurs from a public API request.
+- [ ] Submit a synthetic lead, confirm exactly one outbox row and read-only worker statistics.
+- [ ] Explicitly run the private worker using `--run` and verify test inbox **delivery**, not just SMTP acceptance.
+- [ ] Test SMTP downtime: lead persists and outbox retries with backoff; review `dead` alerts and authenticated owner-only retry.
+- [ ] Schedule private cron execution only after testing; monitor backlog and confirm duplicate alerts can be de-duplicated by lead reference.
+- [ ] Confirm backup/restore contains leads **and** notification_outbox, plus private runtime config recovery; do not include secrets in backups made public.

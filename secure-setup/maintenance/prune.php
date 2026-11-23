@@ -10,8 +10,12 @@ try {
     $pdo=opsDb($cfg);
     $days=(int)($cfg['retention_days']??0);
     if($days<30||$days>3650)throw new RuntimeException('Set a reviewed retention_days value (30-3650)');
-    // Do not delete leads associated with service jobs. Owner must review jobs and legal obligations first.
-    $stmt=$pdo->prepare('DELETE l FROM leads l LEFT JOIN jobs j ON j.lead_id=l.id WHERE j.id IS NULL AND l.created_at < DATE_SUB(UTC_TIMESTAMP(),INTERVAL ? DAY)');
+    // Keep active cases and any lead whose owner alert is still pending,
+    // being delivered or failed. Discarding dead alerts would hide incidents.
+    $stmt=$pdo->prepare("DELETE l FROM leads l
+        LEFT JOIN jobs j ON j.lead_id=l.id
+        LEFT JOIN notification_outbox o ON o.lead_id=l.id AND o.status <> 'sent'
+        WHERE j.id IS NULL AND o.id IS NULL AND l.created_at < DATE_SUB(UTC_TIMESTAMP(),INTERVAL ? DAY)");
     $stmt->execute([$days]);
     echo 'Pruned '.$stmt->rowCount()." unassigned leads.\n";
 } catch(Throwable $e){fwrite(STDERR,"Prune task unavailable: ".$e->getMessage()."\n");exit(1);}
