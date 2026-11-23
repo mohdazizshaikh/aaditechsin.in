@@ -98,3 +98,12 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - [x] Added owner-only delivery counters and manual requeue for failed alerts.
 - [x] Extended synthetic MariaDB CI to verify enqueue, dry-run no-write behavior, and owner dashboard summary.
 - [ ] **Not deployed:** Hostinger cron installation, real SMTP acceptance/delivery/duplicate handling, production privacy approval and actual backups remain external blockers.
+
+## V8.5 retention fail-safe — source implementation
+
+- [x] CLI retention task is **dry-run by default**; requires explicit `--run` for deletion; invalid arguments fail closed.
+- [x] Pending/sending/dead owner alerts and all assigned cases are excluded from lead cleanup.
+- [x] Raw DB/PHP exception content no longer printed to cron stderr.
+- [x] Disposable MariaDB integration test covers dry-run, explicit delete and protected rows.
+- [ ] Real Hostinger retention, restore and scheduled deletion still **not accepted**; staging evidence and privacy review required.
+- [ ] GitHub CI result for the latest V8.5 commit must be checked, not assumed from local lint.

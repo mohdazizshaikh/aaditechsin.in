@@ -138,6 +138,7 @@ def run() -> None:
         CONFIG.write_text('''<?php\nreturn [
   'public_base_url' => 'https://ci-staging.invalid',
   'tracking_ttl_days' => 7,
+  'retention_days' => 30,
   'rate_limit_salt' => 'CI_ONLY_RANDOM_SALT_NOT_PRODUCTION_32_BYTES_LONG',
   'database' => ['enabled'=>true, 'host'=>%s, 'port'=>%s, 'name'=>%s, 'username'=>%s, 'password'=>%s],
   'leads' => ['enabled'=>true],
@@ -306,6 +307,27 @@ def run() -> None:
                 cursor.execute('UPDATE jobs SET tracking_expires_at=%s WHERE id=%s', ('2000-01-01 00:00:00',job_id))
                 expired = public.get(base + '/track/?token=' + token, timeout=5)
                 assert expired.status_code == 404, f'Expired tracking link accepted: {expired.status_code}'
+                # Retention is dry-run by default. Only unassigned, expired
+                # leads with resolved alerts can be deleted on explicit --run.
+                cursor.execute("UPDATE leads SET created_at=DATE_SUB(UTC_TIMESTAMP(), INTERVAL 70 DAY) WHERE id=%s", (lead[0],))
+                for code, alert_status in [('RET-SENT', 'sent'), ('RET-PENDING', 'pending'), ('RET-DEAD', 'dead')]:
+                    cursor.execute("INSERT INTO leads(reference,full_name,email,phone,service,device,message,source,consent_at,created_at) VALUES(%s,%s,%s,'','IT Support','','CI retention data','website',UTC_TIMESTAMP(),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 70 DAY))", (code, 'Synthetic CI Retention', f'{code.lower()}@example.invalid'))
+                    lid = cursor.lastrowid
+                    cursor.execute('INSERT INTO notification_outbox(lead_id,status) VALUES(%s,%s)', (lid,alert_status))
+                retention = ROOT / 'secure-setup/maintenance/prune.php'
+                default_dry = subprocess.run(['php', str(retention)], cwd=str(ROOT), capture_output=True, text=True, timeout=10)
+                assert default_dry.returncode == 0 and 'READ-ONLY' in default_dry.stdout and 'Eligible unassigned leads: 1' in default_dry.stdout, 'Retention dry-run failed'
+                cursor.execute("SELECT COUNT(*) FROM leads WHERE reference LIKE 'RET-%'")
+                assert cursor.fetchone()[0] == 3, 'Default retention unexpectedly deleted records'
+                invalid = subprocess.run(['php', str(retention), '--unrecognized'], cwd=str(ROOT), capture_output=True, text=True, timeout=10)
+                assert invalid.returncode == 2, 'Retention accepted an unknown argument'
+                executed = subprocess.run(['php', str(retention), '--run'], cwd=str(ROOT), capture_output=True, text=True, timeout=10)
+                assert executed.returncode == 0 and 'Deleted eligible unassigned leads: 1' in executed.stdout, 'Explicit retention cleanup failed'
+                cursor.execute("SELECT reference FROM leads WHERE reference LIKE 'RET-%' ORDER BY reference")
+                assert [x[0] for x in cursor.fetchall()] == ['RET-DEAD','RET-PENDING'], 'Pending/dead notifications were pruned'
+                cursor.execute('SELECT COUNT(*) FROM leads WHERE id=%s', (lead[0],))
+                assert cursor.fetchone()[0] == 1, 'Assigned customer case was pruned'
+                print('Synthetic retention dry-run, explicit deletion and notification protections: PASS')
                 print('Synthetic MariaDB + HTTP lead/portal/partner/approval/tracking E2E: PASS')
             finally:
                 if proxy is not None:

@@ -100,7 +100,15 @@ The Google review display is restricted to live authorized server API data; it n
 
 ## 7 — Retention, rollback and release controls
 
-`secure-setup/maintenance/prune.php` is CLI-only and must be copied privately to `secure/maintenance/` before use. It deletes **unassigned** leads older than reviewed `retention_days` (30–3650), **not** leads linked to cases. Review legal retention and case/audit deletion separately; do not automate deletion of active customer cases.
+`secure-setup/maintenance/prune.php` is CLI-only and must be copied privately to `secure/maintenance/` before use. **V8.5 safety:** running without arguments performs a **read-only eligibility count**; deletion requires the explicit `--run` flag. It only deletes unassigned leads older than a privately configured and approved integer `retention_days` (30–3650), excluding leads with pending/sending/dead email alerts and **all** leads linked to service cases. Review legal retention, backups, SMTP alerts, and case/audit deletion separately; do not automate deletion of active customer cases.
+
+```bash
+php /path/to/domain-root/secure/maintenance/prune.php --dry-run
+# Only after reviewing the count, backups and retention policy:
+php /path/to/domain-root/secure/maintenance/prune.php --run
+```
+
+**Important upgrade:** Any existing cron invoking `prune.php` without `--run` becomes **read-only** after this change. Do not update production cron jobs before staging acceptance and a deliberate retention policy decision.
 
 Before production cutover: record original website backup, restoration test, database backup and rollback contact. Get explicit owner approval for any overwrite of `aaditechs.in`. Keep staging credentials separate from production. Never deploy directly from an unverified ZIP to the live domain. Change public flags only after its matching server-side integration is validated. Confirm that Google API sync, SMTP and host environment are truly working; their status cannot be inferred from a Git push.
 

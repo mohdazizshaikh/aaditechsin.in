@@ -29,3 +29,8 @@ assert 'beginTransaction()' in (root/'public_html/api/lead.php').read_text()
 assert 'queueMail($cfg,$row)' in (root/'secure-setup/maintenance/notification-worker.php').read_text()
 assert "PHP_SAPI !== 'cli'" in (root/'secure-setup/maintenance/notification-worker.php').read_text()
 assert "o.status <> 'sent'" in (root/'secure-setup/maintenance/prune.php').read_text()
+
+prune=(root/'secure-setup/maintenance/prune.php').read_text()
+assert "$argv[1] ?? '--dry-run'" in prune
+assert "--run" in prune and "READ-ONLY" in prune
+assert '$e->getMessage()' not in prune, 'Prune must not log sensitive raw exceptions'

@@ -64,3 +64,11 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 - [ ] Test SMTP downtime: lead persists and outbox retries with backoff; review `dead` alerts and authenticated owner-only retry.
 - [ ] Schedule private cron execution only after testing; monitor backlog and confirm duplicate alerts can be de-duplicated by lead reference.
 - [ ] Confirm backup/restore contains leads **and** notification_outbox, plus private runtime config recovery; do not include secrets in backups made public.
+
+## V8.5 retention-safety gate (not deployed)
+
+- [ ] Set an approved integer `retention_days` in private config; no automatic deletion until retention and legal policy sign-off.
+- [ ] Run `php secure/maintenance/prune.php` (or `--dry-run`) and verify it prints only an eligible count without database writes.
+- [ ] With synthetic staging rows, confirm jobs and pending/sending/dead alerts prevent deletion. Verify one expired unassigned lead with a sent alert is eligible.
+- [ ] Record a verified staging DB backup before any `--run`. Confirm the exact count changed and backups permit recovery.
+- [ ] Review any existing Hostinger cron: previous no-argument `prune.php` invocations are now read-only. Never silently convert those schedules to `--run`.
