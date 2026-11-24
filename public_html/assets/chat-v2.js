@@ -47,3 +47,8 @@
   q('.chat-close',panel).addEventListener('click',close);q('.chat-reset',panel).addEventListener('click',reset);
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden)close();});
 })();
+
+// Shared public-page entry point for the independent optional analytics module.
+if(window.AADITECHS_PUBLIC_CONFIG?.features?.analytics===true){
+  const script=document.createElement('script');script.src='/assets/analytics.js';document.head.append(script);
+}
