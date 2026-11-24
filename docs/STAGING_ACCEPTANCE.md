@@ -150,3 +150,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.3A/V10.4 acceptance (pending runtime)
 
 - [ ] Verify dedicated business Gmail consent and metadata scope, exact mailbox profile, INBOX system label counts, missing/expired/revoked token and generation change, stale snapshot, no raw responses, paused capture and actual owner report. Verify authorized discovery export source host, exact batch schema, all-or-none rollback, deduplication, source-run visibility, qualified-only reminder, date bounds, pause, completion/cancellation and no outreach. Browser dashboard, live WhatsApp/SMS/telephony and broader opportunity provider acceptance pending.
+
+## V10.5 acceptance (pending runtime)
+
+- [ ] Verify authorized owner HTTPS access, guest/partner rejection, session inactivity and fingerprint rotation, disabled flag, invalid dates/POST rejection, no-store/noindex/CSP, no customer fields or credentials, 7/30 completed UTC windows and current-status cohort labels, missing vs zero communications coverage, all-ledger and OAuth caveats, mobile table readability and DB/query performance on staging. Verify actual data sources separately. No dashboard mutation or release approval inferred.

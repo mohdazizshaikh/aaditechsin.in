@@ -16,6 +16,8 @@ try:
         except Exception:time.sleep(.1)
     status,_=request('/portal/')
     assert status==503,('unconfigured portal',status)
+    status,_=request('/portal/intelligence.php')
+    assert status==404,('unconfigured intelligence',status)
     status,_=request('/api/google-reviews.php')
     assert status==503,('unconfigured google api',status)
     status,_=request('/api/lead.php','POST',b'{}','application/json')

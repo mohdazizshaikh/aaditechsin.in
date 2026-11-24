@@ -117,3 +117,7 @@
 ## V10.3A/V10.4 security (pending runtime)
 
 - [ ] Metadata-only Gmail scope with dedicated authorized business account, fixed HTTPS GET endpoints, no message lists/bodies/headers/IDs, no credentials or mailbox address in DB/reports, short local expiry gate, generation change, latest count snapshot only. Verify OAuth consent and restricted-scope policy before activation. Local discovery only from explicitly authorized sources, no scraping/contact harvesting, bounded batch, exact validation, no automatic outreach; reminders internal only and owner controlled.
+
+## V10.5 security (pending runtime)
+
+- [ ] Independent default-OFF dashboard flag, portal owner role only, existing password/TOTP session fingerprint, expiry, HTTPS, GET only, strict period allowlist, server-side escaping, private headers and no external scripts. No personal contact fields, message bodies, drafts, source URLs, raw receipts/tokens or write actions. Confirm staging access controls and performance with realistic sanitized data before activation.

@@ -112,3 +112,7 @@ Exact approved private PNG/MP4 -> exclusive Telegram revision -> owner type/mani
 ## V10.3A/V10.4 intelligence boundary
 
 Dedicated authorized Gmail metadata credential, exact mailbox profile, fixed INBOX label counts, generation/expiry and pause gates -> single latest sanitized snapshot (no message IDs, headers or bodies). Authorized local discovery JSON uses existing allowlisted feed schema and service matching, transactional batch, duplicate fingerprints and run evidence. Qualified opportunities receive owner-set UTC internal review dates; completion/cancellation audit only, no send. /intelligence and existing daily owner reports aggregate stored evidence. See V103A_V104_INTELLIGENCE.md.
+
+## V10.5 private owner dashboard boundary
+
+/portal/intelligence.php uses existing HTTPS and owner session fingerprint with a 30-minute inactivity gate. Independent default-OFF flag. GET only with fixed 7/30 completed UTC-day periods, no mutation or external requests; server-side escaped aggregate tables and bounded task/due queues. Lead cohorts use creation date and current status, communications show coverage and missing versus zero, workflow counts remain current historical inventories. Disabled modules hidden; no customer details, messages, raw credentials, evidence URLs or drafts. Existing private headers/CSP apply. See V105_OWNER_DASHBOARD.md.
