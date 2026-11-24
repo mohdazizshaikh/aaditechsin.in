@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/gmail-health-core.php';
 require_once __DIR__.'/search-console-core.php';
+require_once __DIR__.'/live-seo-core.php';
 require_once __DIR__.'/communication-review-core.php';
 require_once __DIR__.'/native-usage-core.php';
 require_once __DIR__.'/whatsapp-inbound-core.php';
@@ -13,6 +14,8 @@ function intelligenceSummary(PDO $db,array $cfg,?DateTimeImmutable $now=null):st
     $pause=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
     $lines[]='Growth: '.($pause===false?'unavailable':((int)$pause===1?'paused':'resumed'));
     if(($cfg['seo']['search_console']['enabled']??false)===true)$lines[]=scSummary($db,$cfg,$now);
+    if(scConfig($cfg)&&($cfg['seo']['search_console']['history_enabled']??false)===true)$lines[]=scHistorySummary($db,$cfg,$now);
+    if(liveSeoEnabled($cfg))$lines[]=liveSeoSummary($db,$cfg,$now);
     if(discoveryEnabled($cfg)){
         $counts=['pending_review'=>0,'qualified'=>0,'rejected'=>0];
         foreach($db->query('SELECT status,COUNT(*) AS n FROM growth_opportunities GROUP BY status')->fetchAll(PDO::FETCH_ASSOC) as $r)$counts[$r['status']]=(int)$r['n'];

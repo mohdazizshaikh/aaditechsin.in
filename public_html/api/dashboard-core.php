@@ -61,6 +61,8 @@ function dashboardSnapshot(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=
         }
     }
     $data['communications']=communicationsEnabled($cfg)?dashboardCommunications($db,$period):null;
+    $data['search_history']=scHistory($db,$cfg,$days,$now);
+    $data['live_seo']=liveSeoEnabled($cfg)?liveSeoSummary($db,$cfg,$now):null;
     $data['search_console']=($cfg['seo']['search_console']['enabled']??false)===true?scSummary($db,$cfg,$now):null;
     $data['comm_reviews']=commReviewEnabled($cfg)?commReviewSummary($db,$now):null;
     $data['tw_inbound']=(twInboundConfig($cfg,'sms')||twInboundConfig($cfg,'calls'))?twInboundSummary($db,$cfg,$now):null;
