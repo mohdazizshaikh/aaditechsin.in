@@ -19,6 +19,8 @@ $mock=static function($p,$method,$path,$data)use(&$seen,&$chunks,&$calls,$id){
 $remember=static function($id)use(&$seen){$seen[]=$id;};
 xvCheck(xvUpload($p,$row,$bytes,$mock,$remember)['status']==='processing'&&implode('',$chunks)===$bytes&&!in_array('2/tweets',$calls),'Separate upload');
 xvCheck(xvPublish($p,$row,$mock)['status']==='accepted','Ready publish');
+$notReady=static function($p,$method,$path,$data){if($path==='2/users/me')return ['http'=>200,'json'=>['data'=>['id'=>'456']]];if($path==='2/media/upload')return ['http'=>200,'json'=>['data'=>['id'=>'789','expires_after_secs'=>600,'processing_info'=>['state'=>'pending']]]];throw new LogicException('Must not publish');};
+xvCheck(!xvReady($p,$row,$notReady)&&xvPublish($p,$row,$notReady)['status']==='unknown','Processing cannot publish');
 $calls=[];xvCheck(xvUpload($p,$row,$bytes,$mock,static function(){throw new RuntimeException('DB failure');})['status']==='unknown'&&$calls===['2/users/me','2/media/upload/initialize'],'Receipt failure blocks append');
 if(($argv[1]??'')!=='--database'){echo "X video mock multipart: PASS\n";exit;}
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1')exit(2);

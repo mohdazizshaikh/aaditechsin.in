@@ -47,7 +47,7 @@ function miStore(string $root,string $hash,string $bytes,int $w,int $h):void {
 }
 function miRegister(PDO $db,array $cfg,string $provider,int $task,int $rev,string $manifest,string $hash,int $size,string $kind='image'):int {
     $p=miTarget($cfg,$provider,$kind);if(!$p)throw new RuntimeException('Disabled');$r=miManifest($db,$task,$rev,$manifest,$provider);
-    if(!preg_match('/^[a-f0-9]{64}$/D',$hash)||$size<24||$size>($kind==='video'?20*1024*1024:8000000)||($kind==='video'&&!hash_equals($r['video_hash'],$hash))||strlen($r['caption'])>($provider==='threads'?500:900))throw new InvalidArgumentException('Invalid image');
+    if(!preg_match('/^[a-f0-9]{64}$/D',$hash)||$size<24||$size>($kind==='video'?20*1024*1024:8000000)||($kind==='video'&&!hash_equals($r['video_hash'],$hash))||strlen($r['caption'])>($provider==='threads'?500:900))throw new InvalidArgumentException('Invalid asset');
     foreach(['growth_meta_images',$provider==='threads'?'growth_meta_publications':'growth_instagram_uploads'] as $table){
         $q=$db->prepare("SELECT id FROM $table WHERE task_id=? AND revision=?");$q->execute([$task,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision already reserved');
     }
@@ -71,7 +71,7 @@ function miCommand(PDO $db,array $cfg,string $cmd):?string {
     if(preg_match('/^\/approveimage ([1-9][0-9]{0,14}) ([a-f0-9]{64}) (threads|instagram) ([1-9][0-9]{0,30})$/D',$cmd,$m)){
         $paused=$db->query('SELECT paused FROM growth_control WHERE id=1 FOR UPDATE')->fetchColumn();if($paused===false||(int)$paused!==0)return 'Growth paused.';
         $p=miTarget($cfg,$m[3],$kind);if(!$p||$p['id']!==$m[4])return 'Target mismatch.';
-        $q=$db->prepare("UPDATE growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests a ON a.task_id=u.task_id AND a.revision=u.revision AND a.manifest_hash=u.manifest_hash AND a.status='approved' SET u.status='approved' WHERE u.id=? AND u.asset_hash=? AND u.provider=? AND u.target_id=? AND u.page_id=? AND u.asset_kind=? AND u.status='pending_review'");
+        $q=$db->prepare("UPDATE growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests a ON a.task_id=u.task_id AND a.revision=u.revision AND a.manifest_hash=u.manifest_hash AND a.status='approved' AND (u.asset_kind='image' OR a.video_hash=u.asset_hash) SET u.status='approved' WHERE u.id=? AND u.asset_hash=? AND u.provider=? AND u.target_id=? AND u.page_id=? AND u.asset_kind=? AND u.status='pending_review'");
         $q->execute([(int)$m[1],$m[2],$m[3],$m[4],$p['page'],$kind]);if($q->rowCount()!==1)return 'Image approval mismatch or stale revision.';
         $q=$db->prepare('SELECT task_id,revision FROM growth_meta_images WHERE id=?');$q->execute([(int)$m[1]]);$r=$q->fetch(PDO::FETCH_ASSOC);growthAudit($db,(int)$r['task_id'],(int)$r['revision'],'meta_image_approved','owner');return 'Exact asset and public post approved; temporary bearer URL authorized. No request sent.';
     }
@@ -83,7 +83,7 @@ function miCommand(PDO $db,array $cfg,string $cmd):?string {
 }
 function miRow(PDO $db,array $cfg,string $provider,int $id,string $state):array {
     creativeActive($db);$p=miTarget($cfg,$provider)??miTarget($cfg,$provider,'video');if(!$p)throw new RuntimeException('Disabled');
-    $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' WHERE u.id=? AND u.provider=? AND u.target_id=? AND u.page_id=? AND u.status=? FOR UPDATE");
+    $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' AND (u.asset_kind='image' OR m.video_hash=u.asset_hash) WHERE u.id=? AND u.provider=? AND u.target_id=? AND u.page_id=? AND u.status=? FOR UPDATE");
     $q->execute([$id,$provider,$p['id'],$p['page'],$state]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r||!miTarget($cfg,$provider,$r['asset_kind']))throw new RuntimeException('No matching approved asset');return $r;
 }
 function miClaimFetch(PDO $db,array $cfg,string $provider,int $id):array {
@@ -94,7 +94,7 @@ function miClaimFetch(PDO $db,array $cfg,string $provider,int $id):array {
 function miFetch(PDO $db,array $cfg,string $token,bool $head=false):array {
     creativeActive($db);
     if(!preg_match('/^[a-f0-9]{64}$/D',$token))throw new RuntimeException('Unavailable');
-    $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' WHERE u.token_hash=? AND u.status IN ('fetching','processing') AND u.expires_at>UTC_TIMESTAMP() AND u.fetch_count<20 FOR UPDATE");
+    $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' AND (u.asset_kind='image' OR m.video_hash=u.asset_hash) WHERE u.token_hash=? AND u.status IN ('fetching','processing') AND u.expires_at>UTC_TIMESTAMP() AND u.fetch_count<20 FOR UPDATE");
     $q->execute([hash('sha256',$token)]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new RuntimeException('Unavailable');
     $p=miTarget($cfg,$r['provider'],$r['asset_kind']);if(!$p||$p['id']!==$r['target_id']||$p['page']!==$r['page_id'])throw new RuntimeException('Unavailable');
     $bytes=miAssetBytes($cfg,$r);
