@@ -9,6 +9,13 @@ creativeCheck(creativeValidate($result)===$result,'Valid draft');
 foreach([['caption'=>'100% guaranteed data recovery'],['caption'=>'We are a certified partner'],['caption'=>'Email someone@example.com'],['caption'=>str_repeat('x',901)],['task_id'=>'1'],['model'=>'../invalid']] as $patch){
     try{creativeValidate(array_replace($result,$patch));throw new RuntimeException('Invalid accepted');}catch(InvalidArgumentException $ignored){}
 }
+
+require_once dirname(__DIR__).'/public_html/api/creative-transport-core.php';
+$token=str_repeat('a',64);
+$tcfg=['growth'=>['enabled'=>true],'creative'=>['enabled'=>true],'creative_transport'=>['enabled'=>true,'token_sha256'=>hash('sha256',$token)]];
+creativeCheck(!creativeTransportAuthorized([],$token),'Transport default OFF');
+creativeCheck(creativeTransportAuthorized($tcfg,$token)&&!creativeTransportAuthorized($tcfg,str_repeat('b',64)),'Scoped token authentication');
+
 if(($argv[1]??'')!=='--database'){echo "Creative result and claims rules: PASS\n";exit;}
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1')exit(2);
 $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aaditechs_ci;charset=utf8mb4','aaditechs_ci',getenv('CI_DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false]);
@@ -34,5 +41,66 @@ try{
     creativeCheck(str_contains(growthCommand($db,'/coverage',$cfg),'infrastructure: 1 tasks / 1 approved'),'Coverage inventory');
     $q=$db->prepare('SELECT COUNT(*) FROM growth_creative_results WHERE task_id=?');$q->execute([$id]);
     creativeCheck((int)$q->fetchColumn()===2,'Preserve revision history');
+    require_once dirname(__DIR__).'/public_html/api/media-core.php';
+    $mcfg=$cfg+['media'=>['enabled'=>true]];
+    creativeCheck(!mediaEnabled($cfg)&&mediaEnabled($mcfg),'Media default OFF');
+    $mj=mediaExport($db,$id,2);
+    creativeCheck($mj['dimensions']===[1200,628],'Approved profile');
+    try{mediaExport($db,$id,1);throw new LogicException('Stale export');}catch(RuntimeException $e){creativeCheck($e->getMessage()==='Current approved text revision required','Stale export blocked');}
+    $manifest=json_encode(['version'=>1,'task_id'=>$id,'revision'=>2,'channel'=>'linkedin','renderer'=>'template','width'=>1200,'height'=>628,'image_sha256'=>str_repeat('a',64),'video_sha256'=>str_repeat('b',64)],JSON_THROW_ON_ERROR);
+    $receipt=mediaRegister($db,$manifest);$digest=$receipt['manifest_sha256'];
+    creativeCheck($digest===hash('sha256',$manifest),'Manifest hash');
+    creativeCheck(str_contains(growthCommand($db,"/media $id",$mcfg),$digest),'Owner metadata list');
+    creativeCheck(str_contains(growthCommand($db,"/approvemedia $id 2 ".str_repeat('c',64),$mcfg),'not pending'),'Wrong digest blocked');
+    creativeCheck(str_contains(growthCommand($db,"/approvemedia $id 2 $digest",$mcfg),'review recorded'),'Approve exact digest');
+    mediaRegister($db,$manifest);
+    creativeCheck(str_contains(growthCommand($db,"/rejectmedia $id 2 $digest",$mcfg),'not pending'),'Duplicate registration preserves review');
+    require_once dirname(__DIR__).'/public_html/api/expert-core.php';
+    $ecfg=$cfg+['expert'=>['enabled'=>true]];
+    creativeCheck(!expertEnabled($cfg)&&count(expertKnowledge())===14,'Expert default OFF and coverage');
+    $eid=expertCreate($db,'data-recovery','assessment');
+    $ej=expertExport($db,$eid);
+    creativeCheck($ej['intent']==='assessment'&&$ej['service_id']==='data-recovery','Expert scoped export');
+    $er=['version'=>1,'task_id'=>$eid,'revision'=>1,'model'=>'local-test:1b','assessment'=>'Assess the storage type.','questions'=>'What symptoms are present?','next_steps'=>'Arrange a specialist review.'];
+    creativeCheck(expertImport($db,$er)&&!expertImport($db,$er),'Expert import and duplicate protection');
+    creativeCheck(str_contains(growthCommand($db,"/task $eid",$ecfg),'Avoid writing'),'Mandatory safety note');
+    creativeCheck(str_contains(growthCommand($db,"/approve $eid 1",$ecfg),'approved'),'Owner expert review');
+    require_once dirname(__DIR__).'/public_html/api/seo-core.php';
+    $scfg=$cfg+['seo'=>['enabled'=>true]];
+    creativeCheck(!seoEnabled($cfg)&&count(seoTopics())===14,'SEO default OFF and coverage');
+    $sr=['version'=>1,'scope'=>'source-only','pages'=>7,'counts'=>['missing_title'=>1]];
+    creativeCheck(seoRegister($db,$sr)['status']==='recorded'&&seoRegister($db,$sr)['status']==='duplicate_summary','SEO distinct summary');
+    creativeCheck(str_contains(growthCommand($db,'/seo',$scfg),'missing_title: 1'),'Owner SEO report');
+    creativeCheck(str_contains(growthCommand($db,'/seotopics infrastructure',$scfg),'not measured'),'SEO topic evidence boundary');
+    $id2=creativeCreate($db,'infrastructure','linkedin','education');
+    $claim=creativeLeaseClaim($db);
+    creativeCheck($claim['job']['task_id']===$id2,'Claim pending task');
+    creativeCheck(creativeLeaseClaim($db)===['status'=>'empty'],'Active lease cannot be duplicated');
+    $v2=array_replace($result,['task_id'=>$id2]);
+    creativeCheck(creativeLeaseFinish($db,$id2,1,str_repeat('b',64),$v2)['status']==='conflict','Wrong lease');
+    creativeCheck(creativeLeaseFinish($db,$id2,1,$claim['lease'],$v2)['status']==='pending_review','Complete lease');
+    creativeCheck(creativeLeaseFinish($db,$id2,1,$claim['lease'],$v2)['status']==='pending_review','Replay completion');
+    creativeCheck(creativeLeaseFinish($db,$id2,1,$claim['lease'],array_replace($v2,['caption'=>'Different draft']))['status']==='conflict','Conflicting replay');
+    $id3=creativeCreate($db,'infrastructure','linkedin','education');
+    for($i=0;$i<3;$i++){
+        $c=creativeLeaseClaim($db);
+        creativeCheck($c['job']['task_id']===$id3,'Retry same task');
+        creativeCheck(creativeLeaseFinish($db,$id3,1,$c['lease'],null)['status']==='failed','Report failed generation');
+    }
+    creativeCheck(creativeLeaseClaim($db)===['status'=>'empty'],'Bounded attempts');
+    creativeCheck(str_contains(growthCommand($db,'/creativeworker',$tcfg),'exhausted'),'Owner sees exhausted job');
+    creativeCheck(str_contains(growthCommand($db,"/retrycreative $id3 1",$tcfg),'New creative revision'),'Owner can retry exhausted task');
+    $new=creativeLeaseClaim($db);
+    creativeCheck($new['job']['task_id']===$id3&&$new['job']['revision']===2,'Retry increments revision');
+    creativeCheck(creativeLeaseFinish($db,$id3,1,$c['lease'],array_replace($result,['task_id'=>$id3]))['status']==='conflict','Old revision cannot replace draft'); 
+    creativeCheck(creativeLeaseFinish($db,$id3,2,$new['lease'],array_replace($result,['task_id'=>$id3,'revision'=>2]))['status']==='pending_review','New revision completes');
+    $id4=creativeCreate($db,'infrastructure','linkedin','education');
+    $old=creativeLeaseClaim($db);
+    $db->prepare("UPDATE growth_creative_leases SET expires_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE task_id=?")->execute([$id4]);
+    $fresh=creativeLeaseClaim($db);
+    creativeCheck($old['lease']!==$fresh['lease'],'Rotate expired lease');
+    creativeCheck(creativeLeaseFinish($db,$id4,1,$old['lease'],null)['status']==='conflict','Expired token rejected');
+    growthCommand($db,'/pause',$cfg);
+    try{creativeLeaseFinish($db,$id4,1,$fresh['lease'],null);throw new LogicException('Pause ignored');}catch(RuntimeException $e){creativeCheck($e->getMessage()==='Growth paused','Pause completion');}
     $db->rollBack();echo "Synthetic creative request, revision, pause, review and coverage: PASS\n";
 }catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Creative integration failed: '.$e->getMessage()."\n");exit(1);}
