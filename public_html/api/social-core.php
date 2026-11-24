@@ -6,6 +6,8 @@ function socialTarget(array $cfg):?string {
     $target=$cfg['social']['telegram_channel']['chat_id']??null;
     $token=$cfg['social']['telegram_channel']['bot_token']??null;
     if(!is_string($target)||!preg_match('/^-100[0-9]{6,15}$/D',$target)||!is_string($token)||!preg_match('/^[0-9]{5,16}:[A-Za-z0-9_-]{20,128}$/D',$token))return null;
+    $ownerToken=$cfg['growth']['telegram']['bot_token']??'';
+    if(is_string($ownerToken)&&$ownerToken!==''&&hash_equals($ownerToken,$token))return null;
     return $target;
 }
 function socialSchedule(PDO $db,array $cfg,int $task,int $rev,string $target,string $when,?DateTimeImmutable $now=null):int {
