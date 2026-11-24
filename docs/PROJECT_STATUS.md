@@ -11,12 +11,13 @@ Production is unchanged. Main remains V9.6 at verified commit 7582be3c9beafa7335
 | V9.1–V9.6 | [Main consolidated CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45380755788) | Live provider, owner bot, privacy and staging acceptance |
 | V9.7 | [PR #3](https://github.com/mohdazizshaikh/aaditechsin.in/pull/3), [both CI jobs passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45443108590) | HTTPS endpoint, local Ollama runtime, scheduling |
 | V9.8 | [PR #4](https://github.com/mohdazizshaikh/aaditechsin.in/pull/4), [corrected CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45447300543) | Real diffusion, native video, automatic transfer and binary preview |
-| V9.9 | [PR #5](https://github.com/mohdazizshaikh/aaditechsin.in/pull/5), initial offline passed, DB safety-note correction f6ec8c361097823c808b16243a3faaf00ddd62bb awaiting verification at writing | Live AI, consented free text, customer-specific qualification |
-| V10.0 | Source on development/v100-seo, CI not yet verified at writing | Live SEO crawl, Search Console, competitor evidence, scheduling |
+| V9.9 | [PR #5](https://github.com/mohdazizshaikh/aaditechsin.in/pull/5), [corrected CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45449569981) | Live AI, consented free text, customer-specific qualification |
+| V10.0 | [PR #6](https://github.com/mohdazizshaikh/aaditechsin.in/pull/6), [both CI jobs passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45449791408) | Live SEO crawl, Search Console, competitor evidence, scheduling |
+| V10.1 | development/v101-meta source, CI not yet verified at writing | Facebook/Threads live authorization, Instagram/media transport, token lifecycle and insights |
 
-Next phases: V10.1 Meta connectors, V10.2 remaining social connectors, V10.3 communications, V10.4 discovery providers, V10.5 dashboard, V10.6 staging and release. Native AI video, actual local model tests, public AI and provider acceptance remain open independently. No real outreach, posts, production changes or credentials in Git. All new flags OFF.
+Next phases: V10.2 remaining social connectors, V10.3 communications, V10.4 discovery providers, V10.5 dashboard, V10.6 staging and release. Native AI video, actual local model tests, public AI and provider acceptance remain open independently. No real outreach, posts, production changes or credentials in Git. All new flags OFF.
 
-Canonical tracker: [issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2); [release gate #1](https://github.com/mohdazizshaikh/aaditechsin.in/issues/1). Module docs V9_GROWTH_FOUNDATION, V92_ANALYTICS, V93_DISCOVERY, V931_SOURCE_ADAPTER, V94_CREATIVE, V95_V96_OPERATIONS, V97_CREATIVE_TRANSPORT, V98_MEDIA_STUDIO, V99_TECHNICAL_EXPERT, V100_SEO.
+Canonical tracker: [issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2); [release gate #1](https://github.com/mohdazizshaikh/aaditechsin.in/issues/1). Module docs V9_GROWTH_FOUNDATION, V92_ANALYTICS, V93_DISCOVERY, V931_SOURCE_ADAPTER, V94_CREATIVE, V95_V96_OPERATIONS, V97_CREATIVE_TRANSPORT, V98_MEDIA_STUDIO, V99_TECHNICAL_EXPERT, V100_SEO, V101_META.
 
 ## V8 audit additions (local source, not live acceptance)
 

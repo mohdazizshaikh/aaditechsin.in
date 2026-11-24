@@ -27,6 +27,11 @@ return [
     'creative' => ['enabled' => false], // Local model review workflow only.
     'social' => [
         'enabled' => false,
+        'meta' => [
+            'enabled' => false,
+            'facebook' => ['enabled' => false, 'account_id' => 'REPLACE_WITH_PAGE_ID', 'access_token' => 'REPLACE_WITH_PAGE_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_VERSION'],
+            'threads' => ['enabled' => false, 'account_id' => 'REPLACE_WITH_THREADS_ID', 'access_token' => 'REPLACE_WITH_THREADS_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_VERSION'],
+        ],
         'telegram_channel' => [
             'enabled' => false,
             'chat_id' => 'REPLACE_WITH_APPROVED_BUSINESS_CHANNEL_ID',

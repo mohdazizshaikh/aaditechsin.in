@@ -50,3 +50,8 @@
 - [ ] Media files private, exact manifest review, no publication permission; expert drafts human reviewed.
 - [ ] SEO audit read-only, approved metadata changes via review, no public report endpoint or invented metrics.
 - [ ] Verify all defaults OFF, backup/restore and staging sign-off before activation.
+
+## V10.1 Meta security gates (pending runtime)
+
+- [ ] Verify least privilege Meta scopes, approved test account IDs and separate tokens, no query secrets/redirects, exact HTTPS identity, scoped revision and receipt ledger.
+- [ ] Test ambiguous send reconciliation and stop worker before pause/credential rotation. No automatic retries. Instagram and private media remain unconnected.
