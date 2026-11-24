@@ -495,3 +495,5 @@ CREATE TABLE IF NOT EXISTS growth_x_video (
  UNIQUE KEY uq_xv_revision(task_id,revision),
  CONSTRAINT fk_xv_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE growth_meta_images ADD COLUMN IF NOT EXISTS asset_kind ENUM('image','video') NOT NULL DEFAULT 'image';

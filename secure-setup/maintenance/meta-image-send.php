@@ -16,7 +16,9 @@ function miCreate(array $p,array $r,callable $request):?string {
     try{
         if($p['id']!==$r['target_id']||$p['provider']!==$r['provider']||$p['page']!==$r['page_id']||!miIdentity($p,$request)||!preg_match('/^[a-f0-9]{64}$/D',$r['fetch_token']))return null;
         $url=$p['origin'].'/api/media-fetch.php?t='.$r['fetch_token'];
-        $data=$p['provider']==='threads'?['media_type'=>'IMAGE','image_url'=>$url,'text'=>$r['caption']]:['image_url'=>$url,'caption'=>$r['caption']];
+        $kind=$r['asset_kind']??'image';
+        if($kind==='video'&&$p['provider']!=='threads')return null;
+        $data=$p['provider']==='threads'?['media_type'=>$kind==='video'?'VIDEO':'IMAGE',($kind==='video'?'video_url':'image_url')=>$url,'text'=>$r['caption']]:['image_url'=>$url,'caption'=>$r['caption']];
         $result=$request($p,'POST',$p['id'].($p['provider']==='threads'?'/threads':'/media'),$data);
         return ($result['http']??0)===200&&!isset($result['json']['error'])?miId($result['json']['id']??null):null;
     }catch(Throwable $e){return null;}
