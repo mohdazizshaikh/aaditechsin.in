@@ -53,6 +53,7 @@ jobs:
           php tests/x_video_rules.php
           php tests/carousel_rules.php
           php tests/report_rules.php
+          python3 tests/media_transfer.py
           python3 tests/local_creative.py
           python3 tests/local_expert.py
           .ci-venv/bin/python tests/seo_audit.py

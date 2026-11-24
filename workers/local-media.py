@@ -116,6 +116,8 @@ def render(job,root,font,renderer,model=None,generate=diffusion_image):
         w,h=PROFILES[job["channel"]]
         manifest={"version":1,"task_id":job["task_id"],"revision":job["revision"],"channel":job["channel"],"renderer":renderer,"width":w,"height":h,"image_sha256":sha(out/"creative.png"),"video_sha256":sha(out/"creative.mp4")}
         (out/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,separators=(",",":")),encoding="utf-8")
+        for name in ("creative.png","creative.mp4","manifest.json"):
+            (out/name).chmod(0o600)
         return out
     except BaseException:
         shutil.rmtree(out)

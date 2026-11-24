@@ -42,10 +42,32 @@ function oauthStatus(PDO $db,array $cfg,?int $now=null):array {
     }return $out;
 }
 function oauthCommand(PDO $db,array $cfg,string $cmd):?string {
+    if($cmd==='/connectionalerts')return ($cfg['growth']['enabled']??false)===true?oauthAlertText($db,$cfg):'Growth disabled.';
     if($cmd!=='/connections')return null;
     if(($cfg['growth']['enabled']??false)!==true||($cfg['oauth_lifecycle']['enabled']??false)!==true)return 'OAuth lifecycle checks disabled.';
     $lines=['Provider identity health (not publish permission):'];
     foreach(oauthStatus($db,$cfg) as $r)$lines[]=$r['provider'].': '.$r['policy'].' / '.$r['health'].($r['expires']?' / '.$r['expires']:'');
     $lines[]='Rotate privately; no tokens or refresh secrets in Telegram.';
+    return implode("\n",$lines);
+}
+
+function oauthWatched(array $cfg,string $provider):bool {
+    if(!creativeEnabled($cfg)||($cfg['social']['enabled']??false)!==true)return false;
+    return match($provider){
+        'facebook','threads'=>($cfg['social']['meta']['enabled']??false)===true&&($cfg['social']['meta'][$provider]['enabled']??false)===true,
+        'linkedin','x','google-business'=>($cfg['social']['network']['enabled']??false)===true&&($cfg['social']['network'][$provider]['enabled']??false)===true,
+        'instagram','youtube'=>mediaEnabled($cfg)&&($cfg['media_upload']['enabled']??false)===true&&($cfg['media_upload'][$provider]['enabled']??false)===true,
+        default=>false
+    };
+}
+function oauthAlertText(PDO $db,array $cfg,?int $now=null):string{
+    if(($cfg['oauth_lifecycle']['alerts_enabled']??false)!==true)return 'OAuth alerts disabled.';
+    $lines=['OAuth attention (local deadlines; not live permissions):'];
+    foreach(oauthStatus($db,$cfg,$now) as $r){
+        if(!oauthWatched($cfg,$r['provider']))continue;
+        if($r['policy']==='current'&&$r['health']==='identity_verified')continue;
+        $lines[]=$r['provider'].': '.$r['policy'].' / '.$r['health'].($r['expires']?' / '.$r['expires']:'');
+    }
+    if(count($lines)===1)$lines[]='No configured provider currently needs attention.';
     return implode("\n",$lines);
 }

@@ -62,7 +62,9 @@ def options(cfg):
     if not isinstance(remote,str) or not re.fullmatch(r"/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+",remote) or any(x in (".","..","public_html","www","htdocs") for x in remote.split("/")):
         raise ValueError("Private remote inbox required")
     identity=private_path(cfg["identity_file"]);known=private_path(cfg["known_hosts"])
-    return ["-F","/dev/null","-P",str(port),"-i",str(identity),"-o","UserKnownHostsFile="+str(known),"-o","GlobalKnownHostsFile=/dev/null","-o","StrictHostKeyChecking=yes","-o","BatchMode=yes","-o","IdentitiesOnly=yes","-o","IdentityAgent=none","-o","PasswordAuthentication=no","-o","KbdInteractiveAuthentication=no","-o","ProxyCommand=none","-o","ProxyJump=none","-o","ForwardAgent=no","-o","ClearAllForwardings=yes","-o","ConnectTimeout=15","-b","-",user+"@"+host],remote
+    if any(not re.fullmatch(r"/[A-Za-z0-9_./-]+",str(p)) for p in (identity,known)):
+        raise ValueError("Unsafe SSH option path")
+    return ["-F","/dev/null","-P",str(port),"-i",str(identity),"-o","UserKnownHostsFile="+str(known),"-o","GlobalKnownHostsFile=/dev/null","-o","StrictHostKeyChecking=yes","-o","UpdateHostKeys=no","-o","VerifyHostKeyDNS=no","-o","BatchMode=yes","-o","IdentitiesOnly=yes","-o","IdentityAgent=none","-o","PasswordAuthentication=no","-o","KbdInteractiveAuthentication=no","-o","ProxyCommand=none","-o","ProxyJump=none","-o","ForwardAgent=no","-o","ClearAllForwardings=yes","-o","ConnectTimeout=15","-b","-",user+"@"+host],remote
 
 def deliver(cfg, directory, expected, run=subprocess.run):
     args,remote=options(cfg)
