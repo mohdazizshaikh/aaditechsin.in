@@ -55,3 +55,7 @@
 
 - [ ] Verify least privilege Meta scopes, approved test account IDs and separate tokens, no query secrets/redirects, exact HTTPS identity, scoped revision and receipt ledger.
 - [ ] Test ambiguous send reconciliation and stop worker before pause/credential rotation. No automatic retries. Instagram and private media remain unconnected.
+
+## V10.2 network security gates (pending live verification)
+
+- [ ] Verify scoped organization/user/location identity, separate OAuth tokens, bounded HTTPS transport and no redirects, no logs of secrets or raw errors. No automatic retries, only approved revisions, manual uncertain reconciliation. Confirm actual provider visibility and quotas separately.

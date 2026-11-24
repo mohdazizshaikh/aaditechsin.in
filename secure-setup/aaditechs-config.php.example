@@ -27,6 +27,12 @@ return [
     'creative' => ['enabled' => false], // Local model review workflow only.
     'social' => [
         'enabled' => false,
+        'network' => [
+            'enabled' => false,
+            'linkedin' => ['enabled' => false, 'account_id' => 'REPLACE_WITH_ORG_ID', 'access_token' => 'REPLACE_WITH_ORG_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_YYYYMM'],
+            'x' => ['enabled' => false, 'account_id' => 'REPLACE_WITH_USER_ID', 'access_token' => 'REPLACE_WITH_USER_CONTEXT_TOKEN'],
+            'google-business' => ['enabled' => false, 'account_id' => 'REPLACE_WITH_ACCOUNT_COLON_LOCATION', 'access_token' => 'REPLACE_WITH_AUTHORIZED_GBP_TOKEN'],
+        ],
         'meta' => [
             'enabled' => false,
             'facebook' => ['enabled' => false, 'account_id' => 'REPLACE_WITH_PAGE_ID', 'access_token' => 'REPLACE_WITH_PAGE_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_VERSION'],

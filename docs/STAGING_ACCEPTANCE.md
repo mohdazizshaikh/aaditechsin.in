@@ -87,3 +87,8 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 
 - [ ] Apply V10.1 after V10.0 in release order. Verify official Meta app access, exact scopes, API versions, approved test identities and private token storage.
 - [ ] Test target mismatch, revoked token, pause, approved revision, cancellation, ambiguous response and reconciliation before scheduling any authorized test publication. Confirm actual post independently. No Instagram/media acceptance implied.
+
+## V10.2 additional acceptance (pending)
+
+- [ ] Apply V10.2 after V10.1; verify LinkedIn administrator role/version, X user-context scopes/quota, GBP eligibility and account/location authorization. Keep all flags OFF until approved test destination.
+- [ ] Verify real post receipt and visibility independently, ambiguous reconciliation and unified historical ledger counts. No YouTube/Instagram acceptance implied.
