@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/secure-setup/maintenance/release-gate-lib.php';
+require_once dirname(__DIR__).'/public_html/api/growth-core.php';
 function rrCheck(bool $ok,string $m):void{if(!$ok)throw new RuntimeException($m);}
 function rrBlocked(callable $fn):void{try{$fn();}catch(RuntimeException|InvalidArgumentException $e){return;}throw new LogicException('Expected refusal');}
 rrCheck(count(recLedgers())===12&&!isset(recLedgers()['arbitrary']),'Ledger allowlist');

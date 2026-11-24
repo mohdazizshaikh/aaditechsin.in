@@ -21,6 +21,11 @@ try{
     gmailRenewStore($dir,$c);$path=$dir.'/gmail-renewal-candidate.json';
     crCheck((fileperms($path)&0777)===0600&&json_decode(file_get_contents($path),true)===$c,'Private candidate');
     crBlocked(static fn()=>gmailRenewStore($dir,$c));
+    $local=gmailCandidateRead($cfg,$dir,$ts);crCheck($local['digest']===hash_file('sha256',$path),'Candidate digest');
+    crCheck(gmailCandidateVerify($cfg,$dir,$local['digest'],$read,$ts)['digest']===$local['digest'],'Candidate identity');
+    crBlocked(static fn()=>gmailCandidateVerify($cfg,$dir,str_repeat('0',64),$read,$ts));
+    crBlocked(static fn()=>gmailCandidateVerify($cfg,$dir,$local['digest'],static fn()=>['emailAddress'=>'wrong@example.invalid'],$ts));
+    crBlocked(static fn()=>gmailCandidateRead($cfg,$dir,$ts+3600));
 }finally{if(isset($path)&&is_file($path))unlink($path);rmdir($dir);}
 if(($argv[1]??'')!=='--database'){echo "Credential candidate and private storage rules: PASS\n";exit;}
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1'||getenv('CI_DB_PASSWORD')!=='ci_only_not_real_password')exit(2);

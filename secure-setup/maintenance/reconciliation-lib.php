@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__,2).'/public_html/api/growth-core.php';
+
 function recLedgers():array{return [
  'telegram-text'=>'growth_publications','meta-text'=>'growth_meta_publications','network-text'=>'growth_network_publications','youtube'=>'growth_media_uploads','instagram-reel'=>'growth_instagram_uploads','facebook-media'=>'growth_facebook_media','network-image'=>'growth_network_media','meta-media'=>'growth_meta_images','linkedin-video'=>'growth_linkedin_video','x-video'=>'growth_x_video','carousel'=>'growth_carousels','telegram-media'=>'growth_telegram_media'
 ];}
@@ -23,6 +23,7 @@ function recRecord(PDO $db,array $cfg,string $ledger,int $id,string $digest,stri
     if(!in_array($outcome,['confirmed_present','confirmed_absent'],true)||!preg_match('/^[a-f0-9]{64}$/D',$digest)||!preg_match('/^[a-f0-9]{64}$/D',$evidence))throw new InvalidArgumentException('Invalid review');
     $r=recState($db,$ledger,$id,true);if(!hash_equals($r['state_hash'],$digest))throw new RuntimeException('State changed');
     $q=$db->prepare('INSERT INTO growth_publication_reviews(ledger,publication_id,state_hash,evidence_hash,outcome) VALUES(?,?,?,?,?)');$q->execute([$ledger,$id,$digest,$evidence,$outcome]);
+    require_once dirname(__DIR__,2).'/public_html/api/growth-core.php';
     growthAudit($db,$r['task_id'],$r['revision'],'publication_review','private_cli');
 }
 function recUnknownCounts(PDO $db):array{

@@ -38,3 +38,24 @@ function gmailRenewStore(string $dir,array $candidate):void{
     if(!$f)throw new RuntimeException('Existing candidate; inspect privately');
     try{if(!chmod($path,0600))throw new RuntimeException('Permissions');$raw=json_encode($candidate,JSON_THROW_ON_ERROR);if(fwrite($f,$raw)!==strlen($raw)||!fflush($f))throw new RuntimeException('Incomplete candidate');}finally{fclose($f);}
 }
+
+function gmailCandidateRead(array $cfg,string $dir,?int $now=null):array{
+    gmailRenewConfig($cfg);$path=$dir.'/gmail-renewal-candidate.json';
+    clearstatcache(true,$path);$st=@lstat($path);
+    if(!$st||($st['mode']&0170000)!==0100000||($st['mode']&0777)!==0600||$st['nlink']!==1||$st['size']<2||$st['size']>8192)throw new RuntimeException('Private candidate required');
+    $f=@fopen($path,'rb');if(!$f)throw new RuntimeException('Candidate unavailable');
+    try{$opened=fstat($f);if(!$opened||$opened['ino']!==$st['ino']||$opened['dev']!==$st['dev'])throw new RuntimeException('Candidate changed');$raw=stream_get_contents($f,8193);$after=fstat($f);}finally{fclose($f);}
+    if(!is_string($raw)||strlen($raw)!==$st['size']||!$after||$after['size']!==$st['size']||$after['mtime']!==$st['mtime']||$after['ctime']!==$st['ctime'])throw new RuntimeException('Candidate changed');
+    $r=json_decode($raw,true,8,JSON_THROW_ON_ERROR);
+    if(!is_array($r)||count($r)!==4||array_diff(['access_token','generation','expires_utc','revoked'],array_keys($r))||($r['revoked']??null)!==false||$r['generation']===($cfg['communications']['gmail']['generation']??null))throw new RuntimeException('Invalid candidate');
+    $next=$cfg;$next['communications']['gmail']=array_replace($next['communications']['gmail'],$r);
+    $p=gmailConfig($next,$now);if(!$p)throw new RuntimeException('Candidate expired or invalid');
+    return ['digest'=>hash('sha256',$raw),'expires_utc'=>$r['expires_utc'],'target'=>$p];
+}
+function gmailCandidateVerify(array $cfg,string $dir,string $expected,callable $read,?int $now=null):array{
+    $r=gmailCandidateRead($cfg,$dir,$now);
+    if(!preg_match('/^[a-f0-9]{64}$/D',$expected)||!hash_equals($r['digest'],$expected))throw new RuntimeException('Candidate digest changed');
+    gmailCollect($r['target'],$read);
+    $after=gmailCandidateRead($cfg,$dir,$now);if(!hash_equals($r['digest'],$after['digest']))throw new RuntimeException('Candidate changed');
+    return ['digest'=>$r['digest'],'expires_utc'=>$r['expires_utc']];
+}
