@@ -32,7 +32,7 @@ function waInboundDecode(array $p,string $raw,string $sig,?int $now=null):array{
                 $ts=(int)$m['timestamp'];if($ts>$now+300)throw new InvalidArgumentException('Future');
                 if($ts<$now-7*86400||!in_array($m['type'],['text','image','video','audio','document','sticker','location','contacts','interactive','button','order'],true))continue;
                 $h=hash_hmac('sha256',"aaditechs-wa-v1\n".$p['waba'].':'.$p['phone_id'].':'.$m['id'],hex2bin($p['dedupe_key_hex']));
-                $rows[$h]=gmdate('Y-m-d',$ts);
+                $day=gmdate('Y-m-d',$ts);if(isset($rows[$h])&&$rows[$h]!==$day)throw new InvalidArgumentException('Conflicting event');$rows[$h]=$day;
             }
         }
     }
