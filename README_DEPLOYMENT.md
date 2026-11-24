@@ -1,8 +1,12 @@
-# Aaditechs V8.5 — Hostinger deployment, secrets and security runbook
+# Aaditechs — Hostinger deployment, secrets and security runbook
 
 **Updated:** 23 November 2026 · **GitHub source:** `mohdazizshaikh/aaditechsin.in` → `main` · **Domain:** `aaditechs.in`.
 
 > **Current status:** V8.5 source is implemented; latest verified GitHub CI includes disposable MariaDB tests and offline checks. **No production overwrite, Hostinger staging acceptance, live MySQL or SMTP verification, Google API approval, legal review or customer production traffic are claimed.** The pre-existing private ChatGPT Site preview may still be on an older version. All live lead/portal/Google flags start **OFF**.
+
+## V9–V10 development addendum (24 November 2026)
+
+Main V9.6 verified; V9.7–V10.5A/V10.6A stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D then V10.2E then V10.2F then V10.2G then V10.2H then V10.2H.1 then V10.2H.2 then V10.2H.3 then V10.2K/V10.3 then V10.3A/V10.4; V10.2I/J and V10.5/V10.5A/V10.6A have no new SQL migration; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
 
 ## 1 — Deployment model and file destinations
 
@@ -153,3 +157,67 @@ The `source-validation.yml` workflow has a separate `disposable-mariadb-integrat
 - Each successful lead transaction stores its alert intention in MySQL. Cron claims up to 20 due alerts, retries temporary SMTP failures up to six attempts with backoff, and marks permanent failures `dead`. Owner-only portal shows aggregate delivery states and offers manual dead-alert requeue. Never claim mail delivery until test inbox confirms.
 - Delivery is **at least once**, not exactly once: after a crash between SMTP acceptance and DB acknowledgement, duplicate email may occur. The persistent reference lets the owner deduplicate. Cron must be configured and monitored separately.
 - No real SMTP credentials, user contact details, logs or queue exports belong in public GitHub.
+
+V10.1: configure Meta separately in private config, default OFF. Follow docs/V101_META.md; manual identity check and explicit worker invocation, no live OAuth token issuance or schedule installed. Stop workers before target/credential rotation. Never requeue uncertain posts.
+
+V10.2: private social.network flags and credentials, explicitly verify account access before test posting; GBP eligibility remains pending. See docs/V102_NETWORKS.md. No media transfer, automatic schedule or token refresh installed.
+
+V10.2A: private 0700 media storage, 0600 MP4, manual authenticated SFTP, 20 MiB cap, verify actual host PHP memory/quotas and authorized OAuth before staging. No upload via public webroot. See docs/V102A_MEDIA_UPLOAD.md. Explicit owner approval and CLI only.
+
+V10.2B: use authorized Facebook Login for Business linked professional Instagram test account, verified format and explicit public Reel approval. Direct binary transfer, no public media URL; check processing manually before publish. See docs/V102B_INSTAGRAM.md.
+
+V10.2C: verify private PNG/MP4 and PHP cURL/CURLStringFile, memory and quota before actual approved Facebook Page media test. Local Pillow, FFmpeg and ffprobe required. Explicit public approval; no media cron. See docs/V102C_FACEBOOK_MEDIA.md.
+
+V10.2D: independent LinkedIn/X PNG flags, verify permissions, version, quotas, storage and upload URL before approved test. See docs/V102D_NETWORK_MEDIA.md.
+
+V10.2E: before enabling media fetch, validate HTTPS route, CDN/access log query redaction, no cache, quota, approved JPEG and token expiry. No customer data or permanent public assets. See docs/V102E_META_IMAGES.md.
+
+V10.2E: leave fetch_log_redaction_verified=false until staging access/CDN logs actually redact bearer queries. Instagram photo derivative 1080x1350, Threads 1080x1080. Positive synthetic core delivery is not live HTTPS acceptance.
+
+V10.2F: private inventory and retention flags OFF. Back up DB/files, stop workers/transfers, pause and verify no in-flight requests before explicit per-file quarantine/restore. No deletion. See docs/V102F_MEDIA_STORAGE.md.
+
+V10.2G: enable oauth_lifecycle before any live social activation; set per-provider generation/deadline, stop workers/pause before private rotation, check identity read-only and revoke old credential through provider console. See docs/V102G_OAUTH_HEALTH.md.
+
+V10.2H: apply media resource ledger migration before existing LinkedIn/X image workers run. Inspect /mediarecovery for uncertain rows; never requeue automatically. See docs/V102H_MEDIA_RECOVERY.md.
+
+V10.2H.1: apply after V10.2H, LinkedIn video flag OFF. Verify actual API scope/version, private MP4, signed multipart ranges and intermediate URN/ETag finalization; Reel receipt before binary. See docs/V102H1_VIDEO_BATCH.md.
+
+V10.2H.2: apply migration after V10.2H.1, including X ledger and default image asset_kind on existing Meta rows. New flags x_video_enabled and threads_video_enabled OFF. Verify X user scope/processing/expiry and Threads HTTPS full MP4 fetch, redacted logs, no cache and host memory/quotas before enabling. No HTTP Range support; actual provider compatibility unverified. See docs/V102H2_VIDEO_BATCH.md.
+
+V10.2H.3: apply migration after V10.2H.2. Carousel and inbox import flags OFF by default. Verify separate private 0700 inbox, authorized manifest and hashes, carousel provider scope and ordered child receipts, bearer redaction and actual range responses. Remote SFTP delivery remains a separate manual step. See docs/V102H3_CAROUSEL_TRANSFER.md.
+
+V10.2I/J: no DB migration required beyond V10.2H.3. Configure dedicated private SFTP user, independently verified host key, 0700 inbox outside webroot, 0600 config/key/known_hosts/assets and local OpenSSH. Explicit --send only; server-side import still required. Set oauth_lifecycle.alerts_enabled only after approval; existing owner daily reporting and scheduler require independent setup. No auto refresh or cron installation. See docs/V102IJ_TRANSFER_HEALTH.md.
+
+V10.2K/V10.3: apply 2026-11-24-v102k.sql after V10.2H.3 (V10.2I/J has no migration). Telegram media and communications flags OFF. Verify separate business bot, exact channel and administrator post permission; approved private files and receipt. Import only authorized aggregate counts via private CLI. No mailbox, WhatsApp, SMS or telephony credentials or live connectors. See docs/V102K_V103_COMMUNICATIONS.md.
+
+V10.3A/V10.4: apply secure-setup/migrations/2026-11-24-v103a-v104.sql after V10.2K/V10.3. New Gmail, local batch and followup flags OFF. Verify separate authorized business mailbox, metadata-only Google consent and app verification requirements, private credential expiry and generation, no response logging; validate source rights, batch rollback and owner reminder/report delivery. No real connectors or schedule enabled. See docs/V103A_V104_INTELLIGENCE.md.
+
+V10.5: no new schema migration; all previous migrations through V10.3A/V10.4 required. Set intelligence_dashboard.enabled=true only in authorized isolated staging with portal and growth enabled. Confirm existing HTTPS/session, password and TOTP configuration, no cache/index, owner-only link and direct-route rejection for guests/partners. Review 7/30-day data semantics, responsive layout and module-off behavior. No live deployment or write controls. See docs/V105_OWNER_DASHBOARD.md.
+
+V10.5A/V10.6A: no new SQL migration. Use secure-setup/maintenance/release-contract.json for full ordered migration inventory (28 files, not all are missing on every database). Copy release-check.php and release-contract.json together to private secure/maintenance; run php release-check.php --check-db only against approved staging after stopping workers and pausing growth. Required-column/pause verification only, not backup, index/type or provider proof. Local CI replays V9.6 on a disposable database and compares schema metadata. Do not run tests/migration_replay.py on hosting. CSV export and communications batch flags default OFF. Verify completed IST/UTC semantics, aggregate-only exports, source consent, conflicts and private download handling. See docs/V105A_V106A_RELEASE_READINESS.md.
+
+V10.6B: no new migration. Keep communications.gmail.renewal.enabled and communications.retention_enabled OFF until authorized acceptance. Stop workers and pause growth before explicit renewal or retention; private candidate directory 0700 outside public_html, candidate 0600, no overwrite. Verify OAuth consent, exact scope and private rotation; never log or commit candidate. Retention dry-run first, verified backup/restore and approved policy before digest-confirmed apply. No automatic renewal, deletion, cron or deployment. See docs/V106B_CREDENTIAL_RETENTION.md.
+
+V10.6C: no new migration. Keep communications.bridge_enabled and each source authorization OFF until approved. Each source needs an independently authorized aggregate endpoint, per-source private credentials and generation, TLS and signed contract. Run communications-bridge.php --check CHANNEL without networking, then explicit --fetch only after source consent. Release source check requires repository layout; copy release-check.php, release-gate-lib.php and release-contract.json together for private DB check. Stop workers and pause growth before read-only check; any listed unresolved state blocks, no automatic replay or clearing. See docs/V106C_COMMUNICATIONS_RELEASE.md.
+
+V10.6D: apply 2026-11-24-v106d.sql after V10.3A/V10.4 (V10.5 through V10.6C no migrations). Updated contract: 29 ordered migrations, 41 tables, 31 source file hashes. Copy reconciliation-lib.php alongside release-gate-lib.php, release-check.php and release-contract.json. reconciliation.enabled OFF; stop workers and pause before private review. Require independent provider evidence; no original publication mutation or automatic replay. Verify backup artifact privately using workers/backup-verify.py, then independently restore in authorized isolated environment. Gmail candidate --inspect-candidate and --verify-candidate digest do not replace config. See docs/V106D_RECONCILIATION_BACKUP.md.
+
+V10.6E: apply 2026-11-24-v106e.sql after V10.6D. Contract: 30 ordered migrations, 42 tables, 32 source file hashes. Native usage flags OFF; dedicated authorized WABA analytics credential and restricted Twilio usage-read key, local expiry and generation required. Private CLI --check then --capture only after acceptance. CI dump/restore runs only on disposable synthetic MariaDB; real backup/isolated restoration remains mandatory. See docs/V106E_NATIVE_USAGE_RESTORE.md.
+
+V10.6F: apply 2026-11-24-v106f.sql after V10.6E. Contract 31 migrations, 43 tables, 33 hashes. Telegram album and WhatsApp inbound flags OFF. Verify exact manifest pair and owner approval, business bot/admin permissions, group receipt and visibility. Webhook requires dedicated authorized Meta app/WABA/phone, independently generated verification and dedupe secrets, HTTPS, request/log redaction and quotas; confirm retention procedure before activation. No automatic reply, webhook subscription or production configuration. See docs/V106F_ALBUMS_INBOUND.md.
+
+V10.6G: apply 2026-11-24-v106g.sql after V10.6F. Contract 32 migrations, 44 tables, 34 source hashes. Twilio SMS and voice status callbacks and WhatsApp cleanup flags independently OFF. Verify exact configured HTTPS URL, dedicated authorized subaccount and auth token, callback semantics and log redaction. Never replace call-control webhook with voice status endpoint or existing SMS routing without approved integration review. Before cleanup, approve policy, backup/restore, stop workers and pause growth; dry-run first. See docs/V106G_INBOUND_RETENTION.md.
+
+V10.6H: apply 2026-11-24-v106h.sql after V10.6G. Contract 33 migrations, 45 tables, 35 source hashes. Mixed carousel and communication review flags OFF. Verify legacy digest compatibility, exact approved video hash, asset order, actual provider codec/aspect/processing and bearer range delivery; validate review source and retention blocking before enabling. See docs/V106H_MIXED_REVIEWS.md.
+
+V10.6I: apply 2026-11-24-v106i.sql after V10.6H. Contract: 34 migrations, 46 tables, 36 source hashes. Search Console flag and authorization OFF. Dedicated privately consented read-only OAuth app and refresh grant required; no sharing Gmail/GBP tokens. Private CLI --check then --capture only after approved property/scope acceptance. Review local credential deadline, provider response shape, finalized Pacific Time dates and missing-day coverage. No Search Console write, indexing request or deployment. See docs/V106I_SEARCH_CONSOLE.md.
+
+V10.6J: apply 2026-11-25-v106j.sql after V10.6I. Contract 35 migrations, 48 tables, 37 source hashes. History and crawl import flags independently OFF. Verify actual Search Console property (source sitemap uses aaditechs.in), authorization and generation. Explicit local crawler --capture-authorized only with owner permission, reviewed robots policy and approved network environment; import sanitized report within 24 hours through private CLI. Stop/pause rules apply to database import; local crawl has no DB connection. Actual crawl, retention and isolated backup/restore remain pending. See docs/V106J_SEO_HISTORY_CRAWL.md.
+
+V10.6K: no new SQL migration; contract remains 35 migrations, 48 tables, 37 hashes. Run workers/local-runtime-check.py only on trusted local machine, with independently pinned installed model and network egress blocked for genuine offline inference. Optional synthetic inference and codec checks do not authorize production. SEO history retention and GBP media read flags OFF. Approve retention and verify backup/restore before paused digest-confirmed cleanup; --check-config GBP is local, --check-read is an explicit scoped provider GET only. See docs/V106K_RUNTIME_RETENTION.md.
+
+V10.6L: no new migration; contract remains 35 migrations, 48 tables, 37 hashes. Discovery cadence and recovery flags OFF. Explicitly authorize sources and review minimum interval (example 1440 minutes) before enabling. Existing --dry-run remains no-network configuration validation, --run is explicit. No cron installed. Stop all workers, pause, inspect interrupted run and confirm exact digest only after independent process verification. Do not infer imported counts from interrupted ledger. See docs/V106L_DISCOVERY_AUTOMATION.md.
+
+V10.6M: apply 2026-11-25-v106m.sql after V10.6J (K/L no migrations). Contract 36 migrations, 49 tables, 38 source hashes. New flags OFF. Review a private --plan OBJECTIVE before --apply OBJECTIVE SHA256; no model call or publication from batch CLI. Stop workers and pause before Twilio retention; verified backup/restore and explicit policy approval required. Replay hashes remain indefinitely unless separate reviewed migration/policy; never rotate dedupe key casually. See docs/V106M_BULK_COVERAGE_RELEASE.md.
+
+V10.6N: no migration/flag changes. Private creative batch optionally takes LIMIT (1–126) on both --plan and --apply; review selected cells and use the same limit and fresh v2 digest. Old v1 plans are invalid. Verify synthetic CI and actual private staging before use; no generation or publishing from batch creation. See docs/V106N_BOUNDED_CREATIVE_REVIEW.md.
