@@ -33,6 +33,9 @@ return [
         'enabled' => false,
         'telegram' => [
             'enabled' => false,
+            'reports_enabled' => false, // Proactive reports require separate owner acceptance.
+            'bot_token' => 'REPLACE_WITH_PRIVATE_OWNER_BOT_TOKEN',
+            'daily_after_ist' => '18:00',
             'webhook_secret' => 'REPLACE_WITH_RANDOM_WEBHOOK_SECRET',
             'owner_user_id' => 'REPLACE_WITH_NUMERIC_OWNER_USER_ID',
             'owner_chat_id' => 'REPLACE_WITH_PRIVATE_OWNER_CHAT_ID',
