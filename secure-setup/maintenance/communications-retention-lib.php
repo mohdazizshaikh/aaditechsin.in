@@ -10,6 +10,7 @@ function commRetentionPlan(PDO $db,array $cfg,?DateTimeImmutable $now=null):arra
     $gmailCut=$now->setTime(0,0)->modify('-30 days')->format('Y-m-d H:i:s');
     $q=$db->prepare('SELECT id FROM growth_communication_daily WHERE day_utc<? ORDER BY id LIMIT 1001 FOR UPDATE');$q->execute([$cut]);$ids=array_map('intval',$q->fetchAll(PDO::FETCH_COLUMN));
     if(count($ids)>1000)throw new RuntimeException('Excessive candidates; review manually');
+    $q=$db->prepare("SELECT COUNT(*) FROM growth_communication_reviews r JOIN growth_communication_daily a ON a.id=r.aggregate_id WHERE a.day_utc<? AND r.status='open'");$q->execute([$cut]);if((int)$q->fetchColumn()>0)throw new RuntimeException('Close eligible open reviews before retention');
     $q=$db->prepare('SELECT generation,captured_at FROM growth_gmail_snapshot WHERE id=1 AND captured_at<? FOR UPDATE');$q->execute([$gmailCut]);$gmail=$q->fetch(PDO::FETCH_ASSOC)?:null;
     $digest=hash('sha256',json_encode([$cut,$gmailCut,$ids,$gmail],JSON_THROW_ON_ERROR));
     return ['cutoff'=>$cut,'gmail_cutoff'=>$gmailCut,'ids'=>$ids,'gmail'=>$gmail,'digest'=>$digest];

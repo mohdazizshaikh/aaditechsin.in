@@ -7,8 +7,9 @@ function caChildren(array $p,array $r,callable $request,callable $remember):bool
         if(!caBound($p,$r)||!miIdentity($p,$request))return false;
         foreach($r['items'] as $item){
             if(!preg_match('/^[a-f0-9]{64}$/D',$item['fetch_token']))return false;
-            $data=['image_url'=>$p['origin'].'/api/media-fetch.php?c='.$item['fetch_token'],'is_carousel_item'=>'true'];
-            if($p['provider']==='threads')$data['media_type']='IMAGE';
+            $kind=$item['asset_kind']??'image';if(!in_array($kind,['image','video'],true))return false;
+            $data=[($kind==='video'?'video_url':'image_url')=>$p['origin'].'/api/media-fetch.php?c='.$item['fetch_token'],'is_carousel_item'=>'true'];
+            if($kind==='video'||$p['provider']==='threads')$data['media_type']=$kind==='video'?'VIDEO':'IMAGE';
             $v=$request($p,'POST',$p['id'].($p['provider']==='threads'?'/threads':'/media'),$data);$id=$v['json']['id']??null;
             if(($v['http']??0)!==200||isset($v['json']['error'])||!caId($id))return false;
             $remember((int)$item['position_no'],$id);

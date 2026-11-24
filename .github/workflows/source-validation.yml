@@ -54,6 +54,7 @@ jobs:
           php tests/native_usage_rules.php
           php tests/albums_inbound_rules.php
           php tests/twilio_retention_rules.php
+          php tests/mixed_review_rules.php
           python3 tests/backup_verify.py
           php tests/intelligence_rules.php
           php tests/dashboard_rules.php
@@ -141,6 +142,7 @@ jobs:
           php tests/native_usage_rules.php --database
           php tests/albums_inbound_rules.php --database
           php tests/twilio_retention_rules.php --database
+          php tests/mixed_review_rules.php --database
           php tests/intelligence_rules.php --database
           php tests/dashboard_rules.php --database
           php tests/network_media_rules.php --database

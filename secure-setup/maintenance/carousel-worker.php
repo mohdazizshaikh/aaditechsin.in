@@ -7,12 +7,17 @@ require __DIR__.'/upload-assets.php';
 require __DIR__.'/carousel-send.php';
 try{
     $cfg=opsConfig();$provider=$argv[2]??'';$p=caTarget($cfg,$provider);if(!$p)throw new RuntimeException('Disabled');$db=opsDb($cfg);$mode=$argv[1]??'';
-    if($mode==='--stage'&&count($argv)>=9&&count($argv)<=12&&preg_match('/^[1-9][0-9]{0,14}$/D',$argv[3])&&preg_match('/^[1-9][0-9]{0,8}$/D',$argv[4])){
+    if(in_array($mode,['--stage','--stage-mixed'],true)&&count($argv)>=9&&count($argv)<=12&&preg_match('/^[1-9][0-9]{0,14}$/D',$argv[3])&&preg_match('/^[1-9][0-9]{0,8}$/D',$argv[4])){
         $db->beginTransaction();$m=miManifest($db,(int)$argv[3],(int)$argv[4],$argv[5],$provider);uploadPhotoRead($argv[6],$m['image_hash'],(int)$m['width'],(int)$m['height']);
         [$w,$h]=miImageDimensions($provider,(int)$m['width'],(int)$m['height']);$items=[];
         foreach(array_slice($argv,7) as $path){
+            if($mode==='--stage-mixed'&&str_ends_with(strtolower($path),'.mp4')){
+                if(($cfg['media_upload'][$provider.'_mixed_carousel_enabled']??false)!==true)throw new RuntimeException('Mixed disabled');
+                $bytes=uploadRead($path,$m['video_hash']);uploadStore(miRoot($cfg),$m['video_hash'],$bytes);$items[]=['asset_hash'=>$m['video_hash'],'byte_count'=>strlen($bytes),'asset_kind'=>'video'];continue;
+            }
             if(is_link($path)||!is_file($path)||filesize($path)>8000000)throw new RuntimeException('Invalid JPEG');$hash=hash_file('sha256',$path);$bytes=miRead($path,$hash,$w,$h);miStore(miRoot($cfg),$hash,$bytes,$w,$h);$items[]=['asset_hash'=>$hash,'byte_count'=>strlen($bytes)];
         }
+        if($mode==='--stage-mixed'&&!in_array('video',array_column($items,'asset_kind'),true))throw new RuntimeException('Mixed requires a video');
         $id=caRegister($db,$cfg,$provider,(int)$argv[3],(int)$argv[4],$argv[5],$items);$db->commit();echo 'Carousel #'.$id." staged. Review exact order and hashes.\n";
     }elseif(count($argv)===4&&in_array($mode,['--children','--parent','--publish','--status'],true)&&preg_match('/^[1-9][0-9]{0,14}$/D',$argv[3])){
         $id=(int)$argv[3];$stage=substr($mode,2);

@@ -4,6 +4,7 @@ require_once __DIR__.'/growth-core.php';
 require_once __DIR__.'/oauth-health-core.php';
 require_once __DIR__.'/communications-core.php';
 require_once __DIR__.'/gmail-health-core.php';
+require_once __DIR__.'/communication-review-core.php';
 require_once __DIR__.'/native-usage-core.php';
 require_once __DIR__.'/whatsapp-inbound-core.php';
 require_once __DIR__.'/twilio-inbound-core.php';
@@ -78,6 +79,7 @@ function reportClaim(PDO $db,array $cfg,string $kind,DateTimeImmutable $now):?ar
         $key=$local->format('Y-m-d');
         $text="Daily snapshot (IST; day-to-date, not full-day)\n".growthCommand($db,'/today',$cfg)."\n\n".reportErrorText($db,$now);
         if(communicationsEnabled($cfg))$text.="\n\n".communicationsSummary($db,$now);
+        if(commReviewEnabled($cfg))$text.="\n\n".commReviewSummary($db,$now);
         if(waInboundConfig($cfg))$text.="\n\n".waInboundSummary($db,$cfg,$now);
         if(twInboundConfig($cfg,'sms')||twInboundConfig($cfg,'calls'))$text.="\n\n".twInboundSummary($db,$cfg,$now);
         if(communicationsEnabled($cfg)&&($cfg['communications']['native_usage_enabled']??false)===true)$text.="\n\n".nativeUsageSummary($db,$cfg,$now);
