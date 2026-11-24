@@ -162,3 +162,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6B acceptance (pending runtime)
 
 - [ ] Verify Gmail consent and refresh grant, exact metadata scope, mailbox identity, expiry safety margin, unexpected refresh-token rotation refusal, paused growth, exclusive private candidate storage and manual activation/recovery. Verify approved 90-day communications and 30-day stale snapshot retention, dry-run no writes, changed digest rejection, cutoff boundary, transactional rollback, backup/restore and no unrelated deletion. Actual provider and hosting acceptance pending.
+
+## V10.6C acceptance (pending runtime)
+
+- [ ] Authorize aggregate source for each channel, confirm source count definitions and consent, TLS pinned public destination, separate bearer/HMAC secrets, exact signature/generation/freshness/channel/day and no personal data, idempotent import and conflicts/pause. Verify actual upstream integration separately. Compare release migration/fixture file integrity, confirm main baseline, stop workers, pause, reconcile unresolved worker/provider/lease/bearer rows, verify backup and isolated restore, review full cumulative candidate. No deployment or native provider acceptance inferred.

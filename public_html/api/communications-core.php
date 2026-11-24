@@ -24,7 +24,7 @@ function communicationsImport(PDO $db,array $cfg,array $row,?DateTimeImmutable $
 function communicationsSummary(PDO $db,?DateTimeImmutable $now=null):string{
     $utc=new DateTimeZone('UTC');$day=($now??new DateTimeImmutable('now',$utc))->setTimezone($utc)->modify('-1 day')->format('Y-m-d');
     $q=$db->prepare('SELECT channel,received_count,answered_count,missed_count FROM growth_communication_daily WHERE day_utc=? ORDER BY channel');$q->execute([$day]);$rows=[];foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r)$rows[$r['channel']]=$r;
-    $lines=['Manually imported communications, completed UTC day '.$day.' (not live monitoring):'];
+    $lines=['Imported communications aggregates, completed UTC day '.$day.' (not live monitoring):'];
     foreach(['email','whatsapp','sms','calls'] as $c){$r=$rows[$c]??null;$lines[]=$c.': '.($r?'received '.$r['received_count'].' / answered '.$r['answered_count'].' / missed '.$r['missed_count']:'no data');}
     return implode("\n",$lines);
 }
