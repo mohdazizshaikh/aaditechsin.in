@@ -11,6 +11,10 @@ return [
     // Customer tracking links expire automatically; owner can rotate anytime.
     'tracking_ttl_days' => 90,
     // V9.1 review-only foundation, OFF until isolated staging acceptance.
+    'analytics' => [
+        'enabled' => false, // Independent opt-in, privacy approval and staging required.
+        'salt' => 'REPLACE_WITH_INDEPENDENT_RANDOM_ANALYTICS_SALT',
+    ],
     'growth' => [
         'enabled' => false,
         'telegram' => [
