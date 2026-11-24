@@ -177,3 +177,7 @@
 ## V10.6N security (pending runtime)
 
 - [ ] Verify limit-bound v2 plans, pause and feature flags, UTF-8/catalog refusals and result collision rollback in synthetic CI and isolated staging. No old v1 plan reuse, auto approval or publication. No actual provider calls or production changes.
+
+## V10.6O security (pending runtime)
+
+- [ ] Verify default-off scheduler, cadence and authorization prerequisites, private log/cron permissions, no network in configuration check, read-only status, pause and overlap guards. Verify UTF-8 refusals and atomic intake/draft review writes. Actual provider acceptance and scheduler installation remain pending.
