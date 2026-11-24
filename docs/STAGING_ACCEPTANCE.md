@@ -118,3 +118,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2F acceptance (pending runtime)
 
 - [ ] Apply after V10.2E. Verify real admin vs partner/anonymous access, password fingerprint/timeout, no-cache preview, file ACL/hash, bounded inventory, paused old-orphan quarantine and restore, reference protection and DB/filesystem audit recovery. No permanent purge.
+
+## V10.2G acceptance (pending live)
+
+- [ ] Apply after V10.2F. Enable lifecycle enforcement before live OAuth activation; test expired, revoked, malformed/missing metadata and rotation, sanitized read-only checks, stale evidence and actual provider scopes/renewal/revocation. No automated consent/refresh acceptance.

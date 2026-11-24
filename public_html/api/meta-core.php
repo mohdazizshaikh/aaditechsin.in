@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/oauth-policy.php';
 require_once __DIR__.'/creative-core.php';
 function metaTarget(array $cfg,string $provider):?array {
+    if(!oauthAllowed($cfg,$provider))return null;
     if(!creativeEnabled($cfg)||($cfg['social']['enabled']??false)!==true||($cfg['social']['meta']['enabled']??false)!==true||!in_array($provider,['facebook','threads'],true))return null;
     $p=$cfg['social']['meta'][$provider]??[];
     $id=$p['account_id']??null;$token=$p['access_token']??null;$version=$p['api_version']??null;

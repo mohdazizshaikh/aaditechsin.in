@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/oauth-policy.php';
 require_once __DIR__.'/media-core.php';
 function igTarget(array $cfg):?array {
+    if(!oauthAllowed($cfg,'instagram'))return null;
     if(!mediaEnabled($cfg)||($cfg['social']['enabled']??false)!==true||($cfg['media_upload']['enabled']??false)!==true||($cfg['media_upload']['instagram']['enabled']??false)!==true)return null;
     $p=$cfg['media_upload']['instagram'];
     foreach(['page_id','account_id'] as $k)if(!is_string($p[$k]??null)||!preg_match('/^[1-9][0-9]{0,30}$/D',$p[$k]))return null;

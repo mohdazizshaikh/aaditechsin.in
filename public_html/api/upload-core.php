@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/oauth-policy.php';
 require_once __DIR__.'/media-core.php';
 function uploadTarget(array $cfg):?array {
+    if(!oauthAllowed($cfg,'youtube'))return null;
     if(!mediaEnabled($cfg)||($cfg['social']['enabled']??false)!==true||($cfg['media_upload']['enabled']??false)!==true||($cfg['media_upload']['youtube']['enabled']??false)!==true)return null;
     $p=$cfg['media_upload']['youtube'];$id=$p['channel_id']??null;$token=$p['access_token']??null;
     if(!is_string($id)||!preg_match('/^UC[A-Za-z0-9_-]{22}$/D',$id)||!is_string($token)||!preg_match('/^[A-Za-z0-9._~+\/=-]{20,4096}$/D',$token)||str_starts_with($token,'REPLACE_'))return null;
