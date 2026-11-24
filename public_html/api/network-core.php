@@ -24,6 +24,7 @@ function networkSchedule(PDO $db,array $cfg,string $provider,int $id,int $rev,st
     $q->execute([$id,$rev,$provider]);if(!$q->fetchColumn())throw new InvalidArgumentException('Approved current matching revision required');
     if(in_array($provider,['linkedin','x'],true)){$q=$db->prepare('SELECT id FROM growth_network_media WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for media');}
     if($provider==='linkedin'){$q=$db->prepare('SELECT id FROM growth_linkedin_video WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for video');}
+    if($provider==='x'){$q=$db->prepare('SELECT id FROM growth_x_video WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for video');}
     $q=$db->prepare('SELECT id FROM growth_network_publications WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Already scheduled');
     $db->prepare('INSERT INTO growth_network_publications(task_id,revision,provider,target_id,due_at) VALUES(?,?,?,?,?)')->execute([$id,$rev,$provider,$target,$date->format('Y-m-d H:i:s')]);
     $pub=(int)$db->lastInsertId();growthAudit($db,$id,$rev,'network_scheduled','owner');return $pub;

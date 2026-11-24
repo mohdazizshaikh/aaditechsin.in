@@ -31,7 +31,7 @@ try{
     $raw=json_encode(['version'=>1,'task_id'=>$task,'revision'=>1,'channel'=>'x','renderer'=>'template','width'=>1200,'height'=>628,'image_sha256'=>str_repeat('a',64),'video_sha256'=>$hash]);
     $manifest=mediaRegister($db,$raw)['manifest_sha256'];growthCommand($db,"/approvemedia $task 1 $manifest",$cfg);
     $up=xvRegister($db,$cfg,$task,1,$manifest,$hash,strlen($bytes));
-    xvCheck(str_contains(growthCommand($db,"/approvelivideo $up $manifest 456",$cfg),'approved'),'Exact approval');
+    xvCheck(str_contains(growthCommand($db,"/approvexvideo $up $manifest 456",$cfg),'approved'),'Exact approval');
     try{nmRegister($db,$cfg,$task,1,$manifest,'x',str_repeat('a',64),100);throw new LogicException('Image duplicate');}catch(InvalidArgumentException $e){}
     $r=xvClaim($db,$cfg,$up,'upload');xvRemember($db,$r,$id);xvFinish($db,$r,'upload',networkResult('processing',$id));
     $r=xvClaim($db,$cfg,$up,'publish');xvCheck($r['video_id']===$id,'Persisted ID');xvFinish($db,$r,'publish',networkResult('unknown',null,'publish_unverified'));
