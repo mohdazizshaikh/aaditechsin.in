@@ -15,7 +15,9 @@ $calls=[];$mock=static function($p,$kind,$path,$data=[],$binary='')use(&$calls,$
     if($kind==='get')return ['http'=>200,'json'=>['id'=>'789','status_code'=>'FINISHED']];
     igCheck($data['creation_id']==='789','Bound container');return ['http'=>200,'json'=>['id'=>'999']];
 };
-igCheck(igUpload($p,$row,$bytes,$mock)===igResult('processing','789')&&$calls===['get:me','post:456/media','binary:789'],'Separate upload no publish');
+$remembered=[];igCheck(igUpload($p,$row,$bytes,$mock,static function($id)use(&$remembered){$remembered[]=$id;})===igResult('processing','789')&&$calls===['get:me','post:456/media','binary:789'],'Separate upload no publish');
+igCheck($remembered===['789'],'Durable receipt callback');
+$calls=[];igCheck(igUpload($p,$row,$bytes,$mock,static function(){throw new RuntimeException('DB failure');})['status']==='unknown'&&$calls===['get:me','post:456/media'],'Receipt failure blocks binary');
 $calls=[];igCheck(igPublish($p,$row,$mock)===igResult('accepted','999')&&$calls===['get:me','get:789','post:456/media_publish'],'Publish finished container');
 $calls=[];$wait=static function($p,$kind,$path,$data=[],$binary='')use(&$calls){$calls[]=$kind;return $path==='me'?['http'=>200,'json'=>['id'=>'123','instagram_business_account'=>['id'=>'456']]]:['http'=>200,'json'=>['id'=>'789','status_code'=>'IN_PROGRESS']];};
 igCheck(igPublish($p,$row,$wait)['status']==='unknown'&&$calls===['get','get'],'Not finished cannot publish');
@@ -35,7 +37,7 @@ try{
     $up=igRegister($db,$cfg,$id,1,$manifest,$hash,strlen($bytes));
     igCheck(str_contains(growthCommand($db,"/approveig $up $manifest 999",$cfg),'mismatch'),'Wrong destination');
     igCheck(str_contains(growthCommand($db,"/approveig $up $manifest 456",$cfg),'approved'),'Exact public Reel approval');
-    $r=igClaim($db,$cfg,$up,'upload');igFinish($db,$r,'upload',igResult('processing','789'));
+    $r=igClaim($db,$cfg,$up,'upload');igRemember($db,$r,'789');igFinish($db,$r,'upload',igResult('processing','789'));
     $r=igClaim($db,$cfg,$up,'publish');igFinish($db,$r,'publish',igResult('unknown',null,'publish_unverified'));
     try{igClaim($db,$cfg,$up,'publish');throw new LogicException('Retry accepted');}catch(RuntimeException $e){}
     igCheck(str_contains(growthCommand($db,'/publications',$cfg),'instagram unknown: 1'),'Unified ledger');

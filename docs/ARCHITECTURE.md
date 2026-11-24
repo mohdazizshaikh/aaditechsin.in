@@ -88,3 +88,7 @@ Private configured credential and non-secret generation/deadline -> optional sou
 ## V10.2H intermediate media evidence
 
 LinkedIn initialization and uploaded image URN, X uploaded image ID are persisted before final publication. Failure to persist evidence stops send. Read-only reconciliation, no replay or provider token persistence. Video and carousel adapters remain pending. See V102H_MEDIA_RECOVERY.md.
+
+## V10.2H.1 video and reconciliation batch
+
+Private approved MP4 -> exclusive revision -> explicit public authorization -> persistent LinkedIn video URN -> bounded signed multipart PUT -> ordered ETags/finalize -> AVAILABLE owner check -> separate explicit publish. Instagram records Reel container before binary transfer. /mediarecovery includes both. See V102H1_VIDEO_BATCH.md.

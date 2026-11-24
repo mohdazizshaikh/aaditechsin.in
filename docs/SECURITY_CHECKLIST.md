@@ -93,3 +93,7 @@
 ## V10.2H media reconciliation security
 
 - [ ] Persist only validated intermediate resource ID, no signed URL/token or raw response. No automatic retry; inspect uncertain rows and reconcile provider-side. Test audit failure and worker interruption.
+
+## V10.2H.1 security (pending runtime)
+
+- [ ] Private exact hash, exclusive revision, explicit public approval, pinned signed URL without OAuth bearer, bounded multipart, persistent URN and Reel container, no secret logging or blind retries. Verify actual host quotas and provider rights.
