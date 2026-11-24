@@ -119,6 +119,7 @@ $flags = [
     'growth.enabled' => ['growth', 'enabled'],
     'growth.telegram.enabled' => ['growth', 'telegram', 'enabled'],
     'analytics.enabled' => ['analytics', 'enabled'],
+    'discovery.enabled' => ['discovery','enabled'],
 ];
 foreach ($flags as $name => $keys) {
     $enabled = setValue($config, $keys) === true;
@@ -168,6 +169,10 @@ if (setValue($config, ['analytics','enabled']) === true) {
 if (setValue($config, ['growth','enabled']) === true) {
     outcome('Growth requires enabled database', setValue($config,['database','enabled'])===true);
 }
+if (setValue($config,['discovery','enabled']) === true) {
+    outcome('Discovery requires enabled growth and database', setValue($config,['growth','enabled'])===true && setValue($config,['database','enabled'])===true);
+    warning('Discovery only imports evidence; external discovery and sending are not connected');
+}
 if ($checkDb) {
     if (setValue($config, ['database', 'enabled']) !== true || !extension_loaded('pdo_mysql')) {
         outcome('Read-only DB smoke test prerequisites', false);
@@ -181,7 +186,7 @@ if ($checkDb) {
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
             outcome('Read-only DB SELECT 1', $pdo->query('SELECT 1')->fetchColumn() !== false);
-            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox', 'growth_tasks', 'growth_audit', 'growth_control', 'growth_telegram_updates', 'growth_analytics_events', 'growth_analytics_budget'] as $table) {
+            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox', 'growth_tasks', 'growth_audit', 'growth_control', 'growth_telegram_updates', 'growth_analytics_events', 'growth_analytics_budget', 'growth_opportunities'] as $table) {
                 $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?');
                 $stmt->execute([$table]);
                 outcome('Database table present: ' . $table, (int)$stmt->fetchColumn() >= 1);
