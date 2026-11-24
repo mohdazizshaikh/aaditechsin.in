@@ -15,7 +15,11 @@ return [
         'enabled' => false, // Independent opt-in, privacy approval and staging required.
         'salt' => 'REPLACE_WITH_INDEPENDENT_RANDOM_ANALYTICS_SALT',
     ],
-    'discovery' => ['enabled' => false], // Evidence intake and owner review only.
+    'discovery' => [
+        'enabled' => false,
+        'feeds_enabled' => false, // Explicitly authorize each provider before enabling.
+        'feeds' => [], // See docs/V931_SOURCE_ADAPTER.md. No providers connected by default.
+    ],
     'growth' => [
         'enabled' => false,
         'telegram' => [
