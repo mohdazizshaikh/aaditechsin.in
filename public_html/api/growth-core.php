@@ -46,7 +46,14 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
 function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.3 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; no publishing or outreach connector.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.3 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; no publishing or outreach connector.";
+    if($command==='/discoveryruns'){
+        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||($cfg['discovery']['feeds_enabled']??false)!==true)return 'External discovery feeds disabled or unconfigured.';
+        $lines=['Recent source runs (up to 10; not confirmed leads):'];
+        foreach($db->query('SELECT source_id,status,imported_count,duplicate_count,skipped_count,error_code FROM growth_source_runs ORDER BY id DESC LIMIT 10')->fetchAll(PDO::FETCH_ASSOC) as $r)
+            $lines[]=$r['source_id'].' '.$r['status'].' | imported '.$r['imported_count'].' duplicate '.$r['duplicate_count'].' skipped '.$r['skipped_count'].($r['error_code']!==''?' | '.$r['error_code']:'');
+        return count($lines)===1?'No source run recorded.':implode("\n",$lines);
+    }
     require_once __DIR__.'/discovery-core.php';
     $discovery=discoveryCommand($db,$cfg,$command);
     if($discovery!==null)return $discovery;
