@@ -92,3 +92,7 @@ LinkedIn initialization and uploaded image URN, X uploaded image ID are persiste
 ## V10.2H.1 video and reconciliation batch
 
 Private approved MP4 -> exclusive revision -> explicit public authorization -> persistent LinkedIn video URN -> bounded signed multipart PUT -> ordered ETags/finalize -> AVAILABLE owner check -> separate explicit publish. Instagram records Reel container before binary transfer. /mediarecovery includes both. See V102H1_VIDEO_BATCH.md.
+
+## V10.2H.2 X and Threads video boundary
+
+X: private exact MP4, exclusive revision, explicit public approval, persistent media ID, ordered bounded append/finalize, read-only succeeded/expiry check and separate publish. Threads: approved manifest MP4 and exact asset-type approval, same private expiring bearer fetch (15 minutes, 20 requests), FINISHED container and explicit publish; no automatic retry, no permanent public media. Recovery and inventory include both. Carousels need separate ordered multi-asset approval. See V102H2_VIDEO_BATCH.md.
