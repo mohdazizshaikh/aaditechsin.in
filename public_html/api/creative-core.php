@@ -65,6 +65,7 @@ function creativeImport(PDO $db,array $result):bool {
     return true;
 }
 function creativeCommand(PDO $db,array $cfg,string $command):?string {
+    if(preg_match('/^\/coveragegrid(?: |$)/D',$command)){require_once __DIR__.'/creative-batch-core.php';return creativeBatchSummary($db,$cfg,substr($command,14));}
     if(!preg_match('/^\/(?:createcontent|content|coverage)(?: |$)/D',$command))return null;
     if(!creativeEnabled($cfg))return 'Creative engine disabled or unconfigured.';
     if($command==='/content'){
