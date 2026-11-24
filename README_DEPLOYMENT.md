@@ -171,3 +171,5 @@ V10.2C: verify private PNG/MP4 and PHP cURL/CURLStringFile, memory and quota bef
 V10.2D: independent LinkedIn/X PNG flags, verify permissions, version, quotas, storage and upload URL before approved test. See docs/V102D_NETWORK_MEDIA.md.
 
 V10.2E: before enabling media fetch, validate HTTPS route, CDN/access log query redaction, no cache, quota, approved JPEG and token expiry. No customer data or permanent public assets. See docs/V102E_META_IMAGES.md.
+
+V10.2E: leave fetch_log_redaction_verified=false until staging access/CDN logs actually redact bearer queries. Instagram photo derivative 1080x1350, Threads 1080x1080. Positive synthetic core delivery is not live HTTPS acceptance.

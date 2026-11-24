@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/instagram-core.php';
 require_once __DIR__.'/meta-core.php';
 function miTarget(array $cfg,string $provider):?array {
-    if(!mediaEnabled($cfg)||($cfg['media_upload']['enabled']??false)!==true||($cfg['media_upload']['fetch_enabled']??false)!==true||!in_array($provider,['threads','instagram'],true)||($cfg['media_upload'][$provider.'_images_enabled']??false)!==true)return null;
+    if(!mediaEnabled($cfg)||($cfg['media_upload']['enabled']??false)!==true||($cfg['media_upload']['fetch_enabled']??false)!==true||($cfg['media_upload']['fetch_log_redaction_verified']??false)!==true||!in_array($provider,['threads','instagram'],true)||($cfg['media_upload'][$provider.'_images_enabled']??false)!==true)return null;
     $p=$provider==='threads'?metaTarget($cfg,'threads'):igTarget($cfg);
     if(!$p)return null;
     $origin=$cfg['public_base_url']??null;
@@ -15,6 +15,11 @@ function miManifest(PDO $db,int $task,int $rev,string $manifest,string $provider
     if(!preg_match('/^[a-f0-9]{64}$/D',$manifest)||!in_array($provider,['threads','instagram'],true))throw new InvalidArgumentException('Invalid manifest');
     $q=$db->prepare("SELECT m.image_hash,m.width,m.height,r.caption FROM growth_media_manifests m JOIN growth_tasks t ON t.id=m.task_id AND t.revision=m.revision AND t.status='approved' JOIN growth_creative c ON c.task_id=t.id AND c.channel=? JOIN growth_creative_results r ON r.task_id=t.id AND r.revision=t.revision WHERE m.task_id=? AND m.revision=? AND m.manifest_hash=? AND m.status='approved' FOR UPDATE");
     $q->execute([$provider,$task,$rev,$manifest]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new InvalidArgumentException('Approved matching manifest required');return $r;
+}
+function miImageDimensions(string $provider,int $w,int $h):array {
+    if($provider==='instagram'&&[$w,$h]===[1080,1920])return [1080,1350];
+    if($provider==='threads'&&[$w,$h]===[1080,1080])return [$w,$h];
+    throw new RuntimeException('Unsupported image profile');
 }
 function miRoot(array $cfg):string {
     $path=$cfg['media_upload']['private_root']??null;
@@ -89,7 +94,8 @@ function miFetch(PDO $db,array $cfg,string $token,bool $head=false):array {
     $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_meta_images u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' WHERE u.token_hash=? AND u.status IN ('fetching','processing') AND u.expires_at>UTC_TIMESTAMP() AND u.fetch_count<20 FOR UPDATE");
     $q->execute([hash('sha256',$token)]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new RuntimeException('Unavailable');
     $p=miTarget($cfg,$r['provider']);if(!$p||$p['id']!==$r['target_id']||$p['page']!==$r['page_id'])throw new RuntimeException('Unavailable');
-    $bytes=miRead(miRoot($cfg).'/'.$r['asset_hash'].'.jpg',$r['asset_hash'],(int)$r['width'],(int)$r['height'],(int)$r['byte_count']);
+    [$w,$h]=miImageDimensions($r['provider'],(int)$r['width'],(int)$r['height']);
+    $bytes=miRead(miRoot($cfg).'/'.$r['asset_hash'].'.jpg',$r['asset_hash'],$w,$h,(int)$r['byte_count']);
     $db->prepare('UPDATE growth_meta_images SET fetch_count=fetch_count+1 WHERE id=?')->execute([$r['id']]);return ['bytes'=>$head?'':$bytes,'size'=>strlen($bytes)];
 }
 function miFinishFetch(PDO $db,array $r,?string $container):void {

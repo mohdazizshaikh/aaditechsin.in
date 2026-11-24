@@ -112,3 +112,5 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2E acceptance (pending runtime)
 
 - [ ] Apply after V10.2D. Verify actual HTTPS positive/negative GET/HEAD, expiry, fetch cap, revocation/pause, log redaction and no caching, private JPEG format/crop, real Meta container readiness/visibility. Explicit public authorization. No carousel/video acceptance.
+
+- [ ] V10.2E requires explicit fetch_log_redaction_verified=true only after real hosting/CDN log review. Verify Threads 1080x1080 and Instagram 1080x1350 JPEG; synthetic core fetch tests do not prove HTTP deployment.

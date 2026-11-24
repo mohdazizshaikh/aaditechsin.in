@@ -13,12 +13,12 @@ try{
         $db->beginTransaction();$r=miManifest($db,(int)$argv[3],(int)$argv[4],$argv[5],$provider);
         uploadPhotoRead($argv[6],$r['image_hash'],(int)$r['width'],(int)$r['height']);
         if(is_link($argv[7])||!is_file($argv[7])||filesize($argv[7])>8000000)throw new RuntimeException('Invalid JPEG');$hash=hash_file('sha256',$argv[7]);if(!is_string($hash))throw new RuntimeException('Invalid JPEG');
-        $bytes=miRead($argv[7],$hash,(int)$r['width'],(int)$r['height']);
-        $id=miRegister($db,$cfg,$provider,(int)$argv[3],(int)$argv[4],$argv[5],$hash,strlen($bytes));miStore($root,$hash,$bytes,(int)$r['width'],(int)$r['height']);$db->commit();echo 'Image #'.$id." staged. Inspect exact JPEG separately before approval.\n";
+        [$w,$h]=miImageDimensions($provider,(int)$r['width'],(int)$r['height']);$bytes=miRead($argv[7],$hash,$w,$h);
+        $id=miRegister($db,$cfg,$provider,(int)$argv[3],(int)$argv[4],$argv[5],$hash,strlen($bytes));miStore($root,$hash,$bytes,$w,$h);$db->commit();echo 'Image #'.$id." staged. Inspect exact JPEG separately before approval.\n";
     }elseif(count($argv)===4&&in_array($mode,['--create','--status','--publish'],true)&&preg_match('/^[1-9][0-9]{0,14}$/D',$argv[3])){
         $id=(int)$argv[3];
         if($mode==='--create'){
-            $db->beginTransaction();$r=miClaimFetch($db,$cfg,$provider,$id);miRead($root.'/'.$r['asset_hash'].'.jpg',$r['asset_hash'],(int)$r['width'],(int)$r['height'],(int)$r['byte_count']);$db->commit();
+            $db->beginTransaction();$r=miClaimFetch($db,$cfg,$provider,$id);[$w,$h]=miImageDimensions($provider,(int)$r['width'],(int)$r['height']);miRead($root.'/'.$r['asset_hash'].'.jpg',$r['asset_hash'],$w,$h,(int)$r['byte_count']);$db->commit();
             $container=miCreate($p,$r,'miRequest');$db->beginTransaction();miFinishFetch($db,$r,$container);$db->commit();echo $container?"Processing; check status.\n":"Unknown; reconcile manually.\n";
         }else{
             $db->beginTransaction();$r=miRow($db,$cfg,$provider,$id,'processing');$db->commit();$ready=miReady($p,$r,'miRequest');
