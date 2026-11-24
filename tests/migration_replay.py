@@ -74,7 +74,7 @@ try:
         dump=Path(tmp)/"synthetic.sql"
         with dump.open("xb") as handle:
             dump.chmod(0o600)
-            subprocess.run(["mariadb-dump",*args,"--single-transaction","--skip-lock-tables","--no-tablespaces","aaditechs_ci"],env=env,stdout=handle,stderr=subprocess.PIPE,check=True,timeout=60)
+            subprocess.run(["mariadb-dump",*args,"--single-transaction","--skip-lock-tables","aaditechs_ci"],env=env,stdout=handle,stderr=subprocess.PIPE,check=True,timeout=60)
         assert 0<dump.stat().st_size<16*1024*1024
         reset()
         with dump.open("rb") as handle:

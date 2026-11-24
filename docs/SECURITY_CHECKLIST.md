@@ -137,3 +137,7 @@
 ## V10.6D security (pending runtime)
 
 - [ ] Review CLI separately OFF; owner-authorized operator, stop workers, pause, independently review provider evidence (store securely outside Git), exact state/evidence hashes, append-only review with no publication mutation or replay. Review is an attestation, not automated provider verification; unresolved evidence must remain blocked. Backup dump restricted private file/directory, independent expected SHA256, bounded streaming decompression and no SQL execution; encrypt and protect backup at rest separately. Candidate inspection does not expose token; exact digest, current mailbox and expiry rechecked; manual activation only, scope verification remains mandatory.
+
+## V10.6E security (pending runtime)
+
+- [ ] Native provider flags independently OFF; private restricted credentials, fixed HTTPS GET hosts and bounded responses, no redirect/proxy, exact account and period, no raw response or credential logs. Store only latest per-source aggregate snapshot and account hash/generation; no contact records, message bodies or recordings. Confirm upstream fields and retention separately. Disposable restore test must never run against real data; inspect actual encrypted backup and isolated restore separately.
