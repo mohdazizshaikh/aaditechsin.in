@@ -20,6 +20,7 @@ return [
         'feeds_enabled' => false, // Explicitly authorize each provider before enabling.
         'feeds' => [], // See docs/V931_SOURCE_ADAPTER.md. No providers connected by default.
     ],
+    'creative' => ['enabled' => false], // Local model review workflow only.
     'growth' => [
         'enabled' => false,
         'telegram' => [
