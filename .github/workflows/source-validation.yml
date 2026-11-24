@@ -48,6 +48,8 @@ jobs:
           php tests/telegram_media_rules.php
           php tests/communications_rules.php
           php tests/credential_retention_rules.php
+          php tests/communications_bridge_rules.php
+          php tests/release_gate_rules.php
           php tests/intelligence_rules.php
           php tests/dashboard_rules.php
           php tests/network_media_rules.php
@@ -126,6 +128,8 @@ jobs:
           php tests/telegram_media_rules.php --database
           php tests/communications_rules.php --database
           php tests/credential_retention_rules.php --database
+          php tests/communications_bridge_rules.php --database
+          php tests/release_gate_rules.php --database
           php tests/intelligence_rules.php --database
           php tests/dashboard_rules.php --database
           php tests/network_media_rules.php --database

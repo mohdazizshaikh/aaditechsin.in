@@ -477,5 +477,37 @@
       "status",
       "updated_at"
     ]
+  },
+  "source_git_blob_sha1": {
+    "secure-setup/migrations/2026-11-23-v8.sql": "da975cf117802f217282db6dc209b1415fd1fd8d",
+    "secure-setup/migrations/2026-11-23-v84.sql": "87cc6f57c521ffbed1446f6715d35d93d281ba2a",
+    "secure-setup/migrations/2026-11-24-v100.sql": "17aae1e659ad6e485c8979e20f398149257a1550",
+    "secure-setup/migrations/2026-11-24-v101.sql": "6414e5c54e1c1f890a9995229e1831f5e635a845",
+    "secure-setup/migrations/2026-11-24-v102.sql": "6be3cf7ab4b0cd9d7b31c1fa71810b9f9559b391",
+    "secure-setup/migrations/2026-11-24-v102a.sql": "9abb84789419a36295f7320e927c6cf82213ca49",
+    "secure-setup/migrations/2026-11-24-v102b.sql": "cf5aef05208b686136b6ea2999dbc2cac48d831b",
+    "secure-setup/migrations/2026-11-24-v102c.sql": "dc386a2d8869ab849d76eb69e4b33f4d20961426",
+    "secure-setup/migrations/2026-11-24-v102d.sql": "8791cee01e98f1ba60d41f1f72d421447702072c",
+    "secure-setup/migrations/2026-11-24-v102e.sql": "d086151fe07148a5c42b958cee5cc5c3ea93f9ff",
+    "secure-setup/migrations/2026-11-24-v102f.sql": "7f54bda74b5d4f6f16a49a985fa145efe3ba5935",
+    "secure-setup/migrations/2026-11-24-v102g.sql": "e8dd4da905a1175d33cb56d65f885120f45af7f9",
+    "secure-setup/migrations/2026-11-24-v102h.sql": "737e4efbb5f6fed1c116f6cbe07e2b31521b2a11",
+    "secure-setup/migrations/2026-11-24-v102h1.sql": "e4896676f33941b97f655ee0cb5979ede6ec7896",
+    "secure-setup/migrations/2026-11-24-v102h2.sql": "beea6802026133466220e296d2103a1e60f05e17",
+    "secure-setup/migrations/2026-11-24-v102h3.sql": "3e9f22bfb2ae81719fb32b56648c49ad9fff957c",
+    "secure-setup/migrations/2026-11-24-v102k.sql": "0361232dc7fb379ae98ed82334408ab88f541727",
+    "secure-setup/migrations/2026-11-24-v103a-v104.sql": "c9cd2f2da1ea474e87662ecf54f290c4489c8e48",
+    "secure-setup/migrations/2026-11-24-v91.sql": "ac237eebb11f69b62c9853d62ade5e85f6830d0b",
+    "secure-setup/migrations/2026-11-24-v92.sql": "52cb1540b65dc95354cc2737bfd071e2c7eeced1",
+    "secure-setup/migrations/2026-11-24-v93.sql": "f520f4d5eb04d773cbad4277d5f14b4f439ed56b",
+    "secure-setup/migrations/2026-11-24-v931.sql": "47283fbc8431f76613dffb2c95d0b93e30d2dc7e",
+    "secure-setup/migrations/2026-11-24-v94.sql": "618cf5093ab994ff8f00f742511c20982cb6ba5c",
+    "secure-setup/migrations/2026-11-24-v95.sql": "437c584667a25ceb30e2c4cf44f0b2b8262f1cfa",
+    "secure-setup/migrations/2026-11-24-v96.sql": "0bb112829af50897a6b70c49bec63b6496d058c6",
+    "secure-setup/migrations/2026-11-24-v97.sql": "fd7a96fe364d5a38cc2cdb2ac979525a89826465",
+    "secure-setup/migrations/2026-11-24-v98.sql": "3c4aea432fc9dd7a3de48b9a67cb2da9c8bddc9d",
+    "secure-setup/migrations/2026-11-24-v99.sql": "7cb363b74d5ef55bc7ab95ee19771f94e490f538",
+    "secure-setup/schema.sql": "1b0be3bf9083761a0191ca6851be561ce825ee52",
+    "tests/fixtures/schema-v96.sql": "46d52307d885813b1db73b969304ec96d323e64c"
   }
 }

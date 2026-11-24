@@ -123,6 +123,7 @@ $flags = [
     'intelligence_dashboard.enabled' => ['intelligence_dashboard','enabled'],
     'intelligence_dashboard.csv_enabled' => ['intelligence_dashboard','csv_enabled'],
     'communications.batch_import_enabled' => ['communications','batch_import_enabled'],
+    'communications.bridge_enabled' => ['communications','bridge_enabled'],
     'communications.retention_enabled' => ['communications','retention_enabled'],
     'communications.gmail.renewal.enabled' => ['communications','gmail','renewal','enabled'],
     'discovery.enabled' => ['discovery','enabled'],
