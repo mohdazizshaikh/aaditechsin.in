@@ -6,7 +6,7 @@
 
 ## V9–V10 development addendum (24 November 2026)
 
-Main V9.6 verified; V9.7–V10.2 stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
+Main V9.6 verified; V9.7–V10.2A stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
 
 ## 1 — Deployment model and file destinations
 
@@ -161,3 +161,5 @@ The `source-validation.yml` workflow has a separate `disposable-mariadb-integrat
 V10.1: configure Meta separately in private config, default OFF. Follow docs/V101_META.md; manual identity check and explicit worker invocation, no live OAuth token issuance or schedule installed. Stop workers before target/credential rotation. Never requeue uncertain posts.
 
 V10.2: private social.network flags and credentials, explicitly verify account access before test posting; GBP eligibility remains pending. See docs/V102_NETWORKS.md. No media transfer, automatic schedule or token refresh installed.
+
+V10.2A: private 0700 media storage, 0600 MP4, manual authenticated SFTP, 20 MiB cap, verify actual host PHP memory/quotas and authorized OAuth before staging. No upload via public webroot. See docs/V102A_MEDIA_UPLOAD.md. Explicit owner approval and CLI only.

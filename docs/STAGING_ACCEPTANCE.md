@@ -92,3 +92,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 
 - [ ] Apply V10.2 after V10.1; verify LinkedIn administrator role/version, X user-context scopes/quota, GBP eligibility and account/location authorization. Keep all flags OFF until approved test destination.
 - [ ] Verify real post receipt and visibility independently, ambiguous reconciliation and unified historical ledger counts. No YouTube/Instagram acceptance implied.
+
+## V10.2A acceptance (pending runtime)
+
+- [ ] Verify authenticated SFTP, private storage ACL, 20 MiB/memory cap, hash and stale manifest rejection, exact metadata/visibility/account approval, cancellation and no automatic retries. Confirm channel and test video processing/visibility independently; no Instagram media gate accepted.
