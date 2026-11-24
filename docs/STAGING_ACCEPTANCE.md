@@ -182,3 +182,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6G acceptance (pending runtime)
 
 - [ ] Verify dedicated Twilio account/destination, authentic signed form and exact callback URL, URL/encoding variants and duplicate-key refusal, SMS-only and terminal inbound voice status filters, empty SMS response and voice 204 without routing change, duplicates across UTC receipt days, pause, actual delivery/retry and log redaction. Approve replay/retention policy before enabling; classic forms lack signed freshness. Verify WhatsApp 30-day cutoff, bounded dry-run/changed plan/rollback, backup and no Twilio deletion. Actual provider and staging acceptance pending.
+
+## V10.6H acceptance (pending runtime)
+
+- [ ] Verify old JPEG-only bundle approvals survive schema migration; new typed bundle requires one approved MP4, distinct assets, exact account/order and independent mixed flag. Verify actual Instagram/Threads child API behavior, codecs/aspect/duration and complete video fetch before revocation, parent readiness and receipt. Verify communication review reminders only from imported missed counts, owner status transitions, pause and retention guard. Actual provider access, backup/restore and staging release remain pending.

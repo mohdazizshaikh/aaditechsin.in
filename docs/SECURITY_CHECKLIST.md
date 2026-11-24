@@ -149,3 +149,7 @@
 ## V10.6G security (pending runtime)
 
 - [ ] Separate OFF flags, trusted static callback URL, no forwarded host trust, Twilio HMAC-SHA1 per provider protocol, strict form parsing/body cap, dedicated account/destination and stable keyed event digest. Raw callbacks may transiently contain customer details; redact bodies and secrets across logs, rate-limit upstream, no automatic replies/routing or recording. Twilio auth token is sensitive; dedicated subaccount recommended. Replay beyond dedupe lifetime is not solved; no Twilio cleanup enabled. WhatsApp cleanup requires approved 30-day policy, verified backup, paused workers and exact plan digest. No actual deletion or deployment.
+
+## V10.6H security (pending runtime)
+
+- [ ] Mixed media OFF separately per provider; private exact manifest MP4, typed ordered digest, current approval and target, limited bearer lifetime and fetch count, no logs or automatic retry. Communication reviews OFF; no personal identifiers, no inferred unanswered counts, no outbound follow-up, retention blocks open reviews and cascades closed reviews when approved aggregate cleanup executes. Audit retained. No deployment.

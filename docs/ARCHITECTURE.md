@@ -144,3 +144,7 @@ Telegram fixed two-item PNG then MP4 album uses existing approved manifest and e
 ## V10.6G Twilio callbacks and retention
 
 Separate fixed HTTPS SMS and terminal inbound voice status callback endpoints verify Twilio URL + sorted form HMAC-SHA1, exact account/destination and event SID; reject duplicate form keys, persist only keyed event digest/account hash/channel/receipt UTC day. SMS empty TwiML sends no reply; voice status endpoint 204 is not call routing. Owner reports distinguish recorded callbacks from complete call or inbox coverage. WhatsApp cleanup is paused and digest-bound, exact oldest batch with 30-day cutoff. Twilio digests are excluded because classic signed forms lack a reliable freshness guarantee. See V106G_INBOUND_RETENTION.md.
+
+## V10.6H mixed carousel and communications reviews
+
+Existing carousel ledger adds typed children with default image for legacy rows. Image-only digest is unchanged; a mixed bundle binds ordered type/hash/size, one exact approved manifest MP4 and one to four JPEG derivatives. Separate provider flags; per-stage and fetch revalidation, existing bounded bearer access and explicit parent/publish steps. Internal communication reviews link one imported missed-count aggregate to a due date and status, not a customer or message; retention refuses to delete eligible aggregates with open reviews. See V106H_MIXED_REVIEWS.md.
