@@ -15,6 +15,7 @@ return [
         'enabled' => false, // Independent opt-in, privacy approval and staging required.
         'salt' => 'REPLACE_WITH_INDEPENDENT_RANDOM_ANALYTICS_SALT',
     ],
+    'discovery' => ['enabled' => false], // Evidence intake and owner review only.
     'growth' => [
         'enabled' => false,
         'telegram' => [

@@ -1,0 +1,108 @@
+{
+  "infrastructure": [
+    "structured cabling",
+    "network infrastructure",
+    "server deployment",
+    "office setup",
+    "network switch",
+    "network upgrade"
+  ],
+  "software-web": [
+    "website development",
+    "web application",
+    "software development",
+    "workflow automation",
+    "api integration",
+    "cms"
+  ],
+  "it-amc": [
+    "annual maintenance",
+    "it support",
+    "desktop support",
+    "computer maintenance",
+    "amc",
+    "onsite support"
+  ],
+  "cloud": [
+    "cloud migration",
+    "hybrid cloud",
+    "azure",
+    "aws",
+    "google cloud",
+    "cloud infrastructure"
+  ],
+  "security": [
+    "firewall",
+    "endpoint security",
+    "vpn",
+    "cybersecurity",
+    "access security",
+    "security audit"
+  ],
+  "data-backup": [
+    "backup",
+    "disaster recovery",
+    "storage management",
+    "business continuity",
+    "backup modernization"
+  ],
+  "it-procurement": [
+    "laptop",
+    "desktop computer",
+    "hardware procurement",
+    "it assets",
+    "computer supply",
+    "server procurement"
+  ],
+  "smart-office": [
+    "cctv",
+    "access control",
+    "smart office",
+    "workplace automation",
+    "surveillance"
+  ],
+  "special-projects": [
+    "startup it setup",
+    "office relocation",
+    "event technology",
+    "it health check",
+    "temporary infrastructure"
+  ],
+  "video-conferencing": [
+    "video conferencing",
+    "conference room",
+    "meeting room",
+    "teams room",
+    "zoom room",
+    "conference camera"
+  ],
+  "auditorium-av": [
+    "auditorium",
+    "projection system",
+    "training hall",
+    "av control"
+  ],
+  "professional-sound": [
+    "public address",
+    "pa system",
+    "speaker system",
+    "amplifier",
+    "audio mixer",
+    "sound reinforcement"
+  ],
+  "av-maintenance": [
+    "av installation",
+    "av maintenance",
+    "audio visual installation",
+    "av upgrade",
+    "av commissioning"
+  ],
+  "data-recovery": [
+    "data recovery",
+    "failed hard drive",
+    "failed ssd",
+    "raid recovery",
+    "nas recovery",
+    "formatted drive"
+  ]
+}
