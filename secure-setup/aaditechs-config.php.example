@@ -10,6 +10,16 @@ return [
     'public_base_url' => 'https://aaditechs.in',
     // Customer tracking links expire automatically; owner can rotate anytime.
     'tracking_ttl_days' => 90,
+    // V9.1 review-only foundation, OFF until isolated staging acceptance.
+    'growth' => [
+        'enabled' => false,
+        'telegram' => [
+            'enabled' => false,
+            'webhook_secret' => 'REPLACE_WITH_RANDOM_WEBHOOK_SECRET',
+            'owner_user_id' => 'REPLACE_WITH_NUMERIC_OWNER_USER_ID',
+            'owner_chat_id' => 'REPLACE_WITH_PRIVATE_OWNER_CHAT_ID',
+        ],
+    ],
     'google' => [
         'enabled' => false,  // Only after eligibility, API approval, and access tests.
         'client_id' => 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID',

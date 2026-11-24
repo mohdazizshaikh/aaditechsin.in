@@ -33,6 +33,7 @@ jobs:
           .ci-venv/bin/python tests/security_static.py
           .ci-venv/bin/python tests/site_integrity.py
           php tests/workflow_rules.php
+          php tests/growth_rules.php
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only
       - name: Scope statement
