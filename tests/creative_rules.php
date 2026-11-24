@@ -41,6 +41,20 @@ try{
     creativeCheck(str_contains(growthCommand($db,'/coverage',$cfg),'infrastructure: 1 tasks / 1 approved'),'Coverage inventory');
     $q=$db->prepare('SELECT COUNT(*) FROM growth_creative_results WHERE task_id=?');$q->execute([$id]);
     creativeCheck((int)$q->fetchColumn()===2,'Preserve revision history');
+    require_once dirname(__DIR__).'/public_html/api/media-core.php';
+    $mcfg=$cfg+['media'=>['enabled'=>true]];
+    creativeCheck(!mediaEnabled($cfg)&&mediaEnabled($mcfg),'Media default OFF');
+    $mj=mediaExport($db,$id,2);
+    creativeCheck($mj['dimensions']===[1200,628],'Approved profile');
+    try{mediaExport($db,$id,1);throw new LogicException('Stale export');}catch(RuntimeException $e){creativeCheck($e->getMessage()==='Current approved text revision required','Stale export blocked');}
+    $manifest=json_encode(['version'=>1,'task_id'=>$id,'revision'=>2,'channel'=>'linkedin','renderer'=>'template','width'=>1200,'height'=>628,'image_sha256'=>str_repeat('a',64),'video_sha256'=>str_repeat('b',64)],JSON_THROW_ON_ERROR);
+    $receipt=mediaRegister($db,$manifest);$digest=$receipt['manifest_sha256'];
+    creativeCheck($digest===hash('sha256',$manifest),'Manifest hash');
+    creativeCheck(str_contains(growthCommand($db,"/media $id",$mcfg),$digest),'Owner metadata list');
+    creativeCheck(str_contains(growthCommand($db,"/approvemedia $id 2 ".str_repeat('c',64),$mcfg),'not pending'),'Wrong digest blocked');
+    creativeCheck(str_contains(growthCommand($db,"/approvemedia $id 2 $digest",$mcfg),'review recorded'),'Approve exact digest');
+    mediaRegister($db,$manifest);
+    creativeCheck(str_contains(growthCommand($db,"/rejectmedia $id 2 $digest",$mcfg),'not pending'),'Duplicate registration preserves review');
     $id2=creativeCreate($db,'infrastructure','linkedin','education');
     $claim=creativeLeaseClaim($db);
     creativeCheck($claim['job']['task_id']===$id2,'Claim pending task');
