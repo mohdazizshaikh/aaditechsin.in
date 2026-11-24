@@ -46,7 +46,7 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
 function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.6 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate Telegram channel scheduling required.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.6 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate Telegram channel scheduling required.";
     require_once __DIR__.'/reports-core.php';
     $report=reportCommand($db,$cfg,$command);
     if($report!==null)return $report;
@@ -90,7 +90,22 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
         if(discoveryEnabled($cfg)){
             foreach($db->query('SELECT status,COUNT(*) total FROM growth_opportunities GROUP BY status')->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='Opportunity inventory '.$r['status'].': '.$r['total'];
         }else $lines[]='Opportunity intake disabled or unconfigured.';
-        $lines[]='Actual calls, messages, reach, social, outbound sales and external errors: not connected.';
+        $bounds=[$start->setTimezone($utc)->format('Y-m-d H:i:s'),$start->modify('+1 day')->setTimezone($utc)->format('Y-m-d H:i:s')];
+        if(creativeEnabled($cfg)){
+            $q=$db->prepare('SELECT COUNT(*) FROM growth_creative_results WHERE created_at>=? AND created_at<?');$q->execute($bounds);
+            $lines[]='Creative draft revisions recorded today: '.$q->fetchColumn();
+        }else $lines[]='Creative generation disabled or unconfigured.';
+        if(socialTarget($cfg)!==null){
+            $q=$db->prepare("SELECT COUNT(*) FROM growth_publications WHERE status='accepted' AND finished_at>=? AND finished_at<?");$q->execute($bounds);
+            $lines[]='Telegram channel posts accepted today: '.$q->fetchColumn().' (provider receipts, not views)';
+            foreach($db->query("SELECT status,COUNT(*) total FROM growth_publications WHERE status IN ('queued','sending','failed','unknown') GROUP BY status")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='Publication inventory '.$r['status'].': '.$r['total'];
+        }else $lines[]='Telegram business publishing disabled or unconfigured.';
+        if(discoveryEnabled($cfg)&&($cfg['discovery']['feeds_enabled']??false)===true){
+            $q=$db->prepare('SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) imported,COALESCE(SUM(duplicate_count),0) duplicates FROM growth_source_runs WHERE finished_at>=? AND finished_at<?');
+            $q->execute($bounds);$s=$q->fetch(PDO::FETCH_ASSOC);
+            $lines[]='Source runs finished today: '.$s['runs'].' / imported '.$s['imported'].' / duplicates '.$s['duplicates'];
+        }
+        $lines[]='Actual calls, sales messages/email, reach, other social providers and full external errors: not connected.';
         $lines[]='Database query succeeded; not a full system health test.';
         return implode("\n",$lines);
     }

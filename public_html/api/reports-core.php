@@ -36,9 +36,15 @@ function reportErrorText(PDO $db,DateTimeImmutable $now):string {
     return implode("\n",$lines);
 }
 function reportCommand(PDO $db,array $cfg,string $cmd):?string {
-    if(!preg_match('/^\/(?:errors|notifications|notifydaily|notifyerrors)(?: |$)/',$cmd))return null;
+    if(!preg_match('/^\/(?:errors|notifications|notifydaily|notifyerrors|reporthistory)(?: |$)/',$cmd))return null;
     if(($cfg['growth']['enabled']??false)!==true)return 'Growth disabled.';
     if($cmd==='/errors')return reportErrorText($db,new DateTimeImmutable('now'));
+    if($cmd==='/reporthistory'){
+        $lines=['Owner notification history (latest 10, provider receipts only):'];
+        foreach($db->query('SELECT report_type,period_key,status,provider_message_id,error_code FROM growth_report_runs ORDER BY id DESC LIMIT 10')->fetchAll(PDO::FETCH_ASSOC) as $r)
+            $lines[]=$r['report_type'].' '.$r['period_key'].' '.$r['status'].($r['provider_message_id']?' receipt '.$r['provider_message_id']:'').($r['error_code']?' '.$r['error_code']:'');
+        return count($lines)===1?'No owner report recorded.':implode("\n",$lines);
+    }
     if($cmd==='/notifications'){
         $r=reportPreferences($db);
         return 'Proactive daily report: '.((int)$r['daily_enabled']?'ON':'OFF')."\nHourly completed-period error report: ".((int)$r['errors_enabled']?'ON':'OFF')."\nDelivery configuration: ".(ownerReportTarget($cfg)!==null?'configured, not verified':'disabled or unconfigured')."\n/notifydaily on|off /notifyerrors on|off";

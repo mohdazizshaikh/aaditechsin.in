@@ -137,3 +137,9 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - V9.3.1 CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45378963848.
 - Added nine channel formats, four objectives, 14-service catalog-only export, local loopback Ollama structured-output worker, caption/visual/video briefs, versioned result import/history and Telegram /createcontent /content /coverage. Pause and approval gates preserved. No publish connector or rendering.
 - Creative flags OFF. Local model and actual bot not connected. Synthetic tests validate input/claims, fake structured outputs and database revisions; final CI needs verification. See docs/V94_CREATIVE.md. No production changes.
+
+## V9.5–V9.6 source milestones (24 Nov 2026)
+- V9.4 synthetic creative CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45379962242. Actual model untested.
+- V9.5 text-only Telegram business channel scheduling, exact approved revision/destination, private worker, receipt/error states and unknown no-retry. Synthetic CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45380253444. Other social adapters not implemented.
+- V9.6 owner daily snapshots and completed-hour error digests, independent notification preferences, private owner bot destination, period deduplication, provider receipts and report history. No live bot delivery or cron. Final CI needs verification.
+- See docs/V95_V96_OPERATIONS.md for full activation order and remaining gaps. All new external feature flags default OFF. No production changes.

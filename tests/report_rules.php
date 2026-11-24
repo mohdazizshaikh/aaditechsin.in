@@ -20,14 +20,16 @@ try{
     reportCheck($row!==null&&$row['chat']==='12345'&&str_contains($row['text'],'day-to-date'),'Daily snapshot');
     reportFinish($db,$row['id'],['status'=>'accepted','receipt'=>'42','error'=>'']);
     reportCheck(reportClaim($db,$cfg,'daily',$now)===null,'Period deduplication');
-    $hour=$now->setTime((int)$now->format('H'),0)->modify('-30 minutes');
+    $errorNow=new DateTimeImmutable('2001-01-01 10:30:00',new DateTimeZone('UTC'));
+    $hour=$errorNow->setTime(10,0)->modify('-30 minutes');
     $db->prepare("INSERT INTO growth_source_runs(source_id,status,error_code,finished_at) VALUES('ci-report','failed','transport_failed',?)")->execute([$hour->format('Y-m-d H:i:s')]);
-    growthCommand($db,'/notifyerrors off',$cfg);reportCheck(reportClaim($db,$cfg,'errors',$now)===null,'Error opt out');
+    growthCommand($db,'/notifyerrors off',$cfg);reportCheck(reportClaim($db,$cfg,'errors',$errorNow)===null,'Error opt out');
     growthCommand($db,'/notifyerrors on',$cfg);
-    $error=reportClaim($db,$cfg,'errors',$now);
+    $error=reportClaim($db,$cfg,'errors',$errorNow);
     reportCheck($error!==null&&str_contains($error['text'],'Discovery partial/failed: 1'),'Hourly error digest');
     reportFinish($db,$error['id'],['status'=>'unknown','receipt'=>null,'error'=>'transport_unconfirmed']);
-    reportCheck(reportClaim($db,$cfg,'errors',$now)===null,'Unknown never silently retried');
+    reportCheck(reportClaim($db,$cfg,'errors',$errorNow)===null,'Unknown never silently retried');
     reportCheck(str_contains(growthCommand($db,'/notifications',$cfg),'ON'),'Preferences report');
+    reportCheck(str_contains(growthCommand($db,'/reporthistory',$cfg),'transport_unconfirmed'),'Unknown report visible');
     $db->rollBack();echo "Synthetic owner notification preferences, snapshots, receipts and duplicate prevention: PASS\n";
 }catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Report integration failed: '.$e->getMessage()."\n");exit(1);}
