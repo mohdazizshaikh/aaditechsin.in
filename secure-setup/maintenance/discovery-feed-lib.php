@@ -74,6 +74,35 @@ function feedCadence(array $cfg):int {
     if(!is_int($minutes)||$minutes<60||$minutes>10080)throw new InvalidArgumentException('Invalid cadence');
     return $minutes;
 }
+// A scheduled invocation must be separately approved and cadence-limited.
+function feedConfiguredSources(array $cfg,bool $scheduled=false):array{
+    if(!discoveryEnabled($cfg)||($cfg['discovery']['feeds_enabled']??false)!==true)throw new RuntimeException('Disabled');
+    $feeds=$cfg['discovery']['feeds']??null;
+    if(!is_array($feeds)||count($feeds)<1||count($feeds)>5)throw new RuntimeException('Configure 1-5 authorized sources');
+    $minutes=feedCadence($cfg);
+    if($scheduled&&(($cfg['discovery']['scheduler_enabled']??false)!==true||$minutes===0))throw new RuntimeException('Scheduler disabled or cadence missing');
+    $sources=[];
+    foreach($feeds as $id=>$src){
+        if(!is_string($id)||!is_array($src))throw new InvalidArgumentException('Invalid source definition');
+        $sources[]=feedDefinition($id,$src);
+    }
+    return ['sources'=>$sources,'minutes'=>$minutes];
+}
+// Read-only advisory snapshot, not a promise of a future execution.
+function feedScheduleStatus(PDO $db,array $cfg):array{
+    $plan=feedConfiguredSources($cfg,true);
+    $paused=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
+    if($paused===false||!in_array((string)$paused,['0','1'],true))throw new RuntimeException('Control unavailable');
+    $q=$db->prepare("SELECT COUNT(CASE WHEN status='running' THEN 1 END) AS running,MAX(started_at) AS last_attempt,MAX(CASE WHEN started_at>DATE_SUB(UTC_TIMESTAMP(),INTERVAL ? MINUTE) THEN 1 ELSE 0 END) AS recent FROM growth_source_runs WHERE source_id=?");
+    $rows=[];
+    foreach($plan['sources'] as $src){
+        $q->execute([$plan['minutes'],$src['id']]);$row=$q->fetch(PDO::FETCH_ASSOC);
+        if(!$row)throw new RuntimeException('Status unavailable');
+        $state=(string)$paused==='1'?'paused':((int)$row['running']>0?'unresolved':((int)$row['recent']>0?'not_due':'due'));
+        $rows[]=['id'=>$src['id'],'state'=>$state,'last_attempt_utc'=>$row['last_attempt']];
+    }
+    return ['minimum_interval_minutes'=>$plan['minutes'],'sources'=>$rows,'advisory_only'=>true];
+}
 function feedAdmission(PDO $db,array $src,int $minutes):?int{
     if($minutes!==0&&($minutes<60||$minutes>10080))throw new InvalidArgumentException('Invalid cadence');
     if(!$db->inTransaction())throw new LogicException('Transaction required');

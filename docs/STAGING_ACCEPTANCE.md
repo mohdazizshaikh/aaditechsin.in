@@ -210,3 +210,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6N acceptance (pending)
 
 - [ ] In isolated staging only, verify plan limit 1–126, selected cell count, changed digest/limit/objective refusal, rejection and regenerated revision behavior, invalid UTF-8 and atomic failure; confirm no generation/publishing from batch CLI. Synthetic CI is not hosted acceptance. See V106N_BOUNDED_CREATIVE_REVIEW.md.
+
+## V10.6O acceptance (pending)
+
+- [ ] With synthetic authorized test feed, confirm schedule-check is no-network/no-DB, schedule-status is read-only, paused/unresolved/recent sources cannot fetch, and valid due source is imported only for owner review. Confirm private cron and log permissions before any actual scheduler installation; no outbound communications. See V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.

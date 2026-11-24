@@ -5,14 +5,12 @@ require dirname(__DIR__,2).'/public_html/api/operations.php';
 require __DIR__.'/discovery-feed-lib.php';
 try{
     $mode=$argv[1]??'--dry-run';
-    if(count($argv)>2||!in_array($mode,['--dry-run','--run'],true))throw new InvalidArgumentException('Mode');
+    if(count($argv)>2||!in_array($mode,['--dry-run','--run','--schedule-check','--schedule-status','--scheduled-run'],true))throw new InvalidArgumentException('Mode');
     $cfg=opsConfig();
-    if(!discoveryEnabled($cfg)||($cfg['discovery']['feeds_enabled']??false)!==true)throw new RuntimeException('Disabled');
-    $feeds=$cfg['discovery']['feeds']??null;
-    if(!is_array($feeds)||count($feeds)<1||count($feeds)>5)throw new RuntimeException('Configure 1-5 authorized sources');
-    $minutes=feedCadence($cfg);
-    $sources=[];foreach($feeds as $id=>$src)$sources[]=feedDefinition($id,$src);
-    if($mode==='--dry-run'){echo 'Authorized configured sources: '.count($sources)."\nREAD-ONLY: no network or database access.\n";exit;}
+    $scheduled=in_array($mode,['--schedule-check','--schedule-status','--scheduled-run'],true);
+    $plan=feedConfiguredSources($cfg,$scheduled);$minutes=$plan['minutes'];$sources=$plan['sources'];
+    if(in_array($mode,['--dry-run','--schedule-check'],true)){echo 'Authorized configured sources: '.count($sources)."\nMinimum interval minutes: ".$minutes."\nREAD-ONLY: no network or database access.\n";exit;}
+    if($mode==='--schedule-status'){echo json_encode(feedScheduleStatus(opsDb($cfg),$cfg),JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT)."\n";exit;}
     $lock=fopen(__DIR__.'/discovery-feed.lock','c');
     if(!$lock||!flock($lock,LOCK_EX|LOCK_NB))throw new RuntimeException('Already running');
     $db=opsDb($cfg);

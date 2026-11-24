@@ -172,3 +172,7 @@ One independently enabled private creative planner computes missing service/chan
 ## V10.6N bounded creative review
 
 Private batch plan binds full inventory, chosen objective and chunk limit (1–126); applies only reviewed selected cells. Creative result import uses a savepoint for draft, result and audit consistency, and validates UTF-8 and stored catalog dimensions. No new schema, external calls or publication. See V106N_BOUNDED_CREATIVE_REVIEW.md.
+
+## V10.6O discovery scheduler readiness
+
+Independent default-off scheduler admission requires explicit cadence and configured authorized sources; read-only advisory status reports pause/unresolved/recent/due. Scheduled invocation uses existing file and DB locks and transport; no outgoing messages. Opportunity evidence validates UTF-8; intake and outreach draft audit/link mutations use savepoints. See V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.

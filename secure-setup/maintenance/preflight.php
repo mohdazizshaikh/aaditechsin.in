@@ -149,6 +149,7 @@ $flags = [
     'social.telegram_channel.enabled' => ['social','telegram_channel','enabled'],
     'discovery.recovery_enabled' => ['discovery','recovery_enabled'],
     'discovery.cadence_enabled' => ['discovery','cadence_enabled'],
+    'discovery.scheduler_enabled' => ['discovery','scheduler_enabled'],
     'discovery.feeds_enabled' => ['discovery','feeds_enabled'],
 ];
 foreach ($flags as $name => $keys) {
@@ -201,7 +202,14 @@ if (setValue($config, ['growth','enabled']) === true) {
 }
 if (setValue($config,['discovery','enabled']) === true) {
     outcome('Discovery requires enabled growth and database', setValue($config,['growth','enabled'])===true && setValue($config,['database','enabled'])===true);
-    warning('Discovery only imports evidence; external discovery and sending are not connected');
+    warning('Discovery imports evidence only; provider authorization, actual feed acceptance and scheduling require separate verification; no sending');
+}
+if (setValue($config,['discovery','scheduler_enabled']) === true) {
+    try {
+        require_once __DIR__.'/discovery-feed-lib.php';
+        feedConfiguredSources($config,true);
+        outcome('Discovery scheduler explicitly authorized and cadence-limited', true);
+    } catch (Throwable $e) { outcome('Discovery scheduler explicitly authorized and cadence-limited', false); }
 }
 if ($checkDb) {
     if (setValue($config, ['database', 'enabled']) !== true || !extension_loaded('pdo_mysql')) {

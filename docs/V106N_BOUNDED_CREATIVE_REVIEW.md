@@ -9,3 +9,7 @@ Source-only continuation of V10.6M. Both V10.6M CI runs passed on db3d76688b2308
 
 ## Acceptance
 New CI pending. Source changed without local PHP or disposable MariaDB execution in this chat session; do not count the new cases as passed until the actual CI logs confirm. No real inference, scheduling, publishing, approval, provider requests, production data, merge or deployment. P0 remains cumulative CI and actual authorized isolated staging/restore; P1 local AI/native video, consented provider runtime, GBP write approval, retention policy, authorized discovery scheduling and dashboard acceptance.
+
+## Subsequent CI evidence
+
+Both V10.6N source and disposable MariaDB CI runs passed on d8a11474632862a5defe846707ef9d96cc09a6cd: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45494801920 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45494808181. Synthetic only; actual runtime remains pending.
