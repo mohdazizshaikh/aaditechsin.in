@@ -176,3 +176,7 @@ Private batch plan binds full inventory, chosen objective and chunk limit (1–1
 ## V10.6O discovery scheduler readiness
 
 Independent default-off scheduler admission requires explicit cadence and configured authorized sources; read-only advisory status reports pause/unresolved/recent/due. Scheduled invocation uses existing file and DB locks and transport; no outgoing messages. Opportunity evidence validates UTF-8; intake and outreach draft audit/link mutations use savepoints. See V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.
+
+## V10.6P owner coverage intelligence
+
+Existing owner read-only snapshot adds catalog-complete opportunities, four-objective creative channel coverage, and fixed page/source/service aggregate dimensions in the completed IST window. No raw personal identifiers or new collection; no provider writes. See V106P_OWNER_COVERAGE_INTELLIGENCE.md.

@@ -4,6 +4,7 @@ require_once __DIR__.'/operations.php';
 require_once __DIR__.'/intelligence-core.php';
 require_once __DIR__.'/publication-overview.php';
 require_once __DIR__.'/analytics-core.php';
+require_once __DIR__.'/creative-batch-core.php';
 function dashboardEnabled(array $cfg):bool{
     return ($cfg['portal']['enabled']??false)===true&&($cfg['growth']['enabled']??false)===true&&($cfg['intelligence_dashboard']['enabled']??false)===true;
 }
@@ -35,6 +36,47 @@ function dashboardCommunications(PDO $db,array $period):array{
     }
     return $out;
 }
+// Fixed catalog dimensions; no task IDs, draft text or contact data.
+function dashboardCreativeCoverage(PDO $db,array $cfg):?array{
+    if(!creativeBatchEnabled($cfg))return null;
+    $out=[];
+    foreach(creativeObjectives() as $objective){
+        $matrix=creativeBatchMatrix($db,$cfg,$objective);
+        foreach($matrix as $service=>$channels){
+            $row=['channels'=>count($channels),'requested'=>0,'approved'=>0,'awaiting_generation'=>0,'awaiting_review'=>0,'rejected_only'=>0];
+            foreach($channels as $counts){
+                $total=array_sum($counts);
+                $row['requested']+=(int)($total>0);
+                $row['approved']+=(int)($counts['approved']>0);
+                $row['awaiting_generation']+=(int)($counts['regeneration_requested']>0);
+                $row['awaiting_review']+=(int)($counts['pending_review']>0);
+                $row['rejected_only']+=(int)($total>0&&$counts['rejected']===$total);
+            }
+            $out[$objective][$service]=$row;
+        }
+    }
+    return $out;
+}
+// Only observed category events; no records for an event type means unavailable.
+function dashboardWebBreakdown(PDO $db,array $window):array{
+    $groups=[
+        'pages'=>['page_id','page_view',array_keys(analyticsPages())],
+        'sources'=>['channel','page_view',['direct','search','social','email','referral','other']],
+        'services'=>['service_id','service_interest',array_keys(growthCatalog())]
+    ];
+    $out=[];
+    foreach($groups as $name=>[$column,$event,$allowed]){
+        $q=$db->prepare("SELECT $column AS label,COUNT(*) AS n FROM growth_analytics_events WHERE event_day>=? AND event_day<? AND event_type=? GROUP BY $column");
+        $q->execute([$window['start'],$window['end'],$event]);
+        $counts=array_fill_keys($allowed,0);$observed=false;
+        foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r){
+            if(!array_key_exists($r['label'],$counts))continue;
+            $counts[$r['label']]=(int)$r['n'];$observed=true;
+        }
+        $out[$name]=$observed?$counts:array_fill_keys($allowed,null);
+    }
+    return $out;
+}
 function dashboardSnapshot(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=null):array{
     if(!dashboardEnabled($cfg))throw new RuntimeException('Disabled');
     $now=$now??new DateTimeImmutable('now',new DateTimeZone('UTC'));$period=dashboardPeriod($days,$now);
@@ -49,9 +91,10 @@ function dashboardSnapshot(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=
     if(discoveryEnabled($cfg)){
         $data['opportunities']=dashboardCounts($db,'SELECT status,COUNT(*) AS n FROM growth_opportunities GROUP BY status',[],['pending_review','qualified','rejected']);
         $catalog=growthCatalog();
+        foreach($catalog as $id=>$entry)$data['services'][$id]=['title'=>$entry['title'],'pending_review'=>0,'qualified'=>0,'rejected'=>0];
         foreach($db->query('SELECT service_id,status,COUNT(*) AS n FROM growth_opportunities GROUP BY service_id,status ORDER BY service_id,status')->fetchAll(PDO::FETCH_ASSOC) as $r){
             if(!isset($catalog[$r['service_id']]))continue;
-            $k=$r['service_id'];if(!isset($data['services'][$k]))$data['services'][$k]=['title'=>$catalog[$k]['title'],'pending_review'=>0,'qualified'=>0,'rejected'=>0];
+            $k=$r['service_id'];if(!in_array($r['status'],['pending_review','qualified','rejected'],true))continue;
             $data['services'][$k][$r['status']]=(int)$r['n'];
         }
         if(followEnabled($cfg)){
@@ -73,6 +116,8 @@ function dashboardSnapshot(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=
     $data['attention']=($data['publications']!==null)?reportPublicationAttention($db):null;
     $data['connections']=($cfg['oauth_lifecycle']['enabled']??false)===true?oauthStatus($db,$cfg,$now->getTimestamp()):null;
     $data['web_analytics']=analyticsEnabled($cfg)?dashboardWebAnalytics($db,$days,$now):null;
+    $data['creative_coverage']=dashboardCreativeCoverage($db,$cfg);
+    $data['web_breakdown']=$data['web_analytics']===null?null:dashboardWebBreakdown($db,$data['web_analytics']);
     return $data;
 }
 
@@ -114,6 +159,14 @@ function dashboardCsv(array $data):string{
                 $write(['consented_web_ist',$a['start'],$a['end'],$day,'website','recorded_data',$r===null?0:1]);
                 if($r!==null)foreach($r as $k=>$n)$write(['consented_web_ist',$a['start'],$a['end'],$day,'website',$k,$n]);
             }
+        }
+        foreach($data['creative_coverage']??[] as $objective=>$services)
+            foreach($services as $service=>$row)foreach($row as $metric=>$n)
+                $write(['creative_coverage_all_time','','','',$service,$objective.':'.$metric,$n]);
+        if(($data['web_breakdown']??null)!==null){
+            $a=$data['web_analytics'];
+            foreach($data['web_breakdown'] as $group=>$rows)foreach($rows as $label=>$n)
+                $write(['consented_web_breakdown_ist',$a['start'],$a['end'],'',$label,$group,$n]);
         }
         foreach($data['attention']??[] as $k=>$n)$write(['publication_all_time','','','','all_ledgers',$k,$n]);
         rewind($f);$raw=stream_get_contents($f,262145);

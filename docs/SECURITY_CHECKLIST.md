@@ -181,3 +181,7 @@
 ## V10.6O security (pending runtime)
 
 - [ ] Verify default-off scheduler, cadence and authorization prerequisites, private log/cron permissions, no network in configuration check, read-only status, pause and overlap guards. Verify UTF-8 refusals and atomic intake/draft review writes. Actual provider acceptance and scheduler installation remain pending.
+
+## V10.6P security (pending runtime)
+
+- [ ] Confirm existing owner-only session/HTTPS/CSV gates, no personal data or draft text in new sections, fixed SQL dimension allowlist, disabled module behavior and missing vs zero. No new collection or provider access.

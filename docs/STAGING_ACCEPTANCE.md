@@ -214,3 +214,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6O acceptance (pending)
 
 - [ ] With synthetic authorized test feed, confirm schedule-check is no-network/no-DB, schedule-status is read-only, paused/unresolved/recent sources cannot fetch, and valid due source is imported only for owner review. Confirm private cron and log permissions before any actual scheduler installation; no outbound communications. See V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.
+
+## V10.6P acceptance (pending)
+
+- [ ] On authorized isolated staging, test both reporting windows, all catalog rows, creative coverage states and overlapping categories, website missing/zero semantics, CSV privacy and responsive tables with owner/guest/partner sessions. No actual publishing or model calls. See V106P_OWNER_COVERAGE_INTELLIGENCE.md.

@@ -18,3 +18,7 @@ Reject invalid UTF-8 in every evidence field. Savepoint atomically binds new opp
 126 new synthetic evidence normalization scenarios (14 services × nine valid/invalid scenarios), plus 14 synthetic intake/dedup pairs, scheduler configuration denial and read-only due/recent/paused/unresolved cases. Prior tests retained. New CI pending; no local PHP/MariaDB run in this session. These are regression cases, not 126 distinct production tasks.
 
 P0 isolated hosted restore and staging; P1 live authorized sources, scheduler setup, local AI/native video, provider consent, OAuth, retention and GBP permissions remain pending. No merge/deployment.
+
+## Subsequent CI evidence
+
+Both V10.6O CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45496537252 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45496555590. Synthetic only; actual scheduler/provider acceptance remains pending.
