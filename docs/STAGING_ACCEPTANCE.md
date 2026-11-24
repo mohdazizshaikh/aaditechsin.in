@@ -186,3 +186,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6H acceptance (pending runtime)
 
 - [ ] Verify old JPEG-only bundle approvals survive schema migration; new typed bundle requires one approved MP4, distinct assets, exact account/order and independent mixed flag. Verify actual Instagram/Threads child API behavior, codecs/aspect/duration and complete video fetch before revocation, parent readiness and receipt. Verify communication review reminders only from imported missed counts, owner status transitions, pause and retention guard. Actual provider access, backup/restore and staging release remain pending.
+
+## V10.6I acceptance (pending runtime)
+
+- [ ] Verify authorized Aaditechs property and dedicated Google read-only scope, exact OAuth response scope/expiry and property permission, no credentials or raw payload logs; confirm finalized web search period and date row behavior, weighted position, missing coverage, stale/rotated snapshot rejection, pause before network/commit, private owner report. Actual live Search Console consent, data accuracy, live crawl, other provider renewal, isolated backup/restore and staging release remain pending.
