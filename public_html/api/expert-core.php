@@ -41,7 +41,8 @@ function expertImport(PDO $db,array $v):bool {
     creativeActive($db);$v=expertValidate($v);
     $q=$db->prepare("SELECT t.service_id FROM growth_tasks t JOIN growth_expert e ON e.task_id=t.id WHERE t.id=? AND t.revision=? AND t.status='regeneration_requested' FOR UPDATE");$q->execute([$v['task_id'],$v['revision']]);$svc=$q->fetchColumn();
     if(!$svc)return false;
-    $safe=expertKnowledge()[$svc]['escalation'];
+    $knowledge=expertKnowledge()[$svc];
+    $safe=$knowledge['planning'].' '.$knowledge['escalation'];
     $draft="AI assessment (unverified):\n".$v['assessment']."\nQuestions:\n".$v['questions']."\nProposed next steps:\n".$v['next_steps']."\nMandatory human review: ".$safe;
     if(!growthReplace($db,$v['task_id'],$v['revision'],$draft))return false;
     growthAudit($db,$v['task_id'],$v['revision'],'expert_imported','private_cli');
