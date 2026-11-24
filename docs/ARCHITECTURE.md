@@ -124,3 +124,7 @@ Existing owner-only dashboard adds consented website daily trends using complete
 ## V10.6B credentials and retention boundary
 
 Explicit private Gmail renewal candidate uses configured authorized refresh grant, fixed Google token endpoint, exact metadata scope, mailbox identity and INBOX label verification. Candidate stored exclusively in private 0700 directory with 0600 file; never replaces active config or enters DB/logs. Paused growth required before exchange and before save. Communications retention dry-run computes digest over cutoff and locked candidate IDs/snapshot generation; explicit apply rechecks digest, deletes only eligible aggregate rows and stale Gmail snapshot in transaction, retains audit/publication/evidence records. See V106B_CREDENTIAL_RETENTION.md.
+
+## V10.6C signed communications and release gates
+
+Private CLI fetches one authorized per-channel HTTPS aggregate endpoint using a pinned public IPv4, explicit bearer and separate HMAC key. Signed payload binds credential generation, channel, completed UTC day, freshness and counts; strict validation and pause gates before read and commit. Existing immutable aggregate ledger and owner reports reused; no customer details or native provider API connection. Release inventory pins 30 schema/migration/fixture Git blob hashes; read-only DB checker reports unresolved worker/lease, publication and bearer evidence, blocks until reviewed. See V106C_COMMUNICATIONS_RELEASE.md.

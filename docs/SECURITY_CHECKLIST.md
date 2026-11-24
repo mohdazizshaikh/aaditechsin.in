@@ -129,3 +129,7 @@
 ## V10.6B security (pending runtime)
 
 - [ ] Private authorized OAuth client/refresh secret, fixed HTTPS token endpoint, no redirects/proxies/raw response output, exact scope/identity checks, no active config overwrite, exclusive candidate 0600 in private 0700 root. Candidate contains a live access token if actually issued; do not share or commit, inspect and dispose privately after rotation. Retention independently OFF, paused workers, verified backups, exact plan hash and transaction, no scheduled cleanup or audit/publication deletion.
+
+## V10.6C security (pending runtime)
+
+- [ ] Independent default-OFF bridge and per-channel authorization, fixed HTTPS URL, no arbitrary URL input, public IPv4 pinning/no redirects/proxy, bounded response, private bearer and independent HMAC key, exact signed payload and generation/freshness checks, no raw data/secret output, immutable aggregates. Source Git blob SHA-1 checks detect drift, not signed release authenticity. Release DB checks are read-only; unresolved evidence blocks and is never automatically modified. Verify actual process shutdown, grants, backup/restore and provider acceptance separately.
