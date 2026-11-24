@@ -96,3 +96,7 @@ Private approved MP4 -> exclusive revision -> explicit public authorization -> p
 ## V10.2H.2 X and Threads video boundary
 
 X: private exact MP4, exclusive revision, explicit public approval, persistent media ID, ordered bounded append/finalize, read-only succeeded/expiry check and separate publish. Threads: approved manifest MP4 and exact asset-type approval, same private expiring bearer fetch (15 minutes, 20 requests), FINISHED container and explicit publish; no automatic retry, no permanent public media. Recovery and inventory include both. Carousels need separate ordered multi-asset approval. See V102H2_VIDEO_BATCH.md.
+
+## V10.2H.3 carousel and private inbox boundary
+
+Ordered 2–5 JPEG bundle digest binds asset hashes and byte sizes to approved manifest and account. Distinct owner approval, per-child 15-minute bearer digest/cap, durable child container IDs before next provider write, separate parent assembly and publish claim. Exclusive revision across text/single image/video/carousel. Single bounded video GET ranges after full hash verification; private inbox importer verifies approved PNG/MP4 pair before copying to private storage, no network access or publication. See V102H3_CAROUSEL_TRANSFER.md.

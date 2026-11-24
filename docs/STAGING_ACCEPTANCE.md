@@ -134,3 +134,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2H.2 acceptance (pending runtime)
 
 - [ ] Apply after V10.2H.1. Verify existing Meta image rows remain images, X scope and exact user, ordered chunks, durable ID before append, finalize/processing/expiry, exact public approval and no duplicate, Threads video type/hash and HTTPS GET/HEAD delivery, pause/cap/expiry/revocation, no caching/log leakage, container FINISHED and provider visibility. Validate real format and quotas, HTTP Range behavior, crash reconciliation and storage references. No carousel or partial-upload resume acceptance.
+
+## V10.2H.3 acceptance (pending runtime)
+
+- [ ] Apply after V10.2H.2. Verify 2–5 ordered JPEGs, wrong bundle and account rejection, duplicate reservations, child receipt persistence, parent and final readiness, no blind retry, child bearer expiry/cap/revocation, storage references, actual single-range 206/416 and memory limits, separate private inbox import and tampered pair rejection. Verify actual provider behavior and independent visibility. Mixed-video carousels and remote SFTP automation remain pending.

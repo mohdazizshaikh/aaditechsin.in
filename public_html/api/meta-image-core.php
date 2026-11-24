@@ -48,7 +48,7 @@ function miStore(string $root,string $hash,string $bytes,int $w,int $h):void {
 function miRegister(PDO $db,array $cfg,string $provider,int $task,int $rev,string $manifest,string $hash,int $size,string $kind='image'):int {
     $p=miTarget($cfg,$provider,$kind);if(!$p)throw new RuntimeException('Disabled');$r=miManifest($db,$task,$rev,$manifest,$provider);
     if(!preg_match('/^[a-f0-9]{64}$/D',$hash)||$size<24||$size>($kind==='video'?20*1024*1024:8000000)||($kind==='video'&&!hash_equals($r['video_hash'],$hash))||strlen($r['caption'])>($provider==='threads'?500:900))throw new InvalidArgumentException('Invalid asset');
-    foreach(['growth_meta_images',$provider==='threads'?'growth_meta_publications':'growth_instagram_uploads'] as $table){
+    foreach(['growth_carousels','growth_meta_images',$provider==='threads'?'growth_meta_publications':'growth_instagram_uploads'] as $table){
         $q=$db->prepare("SELECT id FROM $table WHERE task_id=? AND revision=?");$q->execute([$task,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision already reserved');
     }
     $db->prepare('INSERT INTO growth_meta_images(task_id,revision,manifest_hash,asset_hash,provider,target_id,page_id,byte_count,caption,asset_kind) VALUES(?,?,?,?,?,?,?,?,?,?)')->execute([$task,$rev,$manifest,$hash,$provider,$p['id'],$p['page'],$size,$r['caption'],$kind]);

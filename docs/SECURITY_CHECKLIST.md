@@ -101,3 +101,7 @@
 ## V10.2H.2 security (pending runtime)
 
 - [ ] Private exact video hash, exclusive text/image/video reservation, separate explicit public approval, no secrets in receipts or reports, X bounded fixed-host upload, fail closed on processing/expiry, Threads short-lived bearer (any holder can fetch), mandatory verified log redaction, cap and revocation, no sensitive assets. Check actual memory/rate limits, stop workers before emergency pause, no uncertain replay.
+
+## V10.2H.3 security (pending runtime)
+
+- [ ] Exact ordered bundle approval, image-only 2–5 cap, independent high-entropy bearer digest per child, verified log redaction/no cache, pause and current manifest checks, persist child evidence before next write, revoke on parent/cancel/failure, no raw tokens in reports. Single-range video only after full verified read, request cap retained. Private inbox separate from webroot and storage, exact hashes, no credential persistence, source files retained. No automatic retry or real posting.
