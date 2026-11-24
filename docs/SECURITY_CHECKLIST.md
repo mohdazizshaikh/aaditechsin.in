@@ -85,3 +85,7 @@
 ## V10.2F media retention security (pending runtime)
 
 - [ ] Owner session only, no public preview, exact content-addressed name and hash, no symlinks/hardlinks, bounded bytes, all references protected, no deletion, paused explicit CLI only. Review actual backups, audit recovery, storage quota and retention policy.
+
+## V10.2G OAuth security (pending runtime)
+
+- [ ] Private token config 0600, no secrets in DB/logs/Telegram/Git, mandatory lifecycle enforcement at release, fail closed on missing/expired/revoked metadata, manual paused rotation and actual provider revocation. Identity health is not scope or publish proof.

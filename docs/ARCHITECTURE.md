@@ -80,3 +80,7 @@ V10.2E uses a separately reviewed 1080x1350 Instagram JPEG derivative while pres
 ## V10.2F private storage boundary
 
 Owner-only existing HTTPS admin session and exact hash-verified referenced media preview. Bounded inventory; protect every historical manifest/ledger reference. Explicit paused private CLI moves old unreferenced bytes to private quarantine or restores them; audit ledger, no deletion. See V102F_MEDIA_STORAGE.md.
+
+## V10.2G OAuth boundary
+
+Private configured credential and non-secret generation/deadline -> optional source-compatible expiry guard (mandatory for live release) -> existing identity preflight -> sanitized latest read-only health record. Local revoke blocks target resolution, not provider consent. No automatic refresh or secrets in DB. See V102G_OAUTH_HEALTH.md.
