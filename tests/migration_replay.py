@@ -3,6 +3,8 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
+import tempfile
 import pymysql
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -65,6 +67,26 @@ try:
     actual={}
     for r in upgraded["columns"]:actual.setdefault(r[0],set()).add(r[1])
     assert actual=={k:set(v) for k,v in contract["tables"].items()},"Release column contract mismatch"
+    # Real dump/restore round trip, only the already-guarded synthetic CI DB.
+    env=dict(os.environ,MYSQL_PWD="ci_only_not_real_password")
+    args=["--protocol=TCP","--host=127.0.0.1","--port=3306","--user=aaditechs_ci"]
+    with tempfile.TemporaryDirectory(prefix="aaditechs-ci-restore-") as tmp:
+        dump=Path(tmp)/"synthetic.sql"
+        with dump.open("xb") as handle:
+            dump.chmod(0o600)
+            subprocess.run(["mariadb-dump",*args,"--single-transaction","--skip-lock-tables","--no-tablespaces","aaditechs_ci"],env=env,stdout=handle,stderr=subprocess.PIPE,check=True,timeout=60)
+        assert 0<dump.stat().st_size<16*1024*1024
+        reset()
+        with dump.open("rb") as handle:
+            subprocess.run(["mariadb",*args,"aaditechs_ci"],env=env,stdin=handle,stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True,timeout=60)
+        assert signature()==upgraded,"Restored schema drift"
+        cur.execute("SELECT COUNT(*) FROM leads WHERE reference='AT-CI-MIGRATION'")
+        assert cur.fetchone()==(1,)
+        cur.execute("SELECT COUNT(*) FROM growth_tasks WHERE title='Synthetic migration'")
+        assert cur.fetchone()==(1,)
+        cur.execute("SELECT paused FROM growth_control WHERE id=1")
+        assert cur.fetchone()==(1,)
+        print("Synthetic MariaDB dump and restore round trip: PASS")
     reset()
     apply(ROOT/"secure-setup/schema.sql")
     fresh=signature()

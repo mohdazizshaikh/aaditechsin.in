@@ -51,6 +51,7 @@ jobs:
           php tests/communications_bridge_rules.php
           php tests/release_gate_rules.php
           php tests/reconciliation_rules.php
+          php tests/native_usage_rules.php
           python3 tests/backup_verify.py
           php tests/intelligence_rules.php
           php tests/dashboard_rules.php
@@ -113,6 +114,8 @@ jobs:
         run: |
           python3 -m venv .ci-venv
           .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 PyMySQL==1.1.1 requests==2.32.3
+      - name: Install disposable MariaDB dump client
+        run: sudo apt-get update -qq && sudo apt-get install -y mariadb-client
       - name: Synthetic MySQL + HTTP full workflow
         run: |
           .ci-venv/bin/python tests/migration_replay.py
@@ -133,6 +136,7 @@ jobs:
           php tests/communications_bridge_rules.php --database
           php tests/release_gate_rules.php --database
           php tests/reconciliation_rules.php --database
+          php tests/native_usage_rules.php --database
           php tests/intelligence_rules.php --database
           php tests/dashboard_rules.php --database
           php tests/network_media_rules.php --database
