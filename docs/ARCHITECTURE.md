@@ -76,3 +76,7 @@ Private PNG, exact revision/hash/target, exclusive text-or-image reservation, ex
 Private JPEG separately reviewed and approved -> expiring bearer capability (digest only, 15 minutes, 20 fetches, exact hash) -> Meta container -> FINISHED check -> revoke token and explicit publish. Anyone holding URL can fetch during window; non-sensitive public marketing only, log redaction mandatory. No permanent public files. See V102E_META_IMAGES.md.
 
 V10.2E uses a separately reviewed 1080x1350 Instagram JPEG derivative while preserving the original 1080x1920 Reel manifest profile. Fetch requires explicit log-redaction verification flag.
+
+## V10.2F private storage boundary
+
+Owner-only existing HTTPS admin session and exact hash-verified referenced media preview. Bounded inventory; protect every historical manifest/ledger reference. Explicit paused private CLI moves old unreferenced bytes to private quarantine or restores them; audit ledger, no deletion. See V102F_MEDIA_STORAGE.md.
