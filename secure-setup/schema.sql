@@ -233,3 +233,345 @@ CREATE TABLE IF NOT EXISTS growth_report_runs (
  UNIQUE KEY uq_report_period(report_type,period_key),
  INDEX idx_reports_status(status,id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V9.7 catalog-only worker lease ledger. No plaintext credentials or lease tokens.
+CREATE TABLE IF NOT EXISTS growth_creative_leases (
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ attempts TINYINT UNSIGNED NOT NULL DEFAULT 1,
+ token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ status ENUM('leased','failed','completed') NOT NULL,
+ expires_at DATETIME NOT NULL,
+ result_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ PRIMARY KEY(task_id,revision),
+ CONSTRAINT fk_creative_lease_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V9.8 metadata only. Actual binary media remains on owner's private PC.
+CREATE TABLE IF NOT EXISTS growth_media_manifests (
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ image_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ video_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ renderer ENUM('local-diffusion','template') NOT NULL,
+ width SMALLINT UNSIGNED NOT NULL,
+ height SMALLINT UNSIGNED NOT NULL,
+ status ENUM('pending_review','approved','rejected') NOT NULL DEFAULT 'pending_review',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ reviewed_at DATETIME NULL,
+ PRIMARY KEY(task_id,revision,manifest_hash),
+ CONSTRAINT fk_media_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V9.9 owner-only structured expert questions.
+CREATE TABLE IF NOT EXISTS growth_expert (
+ task_id BIGINT UNSIGNED PRIMARY KEY,
+ intent ENUM('assessment','planning','escalation') NOT NULL,
+ CONSTRAINT fk_expert_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.0 source-only SEO audit summaries.
+CREATE TABLE IF NOT EXISTS growth_seo_reports (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ report_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ page_count SMALLINT UNSIGNED NOT NULL,
+ counts_json TEXT NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.1 separate Meta text publication ledger.
+CREATE TABLE IF NOT EXISTS growth_meta_publications (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ provider ENUM('facebook','threads') NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ due_at DATETIME NOT NULL,
+ status ENUM('queued','sending','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'queued',
+ receipt VARCHAR(80) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ claimed_at DATETIME NULL,
+ finished_at DATETIME NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_meta_revision(task_id,revision),
+ INDEX idx_meta_due(provider,status,due_at,id),
+ CONSTRAINT fk_meta_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.1 separate network text publication ledger.
+CREATE TABLE IF NOT EXISTS growth_network_publications (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ provider ENUM('linkedin','x','google-business') NOT NULL,
+ target_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ due_at DATETIME NOT NULL,
+ status ENUM('queued','sending','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'queued',
+ receipt VARCHAR(160) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ claimed_at DATETIME NULL,
+ finished_at DATETIME NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_network_revision(task_id,revision),
+ INDEX idx_network_due(provider,status,due_at,id),
+ CONSTRAINT fk_network_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2A verified private asset ledger and explicit YouTube upload approval.
+CREATE TABLE IF NOT EXISTS growth_media_uploads (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ video_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ visibility ENUM('private','unlisted','public') NOT NULL,
+ title VARCHAR(100) NOT NULL,
+ description TEXT NOT NULL,
+ category_id VARCHAR(3) NOT NULL,
+ made_for_kids TINYINT(1) NOT NULL,
+ synthetic_content TINYINT(1) NOT NULL,
+ status ENUM('pending_review','approved','sending','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ receipt VARCHAR(32) NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_media_upload_revision(task_id,revision),
+ CONSTRAINT fk_upload_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2B private Instagram Reel publication ledger.
+CREATE TABLE IF NOT EXISTS growth_instagram_uploads (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ video_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ page_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','uploading','processing','publishing','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ container_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ receipt VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_ig_revision(task_id,revision),
+ CONSTRAINT fk_ig_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2C Facebook Page photo or video publication, one per creative revision.
+CREATE TABLE IF NOT EXISTS growth_facebook_media (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_kind ENUM('photo','video') NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','sending','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ receipt VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_fb_media_revision(task_id,revision),
+ CONSTRAINT fk_fb_media_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2D LinkedIn and X single image publication, one per creative revision.
+CREATE TABLE IF NOT EXISTS growth_network_media (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_kind ENUM('photo') NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ provider ENUM('linkedin','x') NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','sending','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ receipt VARCHAR(160) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_nm_revision(task_id,revision),
+ CONSTRAINT fk_nm_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2E approved single-image delivery, no permanent public storage.
+CREATE TABLE IF NOT EXISTS growth_meta_images (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ provider ENUM('threads','instagram') NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ page_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
+ byte_count INT UNSIGNED NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','fetching','processing','publishing','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL UNIQUE,
+ expires_at DATETIME NULL,
+ fetch_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+ container_id VARCHAR(32) NULL,
+ receipt VARCHAR(32) NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_meta_image_revision(task_id,revision),
+ CONSTRAINT fk_meta_image_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2F reversible private storage maintenance audit.
+CREATE TABLE IF NOT EXISTS growth_media_storage_events (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ asset_name VARCHAR(72) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ action ENUM('quarantined','restored') NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ INDEX idx_media_storage_asset(asset_name,id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2G sanitized read-only provider check evidence, no token or refresh secret.
+CREATE TABLE IF NOT EXISTS growth_oauth_health (
+ provider ENUM('facebook','threads','linkedin','x','google-business','instagram','youtube') PRIMARY KEY,
+ generation CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ target_id VARCHAR(80) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ state ENUM('identity_verified','not_verified','error') NOT NULL,
+ checked_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2H intermediate image receipts, no provider credentials or upload URLs.
+CREATE TABLE IF NOT EXISTS growth_network_media_resources (
+ publication_id BIGINT UNSIGNED PRIMARY KEY,
+ provider ENUM('linkedin','x') NOT NULL,
+ resource_id VARCHAR(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ phase ENUM('initialized','uploaded') NOT NULL,
+ recorded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT fk_nm_resource FOREIGN KEY(publication_id) REFERENCES growth_network_media(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS growth_linkedin_video (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ video_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','uploading','processing','publishing','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ video_id VARCHAR(128) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ receipt VARCHAR(160) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_lv_revision(task_id,revision),
+ CONSTRAINT fk_lv_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS growth_x_video (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ video_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','uploading','processing','publishing','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ video_id VARCHAR(128) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ receipt VARCHAR(160) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_xv_revision(task_id,revision),
+ CONSTRAINT fk_xv_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE growth_meta_images ADD COLUMN IF NOT EXISTS asset_kind ENUM('image','video') NOT NULL DEFAULT 'image';
+
+CREATE TABLE IF NOT EXISTS growth_carousels (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ bundle_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ provider ENUM('threads','instagram') NOT NULL,
+ target_id VARCHAR(32) NOT NULL,
+ page_id VARCHAR(32) NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','fetching','processing','assembling','parent_ready','publishing','accepted','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ container_id VARCHAR(32) NULL,
+ receipt VARCHAR(32) NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_carousel_revision(task_id,revision),
+ CONSTRAINT fk_carousel_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS growth_carousel_items (
+ carousel_id BIGINT UNSIGNED NOT NULL,
+ position_no TINYINT UNSIGNED NOT NULL,
+ asset_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL UNIQUE,
+ expires_at DATETIME NULL,
+ fetch_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+ container_id VARCHAR(32) NULL,
+ PRIMARY KEY(carousel_id,position_no),
+ UNIQUE KEY uq_carousel_child(carousel_id,container_id),
+ CONSTRAINT fk_carousel_item FOREIGN KEY(carousel_id) REFERENCES growth_carousels(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.2K Telegram channel photo or video publication, one per creative revision.
+CREATE TABLE IF NOT EXISTS growth_telegram_media (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ task_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ asset_kind ENUM('photo','video') NOT NULL,
+ byte_count INT UNSIGNED NOT NULL,
+ target_id VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ caption TEXT NOT NULL,
+ status ENUM('pending_review','approved','sending','accepted','failed','unknown','cancelled') NOT NULL DEFAULT 'pending_review',
+ receipt VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NULL,
+ error_code VARCHAR(32) NOT NULL DEFAULT '',
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ finished_at DATETIME NULL,
+ UNIQUE KEY uq_tg_media_revision(task_id,revision),
+ CONSTRAINT fk_tg_media_manifest FOREIGN KEY(task_id,revision,manifest_hash) REFERENCES growth_media_manifests(task_id,revision,manifest_hash) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS growth_communication_daily (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ channel ENUM('email','whatsapp','sms','calls') NOT NULL,
+ day_utc DATE NOT NULL,
+ received_count INT UNSIGNED NOT NULL,
+ answered_count INT UNSIGNED NOT NULL,
+ missed_count INT UNSIGNED NOT NULL,
+ imported_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_communication_day(channel,day_utc)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS growth_gmail_snapshot (
+ id TINYINT UNSIGNED PRIMARY KEY,
+ generation CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ inbox_count INT UNSIGNED NOT NULL,
+ unread_count INT UNSIGNED NOT NULL,
+ captured_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS growth_opportunity_followups (
+ opportunity_id BIGINT UNSIGNED PRIMARY KEY,
+ due_on DATE NOT NULL,
+ status ENUM('open','completed','cancelled') NOT NULL DEFAULT 'open',
+ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ INDEX idx_followup_due(status,due_on),
+ CONSTRAINT fk_followup_opp FOREIGN KEY(opportunity_id) REFERENCES growth_opportunities(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

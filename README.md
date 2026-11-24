@@ -1,10 +1,14 @@
-# Aaditechs — Website & Partner Operations Hub (V8)
+# Aaditechs — Website, Partner Operations & Growth Platform
 
 **Source repository** for Aaditechs' modern website, Audio Visual (AV) solutions, guided assessment chatbot, consent-based Lead Engine, and a private owner/partner work-order portal.
 
 Production: `https://aaditechs.in/` — **not deployed by this source commit**. Previous hosted *static* concept preview: `https://aaditechs-modern-concept-2026.tiledparrot.chatgpt.site` — may still show an earlier V6 until explicitly updated. No CRM data, credentials or production customer records are included in Git.
 
-## What's implemented
+## Growth development status (24 November 2026)
+
+Main V9.6 source verified; V9.7–V10.6C development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [Meta text publishing](docs/V101_META.md), [Other social networks](docs/V102_NETWORKS.md), [Private media uploads](docs/V102A_MEDIA_UPLOAD.md), [Instagram Reels](docs/V102B_INSTAGRAM.md), [Facebook media](docs/V102C_FACEBOOK_MEDIA.md), [LinkedIn/X images](docs/V102D_NETWORK_MEDIA.md), [Meta images](docs/V102E_META_IMAGES.md), [Private media inventory](docs/V102F_MEDIA_STORAGE.md), [OAuth lifecycle](docs/V102G_OAUTH_HEALTH.md), [Media recovery](docs/V102H_MEDIA_RECOVERY.md), [LinkedIn video batch](docs/V102H1_VIDEO_BATCH.md), [X/Threads video batch](docs/V102H2_VIDEO_BATCH.md), [Carousel and private inbox batch](docs/V102H3_CAROUSEL_TRANSFER.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
+
+## Existing website and operations
 
 - Original Aaditechs logo retained; Data Recovery, IT Infrastructure, Software, Support, Cloud, Security and Procurement retained.
 - **Audio Visual division:** Video Conferencing, Auditorium AV, Professional Sound & PA, AV Installation/Maintenance with homepage category filter.
@@ -65,3 +69,17 @@ python tests/browser_smoke.py  # requires Python playwright + local Chromium; us
 ```
 
 See [docs/GAP_AUDIT_V8.md](docs/GAP_AUDIT_V8.md) and [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/SECURITY_CHECKLIST.md](docs/SECURITY_CHECKLIST.md). Keep new work scoped; do not reintroduce Zenith Soles / Robotics Lab, invent customer reviews, or change the original brand logo without owner approval.
+
+V10.2I/J source batch: [private SFTP transfer and integration health](docs/V102IJ_TRANSFER_HEALTH.md). CI pending; no live acceptance.
+
+V10.2K/V10.3 source batch: [Telegram media and communications aggregates](docs/V102K_V103_COMMUNICATIONS.md). CI pending; no live acceptance.
+
+V10.3A/V10.4 source batch: [Gmail metadata, authorized discovery batch and opportunity reminders](docs/V103A_V104_INTELLIGENCE.md). CI pending; no live acceptance.
+
+V10.5 source batch: [private owner intelligence dashboard](docs/V105_OWNER_DASHBOARD.md). CI pending; no live acceptance.
+
+V10.5A/V10.6A source batch: [advanced aggregate reporting and release readiness](docs/V105A_V106A_RELEASE_READINESS.md). CI pending; no live acceptance.
+
+V10.6B source batch: [Gmail renewal candidates and communications retention](docs/V106B_CREDENTIAL_RETENTION.md). CI pending; no live acceptance.
+
+V10.6C source batch: [signed communication bridges and consolidated release gates](docs/V106C_COMMUNICATIONS_RELEASE.md). CI pending; no live acceptance.
