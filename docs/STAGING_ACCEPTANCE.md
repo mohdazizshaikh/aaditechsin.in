@@ -218,3 +218,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6P acceptance (pending)
 
 - [ ] On authorized isolated staging, test both reporting windows, all catalog rows, creative coverage states and overlapping categories, website missing/zero semantics, CSV privacy and responsive tables with owner/guest/partner sessions. No actual publishing or model calls. See V106P_OWNER_COVERAGE_INTELLIGENCE.md.
+
+## V10.6Q acceptance (pending)
+
+- [ ] Trusted local PC, exact tag/digest, actual structured inference, staging TLS/token, batch limits, interrupted/failed lease recovery and independent owner review. No live posting. See V106Q_PINNED_LOCAL_WORKER.md.

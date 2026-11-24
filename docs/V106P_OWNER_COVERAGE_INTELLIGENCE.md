@@ -9,3 +9,7 @@ Consented website breakdown uses same completed IST window as daily website anal
 
 ## Acceptance
 56 synthetic objective/service rows with generation/review/approve/reject outcomes, plus 27 category dimensions, missing/zero distinction, complete opportunity catalog, CSV privacy and disabled-module checks. Existing CI runs synthetic PHP and MariaDB; new CI pending at writing. No live browser, actual owner data, inference, production deployment or merge. Test cases are not 56 independent production features. P0 actual isolated hosting/backup restore and cumulative validation; P1 actual authorized provider, local inference/native video, scheduler, retention and OAuth remain open.
+
+## Subsequent CI evidence
+
+Both V10.6P CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45498426102 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45498432910. Synthetic only; actual hosted acceptance pending.

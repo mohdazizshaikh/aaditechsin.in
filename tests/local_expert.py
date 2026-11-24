@@ -16,3 +16,9 @@ try:m.generate({**j,"knowledge":{"intake":"untrusted"}}, "local-test:1b",fake)
 except ValueError:pass
 else:raise AssertionError("Tampered knowledge accepted")
 print("Expert knowledge coverage and structured mock model: PASS")
+
+for intent in ("planning","escalation"):
+    for s in catalog:
+        j={"version":1,"task_id":1,"revision":1,"service_id":s["id"],"intent":intent,"service":s,"knowledge":kb[s["id"]]}
+        assert m.generate(j,"local-test:1b",fake)["revision"]==1
+print("28 additional expert service/intent cases: PASS (synthetic)")

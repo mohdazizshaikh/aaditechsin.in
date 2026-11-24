@@ -185,3 +185,7 @@
 ## V10.6P security (pending runtime)
 
 - [ ] Confirm existing owner-only session/HTTPS/CSV gates, no personal data or draft text in new sections, fixed SQL dimension allowlist, disabled module behavior and missing vs zero. No new collection or provider access.
+
+## V10.6Q security (pending runtime)
+
+- [ ] Verify independently pinned model and restricted Ollama egress, exact local catalog, strict JSON, bounded sequential polling and stop on uncertain outcome; no overlapping schedulers, secrets or customer context. Inventory is not attestation. Actual runtime acceptance pending.
