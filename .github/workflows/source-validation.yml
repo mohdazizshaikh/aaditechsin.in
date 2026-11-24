@@ -42,6 +42,7 @@ jobs:
           php tests/social_rules.php
           php tests/report_rules.php
           python3 tests/local_creative.py
+          python3 tests/local_expert.py
           .ci-venv/bin/python tests/local_media.py
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only

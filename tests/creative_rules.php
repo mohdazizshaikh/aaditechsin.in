@@ -55,6 +55,16 @@ try{
     creativeCheck(str_contains(growthCommand($db,"/approvemedia $id 2 $digest",$mcfg),'review recorded'),'Approve exact digest');
     mediaRegister($db,$manifest);
     creativeCheck(str_contains(growthCommand($db,"/rejectmedia $id 2 $digest",$mcfg),'not pending'),'Duplicate registration preserves review');
+    require_once dirname(__DIR__).'/public_html/api/expert-core.php';
+    $ecfg=$cfg+['expert'=>['enabled'=>true]];
+    creativeCheck(!expertEnabled($cfg)&&count(expertKnowledge())===14,'Expert default OFF and coverage');
+    $eid=expertCreate($db,'data-recovery','assessment');
+    $ej=expertExport($db,$eid);
+    creativeCheck($ej['intent']==='assessment'&&$ej['service_id']==='data-recovery','Expert scoped export');
+    $er=['version'=>1,'task_id'=>$eid,'revision'=>1,'model'=>'local-test:1b','assessment'=>'Assess the storage type.','questions'=>'What symptoms are present?','next_steps'=>'Arrange a specialist review.'];
+    creativeCheck(expertImport($db,$er)&&!expertImport($db,$er),'Expert import and duplicate protection');
+    creativeCheck(str_contains(growthCommand($db,"/task $eid",$ecfg),'Avoid writing'),'Mandatory safety note');
+    creativeCheck(str_contains(growthCommand($db,"/approve $eid 1",$ecfg),'approved'),'Owner expert review');
     $id2=creativeCreate($db,'infrastructure','linkedin','education');
     $claim=creativeLeaseClaim($db);
     creativeCheck($claim['job']['task_id']===$id2,'Claim pending task');
