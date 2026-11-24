@@ -161,3 +161,7 @@
 ## V10.6J security (pending runtime)
 
 - [ ] Separate history and live-import OFF gates, exact property and generation binding, global bounded history cap; no keyword or raw payload storage. Local crawler explicit operator authorization, fixed HTTPS host/path and public IPv4 pin, no redirects/proxy/credentials, conservative reviewed robots match, body cap and request pacing. No private routes or link discovery. Report is operator-supplied evidence, not signed remote attestation; import checks coverage/freshness and rejects older/duplicate capture. No scheduling or automatic deletion. Approve retention and actual network/hosting acceptance first.
+
+## V10.6K security (pending runtime)
+
+- [ ] Local diagnostic fixed loopback only, no redirects or proxy, exact digest and bounded response, synthetic prompt only; tag/digest checks are not cryptographic execution attestation or proof Ollama cannot use network. Enforce trusted offline runtime and egress isolation separately. Private SEO cleanup independently OFF, paused workers, backup/restore, exact plan and transaction; no automatic deletion. GBP read check independently OFF with existing target/OAuth gate, fixed read-only media path and no response/credential output, never infer write permission. No actual activation or deployment.
