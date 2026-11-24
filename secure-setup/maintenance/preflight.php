@@ -145,6 +145,7 @@ $flags = [
     'creative.enabled' => ['creative','enabled'],
     'social.enabled' => ['social','enabled'],
     'social.telegram_channel.enabled' => ['social','telegram_channel','enabled'],
+    'discovery.cadence_enabled' => ['discovery','cadence_enabled'],
     'discovery.feeds_enabled' => ['discovery','feeds_enabled'],
 ];
 foreach ($flags as $name => $keys) {
