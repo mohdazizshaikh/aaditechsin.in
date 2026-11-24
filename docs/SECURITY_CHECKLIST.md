@@ -59,3 +59,7 @@
 ## V10.2 network security gates (pending live verification)
 
 - [ ] Verify scoped organization/user/location identity, separate OAuth tokens, bounded HTTPS transport and no redirects, no logs of secrets or raw errors. No automatic retries, only approved revisions, manual uncertain reconciliation. Confirm actual provider visibility and quotas separately.
+
+## V10.2A private media security (pending live)
+
+- [ ] Verify private directory, trusted files, symlink refusal, exact binary hash, immutable metadata and channel binding, provider URL allowlist, no public paths/credentials, orphan file cleanup and retention policy. Never retry uncertain uploads; review actual files and platform policy.

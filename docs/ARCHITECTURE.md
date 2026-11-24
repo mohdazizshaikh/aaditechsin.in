@@ -54,3 +54,7 @@ Separate text-only Meta ledger for Facebook Pages and Threads. Explicit owner sc
 ## V10.2 network boundary
 
 Separate LinkedIn organization, X user-context and GBP account/location text ledger, fixed HTTPS hosts and scoped destination preflight, owner-approved exact revisions, no uncertain retries. Unified /publications counts all three ledgers. Instagram and YouTube require actual authorized binary transfer and upload. See V102_NETWORKS.md.
+
+## V10.2A media boundary
+
+Trusted PC -> manual authenticated private transfer -> CLI SHA256-bound content-addressed MP4 storage -> immutable metadata and exact manifest/revision/visibility/channel review -> explicit YouTube resumable upload -> receipt ledger. No public media URL. Uncertain sends never requeued. Instagram and other media providers remain pending. See V102A_MEDIA_UPLOAD.md.
