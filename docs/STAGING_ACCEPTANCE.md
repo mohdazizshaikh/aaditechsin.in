@@ -126,3 +126,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2H acceptance (pending runtime)
 
 - [ ] Apply after V10.2G; verify persistent image resource receipt before post, audit failure blocks next provider action, crash reconciliation, no replay or token leaks. Actual video/carousel work pending.
+
+## V10.2H.1 acceptance (pending runtime)
+
+- [ ] Verify LinkedIn video format/rights and scopes, exact org, ranges/ETags, receipt persistence failure, separate AVAILABLE gate and actual visibility; Instagram receipt before binary, unified uncertain report, text/image/video exclusivity and storage protection. No automatic retry or other video/carousel acceptance.
