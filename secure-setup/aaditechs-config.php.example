@@ -33,7 +33,7 @@ return [
     'media_upload' => ['enabled' => false, 'telegram_media_enabled' => false, 'telegram_album_enabled' => false, 'gbp_media_check_enabled' => false, 'linkedin_video_enabled' => false, 'x_video_enabled' => false, 'inventory_enabled' => false, 'retention_enabled' => false, 'fetch_enabled' => false, 'fetch_log_redaction_verified' => false, 'threads_images_enabled' => false, 'threads_video_enabled' => false, 'threads_carousel_enabled' => false, 'threads_mixed_carousel_enabled' => false, 'instagram_carousel_enabled' => false, 'instagram_mixed_carousel_enabled' => false, 'inbox_import_enabled' => false, 'private_inbox' => 'REPLACE_WITH_PRIVATE_INBOX', 'instagram_images_enabled' => false, 'linkedin_enabled' => false, 'x_enabled' => false, 'facebook_enabled' => false, 'instagram' => ['enabled' => false, 'page_id' => 'REPLACE_WITH_PAGE_ID', 'account_id' => 'REPLACE_WITH_IG_ID', 'access_token' => 'REPLACE_WITH_AUTHORIZED_PAGE_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_VERSION'], 'private_root' => 'REPLACE_WITH_PRIVATE_0700_DIRECTORY', 'youtube' => ['enabled' => false, 'channel_id' => 'REPLACE_WITH_CHANNEL_ID', 'access_token' => 'REPLACE_WITH_AUTHORIZED_TOKEN']],
     'media' => ['enabled' => false], // Private local media, metadata only.
     'creative_transport' => ['enabled' => false, 'token_sha256' => 'REPLACE_WITH_WORKER_TOKEN_SHA256'],
-    'creative' => ['enabled' => false], // Local model review workflow only.
+    'creative' => ['enabled' => false, 'batch_enabled'=>false], // Local model review workflow only.
     'social' => [
         'enabled' => false,
         'network' => [

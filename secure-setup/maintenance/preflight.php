@@ -142,6 +142,7 @@ $flags = [
     'communications.retention_enabled' => ['communications','retention_enabled'],
     'communications.gmail.renewal.enabled' => ['communications','gmail','renewal','enabled'],
     'discovery.enabled' => ['discovery','enabled'],
+    'creative.batch_enabled' => ['creative','batch_enabled'],
     'creative.enabled' => ['creative','enabled'],
     'social.enabled' => ['social','enabled'],
     'social.telegram_channel.enabled' => ['social','telegram_channel','enabled'],
