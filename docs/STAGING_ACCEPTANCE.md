@@ -142,3 +142,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2I/J acceptance (pending runtime)
 
 - [ ] Test dedicated SFTP account and pinned host key mismatch, permissions, exact remote asset pair and import hash checks, timeout/partial transfer recovery, destination rename behavior, no unintended publish. Verify owner-only daily expiry/stale/revoked summary, opt-out and period deduplication, all-ledger counts, actual schedule and delivery. Verify manual rotation and actual provider consent; automatic refresh remains pending.
+
+## V10.2K/V10.3 acceptance (pending runtime)
+
+- [ ] Verify Telegram business bot/channel identity, administrator post permission, real PNG/MP4 constraints, exact type/manifest/account approval, duplicate prevention, private file hash, receipt and independent visibility. Verify communications completed-day counts, extra-field rejection, conflict protection, missing data vs zero, pause, owner reports and retention policy. No live communications connectors, message bodies, call recordings or GBP media acceptance.

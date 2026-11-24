@@ -8,9 +8,9 @@ function storageName(string $name):bool{return preg_match('/^[a-f0-9]{64}\.(?:pn
 function storageReferences(PDO $db,string $name):int {
     if(!storageName($name))throw new InvalidArgumentException('Invalid asset name');
     [$hash,$ext]=explode('.',$name);$queries=match($ext){
-        'png'=>['SELECT COUNT(*) FROM growth_media_manifests WHERE image_hash=?','SELECT COUNT(*) FROM growth_facebook_media WHERE asset_hash=? AND asset_kind=\'photo\'','SELECT COUNT(*) FROM growth_network_media WHERE asset_hash=?'],
+        'png'=>['SELECT COUNT(*) FROM growth_telegram_media WHERE asset_hash=? AND asset_kind=\'photo\'','SELECT COUNT(*) FROM growth_media_manifests WHERE image_hash=?','SELECT COUNT(*) FROM growth_facebook_media WHERE asset_hash=? AND asset_kind=\'photo\'','SELECT COUNT(*) FROM growth_network_media WHERE asset_hash=?'],
         'jpg'=>['SELECT COUNT(*) FROM growth_carousel_items WHERE asset_hash=?','SELECT COUNT(*) FROM growth_meta_images WHERE asset_hash=? AND asset_kind=\'image\''],
-        'mp4'=>['SELECT COUNT(*) FROM growth_media_manifests WHERE video_hash=?','SELECT COUNT(*) FROM growth_media_uploads WHERE video_hash=?','SELECT COUNT(*) FROM growth_linkedin_video WHERE video_hash=?','SELECT COUNT(*) FROM growth_x_video WHERE video_hash=?','SELECT COUNT(*) FROM growth_meta_images WHERE asset_hash=? AND asset_kind=\'video\'','SELECT COUNT(*) FROM growth_instagram_uploads WHERE video_hash=?','SELECT COUNT(*) FROM growth_facebook_media WHERE asset_hash=? AND asset_kind=\'video\'']
+        'mp4'=>['SELECT COUNT(*) FROM growth_telegram_media WHERE asset_hash=? AND asset_kind=\'video\'','SELECT COUNT(*) FROM growth_media_manifests WHERE video_hash=?','SELECT COUNT(*) FROM growth_media_uploads WHERE video_hash=?','SELECT COUNT(*) FROM growth_linkedin_video WHERE video_hash=?','SELECT COUNT(*) FROM growth_x_video WHERE video_hash=?','SELECT COUNT(*) FROM growth_meta_images WHERE asset_hash=? AND asset_kind=\'video\'','SELECT COUNT(*) FROM growth_instagram_uploads WHERE video_hash=?','SELECT COUNT(*) FROM growth_facebook_media WHERE asset_hash=? AND asset_kind=\'video\'']
     };
     $n=0;foreach($queries as $sql){$q=$db->prepare($sql);$q->execute([$hash]);$n+=(int)$q->fetchColumn();}return $n;
 }

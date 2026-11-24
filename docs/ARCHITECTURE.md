@@ -104,3 +104,7 @@ Ordered 2–5 JPEG bundle digest binds asset hashes and byte sizes to approved m
 ## V10.2I/J transfer and integration health
 
 Explicit local approved manifest digest and exact asset bytes -> private spool -> pinned OpenSSH SFTP batch -> private inbox -> existing approved server-side import. No provider credentials or publication in transport; no cron. Existing owner daily-report preference and separately enabled OAuth alerts summarize configured provider local expiry and stale identity evidence. All publication ledgers contribute historical failed/unknown and current in-flight/processing counts. See V102IJ_TRANSFER_HEALTH.md.
+
+## V10.2K/V10.3 Telegram media and communications boundary
+
+Exact approved private PNG/MP4 -> exclusive Telegram revision -> owner type/manifest/channel approval -> separate business bot identity and channel administrator permission check -> one multipart send -> validated message/channel receipt. No owner bot reuse or unknown replay. Communications: authorized private CLI imports only aggregate channel/completed UTC-day counts, rejects extra fields and conflicting duplicate summaries, no message bodies or identifiers. Existing owner daily reports include previous UTC day only when enabled. See V102K_V103_COMMUNICATIONS.md.
