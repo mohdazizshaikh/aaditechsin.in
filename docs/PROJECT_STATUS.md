@@ -122,3 +122,9 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - V9.1 final CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45354481922.
 - Added consent-gated first-party event collector, strict event API, day-scoped tab-session estimates, service interactions, broad traffic channels, click/automation-signal counts, IST saved-lead reports, Telegram query commands and dry-run retention CLI.
 - Both analytics flags default OFF. No Hostinger collection, real bot delivery, GA4/Search Console, actual call/mail/message data, campaign-to-lead attribution or social connectors. Validate latest CI and separately perform browser/staging acceptance. See docs/V92_ANALYTICS.md.
+
+## V9.3 evidence-backed opportunity and outreach review (24 Nov 2026)
+- Added private CLI import of public/authorized source evidence, all 14 service matching rules, date/URL validation, deterministic score and duplicate control. No network fetching or personal-contact enrichment. Imported evidence requires owner verification.
+- Added Telegram opportunity list/detail, qualify/dismiss, pause-gated creation of one linked outreach draft, and draft inventory. V9.1 versioned approval remains review-only; no email or message sender.
+- Added additive migration 2026-11-24-v93.sql, independent discovery flag default OFF, preflight and synthetic rules/database tests. Initial CI schema split failed on a SQL comment semicolon; corrected in commit 630af823333bf0f577607b5a65ca7a6a0511aeec. CI run: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45377527089 (status at documentation write: in_progress/pending).
+- Still pending: authorized external source adapters, actual contact permissions, message/call/reply records, lead conversion, Telegram test bot, Hostinger and retention approval. See docs/V93_DISCOVERY.md and issue #2. No production change.
