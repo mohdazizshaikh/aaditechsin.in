@@ -1,10 +1,14 @@
-# Aaditechs — Website & Partner Operations Hub (V8)
+# Aaditechs — Website, Partner Operations & Growth Platform
 
 **Source repository** for Aaditechs' modern website, Audio Visual (AV) solutions, guided assessment chatbot, consent-based Lead Engine, and a private owner/partner work-order portal.
 
 Production: `https://aaditechs.in/` — **not deployed by this source commit**. Previous hosted *static* concept preview: `https://aaditechs-modern-concept-2026.tiledparrot.chatgpt.site` — may still show an earlier V6 until explicitly updated. No CRM data, credentials or production customer records are included in Git.
 
-## What's implemented
+## Growth development status (24 November 2026)
+
+Main V9.6 source verified; V9.7–V10.0 development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
+
+## Existing website and operations
 
 - Original Aaditechs logo retained; Data Recovery, IT Infrastructure, Software, Support, Cloud, Security and Procurement retained.
 - **Audio Visual division:** Video Conferencing, Auditorium AV, Professional Sound & PA, AV Installation/Maintenance with homepage category filter.

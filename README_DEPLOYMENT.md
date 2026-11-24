@@ -1,8 +1,12 @@
-# Aaditechs V8.5 — Hostinger deployment, secrets and security runbook
+# Aaditechs — Hostinger deployment, secrets and security runbook
 
 **Updated:** 23 November 2026 · **GitHub source:** `mohdazizshaikh/aaditechsin.in` → `main` · **Domain:** `aaditechs.in`.
 
 > **Current status:** V8.5 source is implemented; latest verified GitHub CI includes disposable MariaDB tests and offline checks. **No production overwrite, Hostinger staging acceptance, live MySQL or SMTP verification, Google API approval, legal review or customer production traffic are claimed.** The pre-existing private ChatGPT Site preview may still be on an older version. All live lead/portal/Google flags start **OFF**.
+
+## V9–V10 development addendum (24 November 2026)
+
+Main V9.6 verified; V9.7–V10.0 stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 last; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
 
 ## 1 — Deployment model and file destinations
 

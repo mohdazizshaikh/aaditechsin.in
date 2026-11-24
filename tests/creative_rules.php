@@ -65,6 +65,13 @@ try{
     creativeCheck(expertImport($db,$er)&&!expertImport($db,$er),'Expert import and duplicate protection');
     creativeCheck(str_contains(growthCommand($db,"/task $eid",$ecfg),'Avoid writing'),'Mandatory safety note');
     creativeCheck(str_contains(growthCommand($db,"/approve $eid 1",$ecfg),'approved'),'Owner expert review');
+    require_once dirname(__DIR__).'/public_html/api/seo-core.php';
+    $scfg=$cfg+['seo'=>['enabled'=>true]];
+    creativeCheck(!seoEnabled($cfg)&&count(seoTopics())===14,'SEO default OFF and coverage');
+    $sr=['version'=>1,'scope'=>'source-only','pages'=>7,'counts'=>['missing_title'=>1]];
+    creativeCheck(seoRegister($db,$sr)['status']==='recorded'&&seoRegister($db,$sr)['status']==='duplicate_summary','SEO distinct summary');
+    creativeCheck(str_contains(growthCommand($db,'/seo',$scfg),'missing_title: 1'),'Owner SEO report');
+    creativeCheck(str_contains(growthCommand($db,'/seotopics infrastructure',$scfg),'not measured'),'SEO topic evidence boundary');
     $id2=creativeCreate($db,'infrastructure','linkedin','education');
     $claim=creativeLeaseClaim($db);
     creativeCheck($claim['job']['task_id']===$id2,'Claim pending task');

@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "scope": "Suggested editorial topics only. No measured search volume, rankings, competition or provider data.",
+  "services": {
+    "infrastructure": [
+      "IT infrastructure services Mumbai",
+      "office network setup",
+      "structured cabling and server installation"
+    ],
+    "software-web": [
+      "website development Mumbai",
+      "business web applications",
+      "CMS and API integration"
+    ],
+    "it-amc": [
+      "IT AMC services Mumbai",
+      "office computer maintenance",
+      "onsite and remote IT support"
+    ],
+    "cloud": [
+      "cloud migration assessment Mumbai",
+      "hybrid IT infrastructure",
+      "cloud workload planning"
+    ],
+    "security": [
+      "network security assessment Mumbai",
+      "firewall and VPN planning",
+      "endpoint security readiness"
+    ],
+    "data-backup": [
+      "business backup solutions Mumbai",
+      "disaster recovery planning",
+      "storage and retention assessment"
+    ],
+    "it-procurement": [
+      "IT hardware procurement Mumbai",
+      "enterprise device selection",
+      "IT asset lifecycle planning"
+    ],
+    "smart-office": [
+      "smart office solutions Mumbai",
+      "meeting room integration",
+      "access control planning"
+    ],
+    "special-projects": [
+      "startup IT setup Mumbai",
+      "event technology support",
+      "IT health check planning"
+    ],
+    "video-conferencing": [
+      "video conferencing solutions Mumbai",
+      "meeting room AV setup",
+      "hybrid meeting room assessment"
+    ],
+    "auditorium-av": [
+      "auditorium AV solutions Mumbai",
+      "auditorium sound and projection",
+      "AV site survey"
+    ],
+    "professional-sound": [
+      "professional sound systems Mumbai",
+      "commercial PA systems",
+      "distributed audio planning"
+    ],
+    "av-maintenance": [
+      "AV installation maintenance Mumbai",
+      "AV system inspection",
+      "AV maintenance proposal"
+    ],
+    "data-recovery": [
+      "data recovery assessment Mumbai",
+      "HDD SSD recovery assessment",
+      "RAID NAS recovery inquiry"
+    ]
+  }
+}

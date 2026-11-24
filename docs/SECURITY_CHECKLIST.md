@@ -42,3 +42,11 @@
 - [ ] Enroll owner authenticator securely, verify server clock and recovery on **HTTPS staging**, then enable MFA in private config if approved.
 - [ ] Add or evaluate second factor for partners according to risk; currently their sign-in is password-only.
 - [ ] Complete staging DB/SMTP/auth tests, audit privacy copy and verify backup before public launch.
+
+## V9–V10 growth security addendum (pending live verification)
+
+- [ ] Independent owner/publishing/worker credentials, HTTPS, scoped leases, no secrets logged, rate limits and revocation verified.
+- [ ] Local model loopback only; trusted weights, cloud disabled, no customer data in catalog-only job payloads.
+- [ ] Media files private, exact manifest review, no publication permission; expert drafts human reviewed.
+- [ ] SEO audit read-only, approved metadata changes via review, no public report endpoint or invented metrics.
+- [ ] Verify all defaults OFF, backup/restore and staging sign-off before activation.

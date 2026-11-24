@@ -271,3 +271,12 @@ CREATE TABLE IF NOT EXISTS growth_expert (
  intent ENUM('assessment','planning','escalation') NOT NULL,
  CONSTRAINT fk_expert_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- V10.0 source-only SEO audit summaries.
+CREATE TABLE IF NOT EXISTS growth_seo_reports (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ report_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ page_count SMALLINT UNSIGNED NOT NULL,
+ counts_json TEXT NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

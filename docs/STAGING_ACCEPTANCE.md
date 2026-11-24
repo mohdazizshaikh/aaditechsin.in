@@ -72,3 +72,13 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 - [ ] With synthetic staging rows, confirm jobs and pending/sending/dead alerts prevent deletion. Verify one expired unassigned lead with a sent alert is eligible.
 - [ ] Record a verified staging DB backup before any `--run`. Confirm the exact count changed and backups permit recovery.
 - [ ] Review any existing Hostinger cron: previous no-argument `prune.php` invocations are now read-only. Never silently convert those schedules to `--run`.
+
+## V9–V10 additional release gates (all pending live acceptance)
+
+- [ ] Resolve stacked PRs in dependency order and verify exact release SHA and CI. Back up staging and apply all missing migrations sequentially through V10.0; fresh DB uses full schema. Test restore.
+- [ ] Owner-only Telegram authorization/replay, analytics consent, authorized discovery, growth pause, publication test destination and notification receipts.
+- [ ] V9.7 TLS, worker token rotation, rate limiting, expired leases and actual local Ollama runtime.
+- [ ] V9.8 actual private media render, matching manifest and owner review; no binary uploads or native AI video assumed.
+- [ ] V9.9 static guide browser acceptance, local expert output safety and human review; no public live AI.
+- [ ] V10.0 run source audit, review findings, register synthetic summary, test /seo and /seotopics. Search Console and live SEO acceptance separate.
+- [ ] Confirm all features default OFF, local credentials private and no unintended publishing or outreach. Separate owner decision for production.
