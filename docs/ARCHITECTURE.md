@@ -136,3 +136,7 @@ Private paused CLI inspects unknown publication across 12 allowlisted ledgers, h
 ## V10.6E native usage and synthetic restore
 
 Private explicit GET-only adapters request account-scoped WABA sent/delivered analytics and Twilio inbound SMS/call usage for the previous completed UTC day. Strict account/category/time and local credential gates, latest sanitized snapshot per source, no message or call records requested. Owner reports distinguish provider usage from received/answered/missed aggregates. Disposable CI adds actual MariaDB dump and restore with metadata and synthetic record comparisons, not a production restore. See V106E_NATIVE_USAGE_RESTORE.md.
+
+## V10.6F albums and authenticated inbound boundary
+
+Telegram fixed two-item PNG then MP4 album uses existing approved manifest and exclusive media/text revision ledger, independent owner bundle approval and one multipart sendMediaGroup, validates matching channel/group and two message receipts. WhatsApp inbound endpoint verifies challenge and HMAC-SHA256 over raw payload, exact WABA/phone binding, bounded message IDs/time and stable keyed event digest; persists only digest, account hash and UTC day. No sender/content stored or outbound action; reports distinguish partial webhook observations from inbox/response metrics. See V106F_ALBUMS_INBOUND.md.

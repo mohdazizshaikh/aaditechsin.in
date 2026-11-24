@@ -141,3 +141,7 @@
 ## V10.6E security (pending runtime)
 
 - [ ] Native provider flags independently OFF; private restricted credentials, fixed HTTPS GET hosts and bounded responses, no redirect/proxy, exact account and period, no raw response or credential logs. Store only latest per-source aggregate snapshot and account hash/generation; no contact records, message bodies or recordings. Confirm upstream fields and retention separately. Disposable restore test must never run against real data; inspect actual encrypted backup and isolated restore separately.
+
+## V10.6F security (pending runtime)
+
+- [ ] Separate album flag, exact private PNG/MP4 bytes, one provider request only after distinct approval, validated group and message receipts, no retry of unknown rows. WhatsApp webhook separately OFF with explicit authorization and verified log redaction; verify raw HMAC before DB, exact app/account/phone and bounded payload. Raw webhook may transiently contain personal data; disable payload and query logging, protect verify token and stable HMAC dedupe key, treat keyed digest as pseudonymous, approve retention before enabling. No automatic delete, inbound content store, response or follow-up send.

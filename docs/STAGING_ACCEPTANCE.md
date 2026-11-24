@@ -174,3 +174,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6E acceptance (pending runtime)
 
 - [ ] Verify approved WABA account analytics permission and exact UTC window, sent/delivered semantics and actual response shape; authorized restricted Twilio usage-read key, exact account/category/unit/date, pagination refusal, missing versus zero and reporting lag. Confirm local expiry/generation and pause gates, no personal details stored, usage separate from answered/missed counts. Verify actual authorized isolated backup restore and schema/data integrity, not just synthetic CI. No live connector, inbound webhook, reply or release acceptance inferred.
+
+## V10.6F acceptance (pending runtime)
+
+- [ ] Verify actual two-item Telegram album format, exact digest/order/caption/channel approval, exclusive revision, provider group/two message IDs, memory limit and independent visibility. Verify Meta HTTPS subscription challenge and raw-body HMAC, exact WABA/phone, valid signature and tampering, duplicate deliveries, old/future events, pause/retry behavior, bounded body and storage cap, no raw content in hosting/CDN/APM logs, authorized retention and key-rotation procedure. No complete inbox coverage, native SMS/telephony webhooks or automatic replies inferred.
