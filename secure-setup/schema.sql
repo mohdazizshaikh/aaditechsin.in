@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS growth_creative_leases (
  CONSTRAINT fk_creative_lease_task FOREIGN KEY(task_id) REFERENCES growth_tasks(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- V9.8 metadata only; actual binary media remains on owner's private PC.
+-- V9.8 metadata only. Actual binary media remains on owner's private PC.
 CREATE TABLE IF NOT EXISTS growth_media_manifests (
  task_id BIGINT UNSIGNED NOT NULL,
  revision INT UNSIGNED NOT NULL,

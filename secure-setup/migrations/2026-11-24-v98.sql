@@ -1,4 +1,4 @@
--- V9.8 metadata only; actual binary media remains on owner's private PC.
+-- V9.8 metadata only. Actual binary media remains on owner's private PC.
 CREATE TABLE IF NOT EXISTS growth_media_manifests (
  task_id BIGINT UNSIGNED NOT NULL,
  revision INT UNSIGNED NOT NULL,
