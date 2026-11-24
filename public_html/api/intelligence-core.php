@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/gmail-health-core.php';
+require_once __DIR__.'/communication-review-core.php';
 require_once __DIR__.'/native-usage-core.php';
 require_once __DIR__.'/whatsapp-inbound-core.php';
 require_once __DIR__.'/twilio-inbound-core.php';
@@ -18,6 +19,7 @@ function intelligenceSummary(PDO $db,array $cfg,?DateTimeImmutable $now=null):st
     }else $lines[]='Discovery disabled.';
     if(communicationsEnabled($cfg)){
         $lines[]=communicationsSummary($db,$now);
+        if(commReviewEnabled($cfg))$lines[]=commReviewSummary($db,$now);
         if(waInboundConfig($cfg))$lines[]=waInboundSummary($db,$cfg,$now);
         if(twInboundConfig($cfg,'sms')||twInboundConfig($cfg,'calls'))$lines[]=twInboundSummary($db,$cfg,$now);
         if(($cfg['communications']['native_usage_enabled']??false)===true)$lines[]=nativeUsageSummary($db,$cfg,$now);
