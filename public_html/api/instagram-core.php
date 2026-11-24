@@ -69,6 +69,12 @@ function igFinish(PDO $db,array $row,string $stage,array $v):void {
     $success=$stage==='upload'?'processing':'accepted';
     if(!in_array($status,[$success,'failed','unknown'],true)||!is_string($error)||!preg_match('/^[a-z_]{0,32}$/D',$error)||($id!==null&&(!is_string($id)||!preg_match('/^[1-9][0-9]{0,30}$/D',$id)))||($status===$success&&$id===null)||($stage==='publish'&&$status!=='accepted'&&$id!==null))throw new InvalidArgumentException('Invalid result');
     $field=$stage==='upload'?'container_id':'receipt';$from=$stage==='upload'?'uploading':'publishing';
-    $q=$db->prepare("UPDATE growth_instagram_uploads SET status=?,$field=?,error_code=?,finished_at=CASE WHEN ?='processing' THEN NULL ELSE UTC_TIMESTAMP() END WHERE id=? AND status=?");
+    $q=$db->prepare("UPDATE growth_instagram_uploads SET status=?,$field=COALESCE(?,$field),error_code=?,finished_at=CASE WHEN ?='processing' THEN NULL ELSE UTC_TIMESTAMP() END WHERE id=? AND status=?");
     $q->execute([$status,$id,$error,$status,$row['id'],$from]);if($q->rowCount()!==1)throw new RuntimeException('State changed');growthAudit($db,(int)$row['task_id'],(int)$row['revision'],'ig_'.$status,'private_cli');
+}
+
+function igRemember(PDO $db,array $row,string $id):void{
+    if(!$db->inTransaction()||!preg_match('/^[1-9][0-9]{0,30}$/D',$id))throw new InvalidArgumentException('Invalid container');
+    $q=$db->prepare("UPDATE growth_instagram_uploads SET container_id=? WHERE id=? AND status='uploading' AND container_id IS NULL");$q->execute([$id,$row['id']]);if($q->rowCount()!==1)throw new RuntimeException('State changed');
+    growthAudit($db,(int)$row['task_id'],(int)$row['revision'],'ig_resource','private_cli');
 }

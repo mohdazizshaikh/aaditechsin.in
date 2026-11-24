@@ -17,7 +17,8 @@ try{
         $id=(int)$argv[2];
         if($mode==='--upload'){
             $db->beginTransaction();$row=igClaim($db,$cfg,$id,'upload');$bytes=uploadRead($root.'/'.$row['video_hash'].'.mp4',$row['video_hash'],(int)$row['byte_count']);$db->commit();
-            $result=igUpload($p,$row,$bytes,'igRequest');$db->beginTransaction();igFinish($db,$row,'upload',$result);$db->commit();echo 'Reel #'.$id.' '.$result['status']."\n";
+            $remember=static function(string $id)use($db,$row):void{$db->beginTransaction();try{igRemember($db,$row,$id);$db->commit();}catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}};
+            $result=igUpload($p,$row,$bytes,'igRequest',$remember);$db->beginTransaction();igFinish($db,$row,'upload',$result);$db->commit();echo 'Reel #'.$id.' '.$result['status']."\n";
         }else{
             $db->beginTransaction();$row=igRow($db,$cfg,$id,'processing');$db->commit();
             $status=igContainerStatus($p,$row,'igRequest');

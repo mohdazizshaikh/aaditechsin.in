@@ -21,7 +21,7 @@ function igIdentity(array $p,callable $request):bool {
 }
 function igResult(string $status,?string $id=null,string $error=''):array{return ['status'=>$status,'id'=>$id,'error'=>$error];}
 function igValidId(mixed $id):bool{return is_string($id)&&preg_match('/^[1-9][0-9]{0,30}$/D',$id)===1;}
-function igUpload(array $p,array $row,string $bytes,callable $request):array {
+function igUpload(array $p,array $row,string $bytes,callable $request,?callable $remember=null):array {
     if($p['page']!==$row['page_id']||$p['id']!==$row['target_id']||strlen($bytes)!==(int)$row['byte_count']||!hash_equals($row['video_hash'],hash('sha256',$bytes)))return igResult('failed',null,'asset_mismatch');
     $id=null;
     try{
@@ -29,6 +29,7 @@ function igUpload(array $p,array $row,string $bytes,callable $request):array {
         $r=$request($p,'post',$p['id'].'/media',['media_type'=>'REELS','upload_type'=>'resumable','caption'=>$row['caption'],'share_to_feed'=>'false']);
         $candidate=$r['json']['id']??null;
         if(($r['http']??0)!==200||isset($r['json']['error'])||!igValidId($candidate))return igResult('unknown',null,'container_unverified');
+        if($remember!==null)$remember($candidate);
         $id=$candidate;
         // Never use a provider-supplied URL; build the fixed upload route from validated ID.
         $r=$request($p,'binary',$id,[],$bytes);
