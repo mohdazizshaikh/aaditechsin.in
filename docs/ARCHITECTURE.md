@@ -156,3 +156,7 @@ Explicit private CLI uses a dedicated authorized webmasters.readonly OAuth refre
 ## V10.6J SEO history and public observation
 
 Search Console keeps optional per-property/per-generation/per-PT-day finalized observations, replaces revised values instead of summing overlapping captures, and exposes 7/30 observed-day windows with missing dates distinct from zero. Default property aligned with source sitemap aaditechs.in; previous aaditechsin.in allowlist retained only for explicitly authorized verified properties. Separate local bounded crawler fetches robots and seven fixed public pages via pinned IPv4 HTTPS, no redirect/proxy/cookies or arbitrary path; operator imports sanitized aggregate only. No remote execution, live indexing claim or source mutation. See V106J_SEO_HISTORY_CRAWL.md.
+
+## V10.6K runtime readiness and retention
+
+Explicit local runtime diagnostic checks one installed Ollama model tag and operator-pinned digest; optional synthetic structured inference and real temporary H.264 encode/decode test. No business inputs, downloads or automated activation. Paused private SEO cleanup computes exact digest for up to 1000 daily rows older than proposed 180 PT days; no snapshot or unrelated ledger deletion. Separate GBP scoped media-list read check reuses existing exact target and OAuth gate, no write or upload permission assertion. See V106K_RUNTIME_RETENTION.md.
