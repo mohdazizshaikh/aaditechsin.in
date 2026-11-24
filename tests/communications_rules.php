@@ -14,6 +14,13 @@ try{
     cmCheck(communicationsImport($db,$cfg,$r,$now)&&!communicationsImport($db,$cfg,$r,$now),'Deduplication');
     try{communicationsImport($db,$cfg,array_replace($r,['received'=>13]),$now);throw new LogicException('Overwrite accepted');}catch(RuntimeException $e){}
     cmCheck(str_contains(communicationsSummary($db,$now),'calls: received 12 / answered 9 / missed 3')&&str_contains(growthCommand($db,'/communications',$cfg),'email: no data'),'Owner summary missing vs zero');
+    $cfg['communications']['batch_import_enabled']=true;
+    $batch=['version'=>1,'items'=>[array_replace($r,['channel'=>'email']),array_replace($r,['received'=>13])]];
+    try{communicationsBatch($db,$cfg,$batch,$now);throw new LogicException('Conflict accepted');}catch(RuntimeException $e){}
+    cmCheck(str_contains(communicationsSummary($db,$now),'email: no data'),'Batch rollback');
+    $batch=['version'=>1,'items'=>[array_replace($r,['channel'=>'email']),$r]];
+    cmCheck(communicationsBatch($db,$cfg,$batch,$now)===['imported'=>1,'duplicates'=>1]&&communicationsBatch($db,$cfg,$batch,$now)===['imported'=>0,'duplicates'=>2],'Batch import and dedupe');
+    try{communicationsBatch($db,$cfg,['version'=>1,'items'=>[$r,$r]],$now);throw new LogicException('Duplicate batch key accepted');}catch(InvalidArgumentException $e){}
     growthCommand($db,'/pause',$cfg);try{communicationsImport($db,$cfg,array_replace($r,['channel'=>'sms']),$now);throw new LogicException('Pause bypass');}catch(RuntimeException $e){}
     $db->rollBack();echo "Synthetic communication summary and pause: PASS\n";
 }catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Communications test failed: '.$e->getMessage()."\n");exit(1);}

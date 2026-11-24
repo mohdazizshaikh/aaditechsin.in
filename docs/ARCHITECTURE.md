@@ -116,3 +116,7 @@ Dedicated authorized Gmail metadata credential, exact mailbox profile, fixed INB
 ## V10.5 private owner dashboard boundary
 
 /portal/intelligence.php uses existing HTTPS and owner session fingerprint with a 30-minute inactivity gate. Independent default-OFF flag. GET only with fixed 7/30 completed UTC-day periods, no mutation or external requests; server-side escaped aggregate tables and bounded task/due queues. Lead cohorts use creation date and current status, communications show coverage and missing versus zero, workflow counts remain current historical inventories. Disabled modules hidden; no customer details, messages, raw credentials, evidence URLs or drafts. Existing private headers/CSP apply. See V105_OWNER_DASHBOARD.md.
+
+## V10.5A/V10.6A reporting and release verification
+
+Existing owner-only dashboard adds consented website daily trends using completed IST days, separate from UTC inquiry and communications windows; no person-level attribution or raw session IDs. Independent default-OFF aggregate CSV attachment is GET only with same session and private headers, fixed bounded fields and spreadsheet formula escaping. Private communications batch validates all channel/day counts before atomic import; exact duplicates no-op, conflicts roll back. Release contract inventories 28 ordered migrations and 40 required tables; disposable CI replays V9.6 to latest and compares fresh schema metadata. Read-only staging checker inspects required columns and pause without applying changes. See V105A_V106A_RELEASE_READINESS.md.

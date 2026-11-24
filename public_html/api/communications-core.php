@@ -32,3 +32,17 @@ function communicationsCommand(PDO $db,array $cfg,string $cmd):?string{
     if($cmd!=='/communications')return null;
     return communicationsEnabled($cfg)?communicationsSummary($db):'Communications summary disabled.';
 }
+
+function communicationsBatch(PDO $db,array $cfg,array $doc,?DateTimeImmutable $now=null):array{
+    if(!communicationsEnabled($cfg)||($cfg['communications']['batch_import_enabled']??false)!==true||!$db->inTransaction())throw new RuntimeException('Batch disabled');
+    if(count($doc)!==2||($doc['version']??null)!==1||!is_array($doc['items']??null)||!array_is_list($doc['items'])||count($doc['items'])<1||count($doc['items'])>120)throw new InvalidArgumentException('Exact batch contract');
+    $now=$now??new DateTimeImmutable('now',new DateTimeZone('UTC'));$seen=[];$rows=[];
+    foreach($doc['items'] as $r){
+        if(!is_array($r))throw new InvalidArgumentException('Invalid row');$r=communicationsValidate($r,$now);$key=$r['channel'].':'.$r['day_utc'];
+        if(isset($seen[$key]))throw new InvalidArgumentException('Duplicate day/channel within batch');$seen[$key]=true;$rows[]=$r;
+    }
+    creativeActive($db);$db->exec('SAVEPOINT communications_batch');$n=0;$dupes=0;
+    try{foreach($rows as $r){if(communicationsImport($db,$cfg,$r,$now))++$n;else ++$dupes;}$db->exec('RELEASE SAVEPOINT communications_batch');}
+    catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT communications_batch');$db->exec('RELEASE SAVEPOINT communications_batch');throw $e;}
+    return ['imported'=>$n,'duplicates'=>$dupes];
+}
