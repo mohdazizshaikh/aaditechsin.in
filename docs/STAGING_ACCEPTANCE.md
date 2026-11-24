@@ -96,3 +96,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2A acceptance (pending runtime)
 
 - [ ] Verify authenticated SFTP, private storage ACL, 20 MiB/memory cap, hash and stale manifest rejection, exact metadata/visibility/account approval, cancellation and no automatic retries. Confirm channel and test video processing/visibility independently; no Instagram media gate accepted.
+
+## V10.2B acceptance (pending runtime)
+
+- [ ] Apply V10.2B after V10.2A. Verify Meta Page/linked professional account, version, roles/scopes, real video format and disclosure, private transfer and processing status. Test mismatch, cancellation, expired container, ambiguous upload/publish, provider receipts and actual visibility separately. Explicit owner authorization for public test Reel required.
