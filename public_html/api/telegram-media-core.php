@@ -50,7 +50,7 @@ function tgMediaCommand(PDO $db,array $cfg,string $cmd):?string {
 }
 function tgMediaClaim(PDO $db,array $cfg,int $id):array {
     creativeActive($db);$p=tgMediaTarget($cfg);if(!$p)throw new RuntimeException('Disabled');
-    $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_telegram_media u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' AND u.asset_hash=CASE WHEN u.asset_kind='photo' THEN m.image_hash ELSE m.video_hash END WHERE u.id=? AND u.target_id=? AND u.status='approved' FOR UPDATE");$q->execute([$id,$p['id']]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new RuntimeException('No approved media');
+    $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_telegram_media u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' AND u.asset_kind IN ('photo','video') AND u.asset_hash=CASE WHEN u.asset_kind='photo' THEN m.image_hash ELSE m.video_hash END WHERE u.id=? AND u.target_id=? AND u.status='approved' FOR UPDATE");$q->execute([$id,$p['id']]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new RuntimeException('No approved media');
     $db->prepare("UPDATE growth_telegram_media SET status='sending' WHERE id=?")->execute([$id]);growthAudit($db,(int)$r['task_id'],(int)$r['revision'],'tgmedia_claimed','private_cli');return $r;
 }
 function tgMediaFinish(PDO $db,array $row,array $result):void {

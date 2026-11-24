@@ -32,7 +32,8 @@
     "2026-11-24-v102k.sql",
     "2026-11-24-v103a-v104.sql",
     "2026-11-24-v106d.sql",
-    "2026-11-24-v106e.sql"
+    "2026-11-24-v106e.sql",
+    "2026-11-24-v106f.sql"
   ],
   "tables": {
     "leads": [
@@ -455,7 +456,8 @@
       "receipt",
       "error_code",
       "created_at",
-      "finished_at"
+      "finished_at",
+      "album_messages"
     ],
     "growth_communication_daily": [
       "id",
@@ -495,6 +497,11 @@
       "metric_count",
       "delivered_count",
       "captured_at"
+    ],
+    "growth_whatsapp_inbound": [
+      "event_hash",
+      "account_hash",
+      "day_utc"
     ]
   },
   "source_git_blob_sha1": {
@@ -526,9 +533,10 @@
     "secure-setup/migrations/2026-11-24-v97.sql": "fd7a96fe364d5a38cc2cdb2ac979525a89826465",
     "secure-setup/migrations/2026-11-24-v98.sql": "3c4aea432fc9dd7a3de48b9a67cb2da9c8bddc9d",
     "secure-setup/migrations/2026-11-24-v99.sql": "7cb363b74d5ef55bc7ab95ee19771f94e490f538",
-    "secure-setup/schema.sql": "928f9f2ef8a3df14994c4caa6ccea815549a06f3",
+    "secure-setup/schema.sql": "eede0d76c353aef30dcd4f964c1fe430acdde1a8",
     "tests/fixtures/schema-v96.sql": "46d52307d885813b1db73b969304ec96d323e64c",
     "secure-setup/migrations/2026-11-24-v106d.sql": "be253fd75692ae648a95c4f5f2f1e1dc7fa8c258",
-    "secure-setup/migrations/2026-11-24-v106e.sql": "5bc5d0fc79cbddf114ddeaa68dc65d39afbb533b"
+    "secure-setup/migrations/2026-11-24-v106e.sql": "5bc5d0fc79cbddf114ddeaa68dc65d39afbb533b",
+    "secure-setup/migrations/2026-11-24-v106f.sql": "dec125718abb09807fc2d42a2b4734427f333311"
   }
 }
