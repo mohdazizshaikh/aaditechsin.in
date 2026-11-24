@@ -160,3 +160,7 @@ Search Console keeps optional per-property/per-generation/per-PT-day finalized o
 ## V10.6K runtime readiness and retention
 
 Explicit local runtime diagnostic checks one installed Ollama model tag and operator-pinned digest; optional synthetic structured inference and real temporary H.264 encode/decode test. No business inputs, downloads or automated activation. Paused private SEO cleanup computes exact digest for up to 1000 daily rows older than proposed 180 PT days; no snapshot or unrelated ledger deletion. Separate GBP scoped media-list read check reuses existing exact target and OAuth gate, no write or upload permission assertion. See V106K_RUNTIME_RETENTION.md.
+
+## V10.6L discovery automation boundary
+
+Remote feed admission locks growth control, blocks unresolved source runs and optionally limits attempts per source by minimum interval. Checks pause after fetch and before each record, including run state; partial committed imports remain pending owner review. Local batch uses savepoint rollback on failure. Private interrupted-run recovery requires paused growth, stopped workers attested by operator, exact state digest and age at least one hour; marks run failed only, never retries or modifies opportunities. See V106L_DISCOVERY_AUTOMATION.md.

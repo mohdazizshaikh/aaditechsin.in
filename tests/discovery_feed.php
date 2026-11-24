@@ -43,6 +43,8 @@ feedRecoveryApply($db,$cfg,$id,$plan['digest']);
 $q=$db->prepare('SELECT status,error_code FROM growth_source_runs WHERE id=?');$q->execute([$id]);$rec=$q->fetch(PDO::FETCH_ASSOC);
 feedCheck($rec===['status'=>'failed','error_code'=>'operator_interrupted'],'Reviewed recovery');
 $db->rollBack();
+$db->prepare('DELETE FROM growth_source_runs WHERE id=? AND source_id=?')->execute([$id,$stale['id']]);
+$db->beginTransaction();growthCommand($db,'/resume',$cfg);$db->commit();
 $db->beginTransaction();
 $cfg=['growth'=>['enabled'=>true],'discovery'=>['enabled'=>true,'feeds_enabled'=>true]];
 feedCheck(str_contains(growthCommand($db,'/discoveryruns',$cfg),'transport_failed'),'Owner report');

@@ -6,7 +6,7 @@ Production: `https://aaditechs.in/` — **not deployed by this source commit**. 
 
 ## Growth development status (24 November 2026)
 
-Main V9.6 source verified; V9.7–V10.6K development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [Meta text publishing](docs/V101_META.md), [Other social networks](docs/V102_NETWORKS.md), [Private media uploads](docs/V102A_MEDIA_UPLOAD.md), [Instagram Reels](docs/V102B_INSTAGRAM.md), [Facebook media](docs/V102C_FACEBOOK_MEDIA.md), [LinkedIn/X images](docs/V102D_NETWORK_MEDIA.md), [Meta images](docs/V102E_META_IMAGES.md), [Private media inventory](docs/V102F_MEDIA_STORAGE.md), [OAuth lifecycle](docs/V102G_OAUTH_HEALTH.md), [Media recovery](docs/V102H_MEDIA_RECOVERY.md), [LinkedIn video batch](docs/V102H1_VIDEO_BATCH.md), [X/Threads video batch](docs/V102H2_VIDEO_BATCH.md), [Carousel and private inbox batch](docs/V102H3_CAROUSEL_TRANSFER.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
+Main V9.6 source verified; V9.7–V10.6L development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [Meta text publishing](docs/V101_META.md), [Other social networks](docs/V102_NETWORKS.md), [Private media uploads](docs/V102A_MEDIA_UPLOAD.md), [Instagram Reels](docs/V102B_INSTAGRAM.md), [Facebook media](docs/V102C_FACEBOOK_MEDIA.md), [LinkedIn/X images](docs/V102D_NETWORK_MEDIA.md), [Meta images](docs/V102E_META_IMAGES.md), [Private media inventory](docs/V102F_MEDIA_STORAGE.md), [OAuth lifecycle](docs/V102G_OAUTH_HEALTH.md), [Media recovery](docs/V102H_MEDIA_RECOVERY.md), [LinkedIn video batch](docs/V102H1_VIDEO_BATCH.md), [X/Threads video batch](docs/V102H2_VIDEO_BATCH.md), [Carousel and private inbox batch](docs/V102H3_CAROUSEL_TRANSFER.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
 
 ## Existing website and operations
 
@@ -99,3 +99,5 @@ V10.6I source batch: [Search Console finalized search metrics and ephemeral OAut
 V10.6J source batch: [historical Search Console and bounded public SEO observation](docs/V106J_SEO_HISTORY_CRAWL.md). CI pending; no live acceptance.
 
 V10.6K source batch: [local AI runtime readiness, SEO history retention and GBP media read checks](docs/V106K_RUNTIME_RETENTION.md). CI pending; no live acceptance.
+
+V10.6L source batch: [pause-safe discovery, cadence and reviewed recovery](docs/V106L_DISCOVERY_AUTOMATION.md). CI pending; no live acceptance.
