@@ -120,6 +120,7 @@ $flags = [
     'growth.telegram.enabled' => ['growth', 'telegram', 'enabled'],
     'analytics.enabled' => ['analytics', 'enabled'],
     'discovery.enabled' => ['discovery','enabled'],
+    'creative.enabled' => ['creative','enabled'],
     'discovery.feeds_enabled' => ['discovery','feeds_enabled'],
 ];
 foreach ($flags as $name => $keys) {
@@ -187,7 +188,7 @@ if ($checkDb) {
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
             outcome('Read-only DB SELECT 1', $pdo->query('SELECT 1')->fetchColumn() !== false);
-            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox', 'growth_tasks', 'growth_audit', 'growth_control', 'growth_telegram_updates', 'growth_analytics_events', 'growth_analytics_budget', 'growth_opportunities', 'growth_source_runs'] as $table) {
+            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox', 'growth_tasks', 'growth_audit', 'growth_control', 'growth_telegram_updates', 'growth_analytics_events', 'growth_analytics_budget', 'growth_opportunities', 'growth_source_runs', 'growth_creative', 'growth_creative_results'] as $table) {
                 $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?');
                 $stmt->execute([$table]);
                 outcome('Database table present: ' . $table, (int)$stmt->fetchColumn() >= 1);

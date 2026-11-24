@@ -46,7 +46,10 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
 function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.3 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; no publishing or outreach connector.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.4 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; no publishing or outreach connector.";
+    require_once __DIR__.'/creative-core.php';
+    $creative=creativeCommand($db,$cfg,$command);
+    if($creative!==null)return $creative;
     if($command==='/discoveryruns'){
         if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||($cfg['discovery']['feeds_enabled']??false)!==true)return 'External discovery feeds disabled or unconfigured.';
         $lines=['Recent source runs (up to 10; not confirmed leads):'];
@@ -70,7 +73,7 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
         $q=$db->prepare('SELECT source,COUNT(*) total FROM leads WHERE created_at>=? AND created_at<? GROUP BY source');
         $q->execute([$start->setTimezone($utc)->format('Y-m-d H:i:s'),$start->modify('+1 day')->setTimezone($utc)->format('Y-m-d H:i:s')]);
         $rows=$q->fetchAll(PDO::FETCH_ASSOC);
-        $lines=['Aaditechs V9.3 — '.$start->format('Y-m-d').' IST','Saved leads today: '.array_sum(array_column($rows,'total'))];
+        $lines=['Aaditechs V9.4 — '.$start->format('Y-m-d').' IST','Saved leads today: '.array_sum(array_column($rows,'total'))];
         foreach($rows as $r)$lines[]='Lead intake '.$r['source'].': '.$r['total'];
         if($command==='/leads')return implode("\n",$lines)."\nSaved inquiries, not won projects or marketing-source attribution.";
         $paused=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
@@ -103,7 +106,7 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
         $q->execute([$status,$action==='regenerate'?1:0,$id,$rev]);
         if($q->rowCount()!==1)return 'Task not pending at that revision. Refresh /task ID.';
         growthAudit($db,$id,$rev,$action,'owner');
-        return $action==='regenerate'?'Revision requested. No generator connected; a new draft is required.':$status.' — review recorded only; no external action sent.';
+        return $action==='regenerate'?'Revision requested. A new local-worker result or private reviewed draft is required.':$status.' — review recorded only; no external action sent.';
     }
     return 'Unsupported command. Use /help. Metrics not connected are unavailable, not zero.';
 }

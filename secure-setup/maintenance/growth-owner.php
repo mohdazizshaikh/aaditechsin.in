@@ -20,6 +20,8 @@ try{
         }elseif($mode==='--create')$reply='Pending task #'.growthCreate($db,$input).' revision 1';
         else{
             if(!is_int($input['id']??null)||!is_int($input['revision']??null)||!is_string($input['draft']??null))throw new InvalidArgumentException('Invalid replacement');
+            $q=$db->prepare('SELECT 1 FROM growth_creative WHERE task_id=?');$q->execute([$input['id']]);
+            if($q->fetchColumn()!==false)throw new InvalidArgumentException('Use creative-worker import for creative results');
             $reply=growthReplace($db,$input['id'],$input['revision'],$input['draft'])?'Revised draft pending review':'No matching regeneration request';
         }
     }elseif($mode==='--today')$reply=growthCommand($db,'/today',$cfg);
