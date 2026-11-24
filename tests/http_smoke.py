@@ -24,6 +24,9 @@ try:
     assert status==503,('unconfigured google api',status)
     status,_=request('/api/lead.php','POST',b'{}','application/json')
     assert status==403,('HTTP lead blocked',status)
+    for path in ['/api/twilio-sms-inbound.php','/api/twilio-voice-inbound.php']:
+        status,_=request(path,'POST',b'AccountSid=synthetic','application/x-www-form-urlencoded')
+        assert status==404,('HTTP callback blocked',path,status)
     status,_=request('/api/whatsapp-inbound.php','POST',b'{}','application/json')
     assert status==404,('HTTP inbound blocked',status)
     status,_=request('/api/whatsapp-inbound.php?hub.mode=subscribe&hub.challenge=123&hub.verify_token=wrong')
