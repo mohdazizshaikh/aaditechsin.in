@@ -36,6 +36,8 @@ jobs:
           php tests/growth_rules.php
           php tests/discovery_rules.php
           php tests/discovery_feed.php
+          php tests/creative_rules.php
+          python3 tests/local_creative.py
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only
       - name: Scope statement
@@ -87,5 +89,6 @@ jobs:
           php tests/growth_database.php
           php tests/discovery_rules.php --database
           php tests/discovery_feed.php --database
+          php tests/creative_rules.php --database
       - name: Scope statement
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'

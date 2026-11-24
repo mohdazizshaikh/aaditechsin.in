@@ -132,3 +132,8 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 ## V9.3.1 authorized evidence feed adapter (source only)
 - Added private CLI HTTPS JSON transport, explicit source authorization, public IPv4 pinning, size/timeout limits, no redirects, service matching and source-run ledger. Dry-run validates configuration without network; explicit run checks growth pause before each source. /discoveryruns reports bounded import/error counts.
 - No actual provider configured or contacted. Synthetic test covers feed contract, destination checks, duplicate/partial/failure accounting and owner report; verify final CI. See docs/V931_SOURCE_ADAPTER.md. Live provider/API acceptance, source retention and real outreach remain pending.
+
+## V9.4 catalog-based local AI creative workflow (source only)
+- V9.3.1 CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45378963848.
+- Added nine channel formats, four objectives, 14-service catalog-only export, local loopback Ollama structured-output worker, caption/visual/video briefs, versioned result import/history and Telegram /createcontent /content /coverage. Pause and approval gates preserved. No publish connector or rendering.
+- Creative flags OFF. Local model and actual bot not connected. Synthetic tests validate input/claims, fake structured outputs and database revisions; final CI needs verification. See docs/V94_CREATIVE.md. No production changes.
