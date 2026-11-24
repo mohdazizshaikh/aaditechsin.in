@@ -26,7 +26,9 @@ jobs:
       - name: Install isolated Python test dependency
         run: |
           python3 -m venv .ci-venv
-          .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3
+          .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 Pillow==11.3.0
+      - name: Install local synthetic media dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg fonts-dejavu-core
       - name: Security, links and workflow tests
         run: |
           set -e
@@ -40,6 +42,7 @@ jobs:
           php tests/social_rules.php
           php tests/report_rules.php
           python3 tests/local_creative.py
+          .ci-venv/bin/python tests/local_media.py
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only
       - name: Scope statement
