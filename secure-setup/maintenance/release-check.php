@@ -12,7 +12,7 @@ try{
         $actual=array_map('basename',glob($dir.'/*.sql')?:[]);$expected=$contract['migrations'];sort($actual);sort($expected);
         if($actual!==$expected||count($expected)!==count(array_unique($expected)))throw new RuntimeException('Migration inventory mismatch');
         releaseSourceIntegrity($root,$contract);
-        echo 'PASS: 30 schema/fixture/migration file Git blob hashes match. No signature authenticity asserted.' ."\n";
+        echo 'PASS: 31 schema/fixture/migration file Git blob hashes match. No signature authenticity asserted.' ."\n";
         echo 'PASS: '.count($expected)." ordered migration files accounted for.\n";
         echo 'SOURCE ONLY: no database or hosting acceptance.'."\n";exit;
     }
@@ -30,6 +30,7 @@ try{
     $pause=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
     if($pause===false||(int)$pause!==1){echo "BLOCKED: growth is not paused; stop workers and pause before release rehearsal.\n";exit(1);}
     echo 'PASS: required columns present across '.count($contract['tables'])." tables; growth paused.\n";
+    $review=recUnknownCounts($db);echo 'Owner-reviewed unknown rows (original status unchanged): '.$review['reviewed']."\n";
     $state=releaseWorkerState($db);foreach($state as $k=>$n)echo $k.': '.$n."\n";
     if(!releaseWorkerClear($state)){echo "BLOCKED: unresolved worker, media or provider evidence; reconcile manually. Do not blindly retry.\n";exit(1);}
     echo "READ ONLY: no unresolved listed rows observed; no migration execution, type/index/FK validation, backup/restore, worker-stop proof or provider acceptance asserted.\n";
