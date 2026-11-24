@@ -124,6 +124,22 @@ def verify(directory):
     manifest=read_json(directory/"manifest.json",4096)
     if manifest["image_sha256"]!=sha(directory/"creative.png") or manifest["video_sha256"]!=sha(directory/"creative.mp4"):
         raise ValueError("Asset hash mismatch")
+    from PIL import Image
+    expected=PROFILES.get(manifest.get("channel"))
+    if not expected or (manifest.get("width"),manifest.get("height"))!=expected:
+        raise ValueError("Manifest profile mismatch")
+    with Image.open(directory/"creative.png") as im:
+        if im.format!="PNG" or im.size!=expected:
+            raise ValueError("PNG profile mismatch")
+        im.verify()
+    video=directory/"creative.mp4"
+    if video.stat().st_size>20*1024*1024:
+        raise ValueError("MP4 too large")
+    probe=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_entries","stream=codec_type,codec_name,width,height:format=duration","-of","json",str(video)],timeout=30))
+    streams=[s for s in probe["streams"] if s.get("codec_type")=="video"]
+    if len(streams)!=1 or streams[0].get("codec_name")!="h264" or (streams[0].get("width"),streams[0].get("height"))!=expected or not 3.5<=float(probe["format"]["duration"])<=4.5:
+        raise ValueError("MP4 profile mismatch")
+    subprocess.run(["ffmpeg","-nostdin","-v","error","-xerror","-i",str(video),"-map","0:v:0","-f","null","-"],check=True,timeout=60,capture_output=True)
     return sha(directory/"manifest.json")
 def main():
     p=argparse.ArgumentParser(description=__doc__)

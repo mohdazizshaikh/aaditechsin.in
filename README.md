@@ -6,7 +6,7 @@ Production: `https://aaditechs.in/` — **not deployed by this source commit**. 
 
 ## Growth development status (24 November 2026)
 
-Main V9.6 source verified; V9.7–V10.2B development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [Meta text publishing](docs/V101_META.md), [Other social networks](docs/V102_NETWORKS.md), [Private media uploads](docs/V102A_MEDIA_UPLOAD.md), [Instagram Reels](docs/V102B_INSTAGRAM.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
+Main V9.6 source verified; V9.7–V10.2C development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [Meta text publishing](docs/V101_META.md), [Other social networks](docs/V102_NETWORKS.md), [Private media uploads](docs/V102A_MEDIA_UPLOAD.md), [Instagram Reels](docs/V102B_INSTAGRAM.md), [Facebook media](docs/V102C_FACEBOOK_MEDIA.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
 
 ## Existing website and operations
 
