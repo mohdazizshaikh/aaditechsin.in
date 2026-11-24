@@ -145,3 +145,7 @@
 ## V10.6F security (pending runtime)
 
 - [ ] Separate album flag, exact private PNG/MP4 bytes, one provider request only after distinct approval, validated group and message receipts, no retry of unknown rows. WhatsApp webhook separately OFF with explicit authorization and verified log redaction; verify raw HMAC before DB, exact app/account/phone and bounded payload. Raw webhook may transiently contain personal data; disable payload and query logging, protect verify token and stable HMAC dedupe key, treat keyed digest as pseudonymous, approve retention before enabling. No automatic delete, inbound content store, response or follow-up send.
+
+## V10.6G security (pending runtime)
+
+- [ ] Separate OFF flags, trusted static callback URL, no forwarded host trust, Twilio HMAC-SHA1 per provider protocol, strict form parsing/body cap, dedicated account/destination and stable keyed event digest. Raw callbacks may transiently contain customer details; redact bodies and secrets across logs, rate-limit upstream, no automatic replies/routing or recording. Twilio auth token is sensitive; dedicated subaccount recommended. Replay beyond dedupe lifetime is not solved; no Twilio cleanup enabled. WhatsApp cleanup requires approved 30-day policy, verified backup, paused workers and exact plan digest. No actual deletion or deployment.

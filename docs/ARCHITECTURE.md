@@ -140,3 +140,7 @@ Private explicit GET-only adapters request account-scoped WABA sent/delivered an
 ## V10.6F albums and authenticated inbound boundary
 
 Telegram fixed two-item PNG then MP4 album uses existing approved manifest and exclusive media/text revision ledger, independent owner bundle approval and one multipart sendMediaGroup, validates matching channel/group and two message receipts. WhatsApp inbound endpoint verifies challenge and HMAC-SHA256 over raw payload, exact WABA/phone binding, bounded message IDs/time and stable keyed event digest; persists only digest, account hash and UTC day. No sender/content stored or outbound action; reports distinguish partial webhook observations from inbox/response metrics. See V106F_ALBUMS_INBOUND.md.
+
+## V10.6G Twilio callbacks and retention
+
+Separate fixed HTTPS SMS and terminal inbound voice status callback endpoints verify Twilio URL + sorted form HMAC-SHA1, exact account/destination and event SID; reject duplicate form keys, persist only keyed event digest/account hash/channel/receipt UTC day. SMS empty TwiML sends no reply; voice status endpoint 204 is not call routing. Owner reports distinguish recorded callbacks from complete call or inbox coverage. WhatsApp cleanup is paused and digest-bound, exact oldest batch with 30-day cutoff. Twilio digests are excluded because classic signed forms lack a reliable freshness guarantee. See V106G_INBOUND_RETENTION.md.
