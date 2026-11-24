@@ -22,7 +22,7 @@ return [
         'feeds_enabled' => false, // Explicitly authorize each provider before enabling.
         'feeds' => [], // See docs/V931_SOURCE_ADAPTER.md. No providers connected by default.
     ],
-    'seo' => ['enabled' => false], // Source-only private report summaries.
+    'seo' => ['enabled' => false, 'search_console'=>['enabled'=>false,'authorized'=>false,'revoked'=>false,'property'=>'sc-domain:aaditechsin.in','generation'=>'REPLACE_WITH_RANDOM_32_HEX','review_expires_utc'=>'REPLACE_WITH_UTC_REVIEW_DEADLINE','client_id'=>'REPLACE_WITH_READONLY_CLIENT_ID','client_secret'=>'REPLACE_WITH_PRIVATE_CLIENT_SECRET','refresh_token'=>'REPLACE_WITH_AUTHORIZED_READONLY_REFRESH_TOKEN']],
     'expert' => ['enabled' => false], // Owner-only technical drafts.
     // Enable lifecycle enforcement before any live OAuth publication. Generate a new random 32-hex generation per rotation.
     'oauth_lifecycle' => ['enabled' => false, 'alerts_enabled' => false, 'providers' => array_fill_keys(['facebook','threads','linkedin','x','google-business','instagram','youtube'], ['generation' => 'REPLACE_WITH_RANDOM_32_HEX', 'expires_utc' => 'REPLACE_WITH_UTC_DEADLINE', 'revoked' => false])],
