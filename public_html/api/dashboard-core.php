@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/operations.php';
 require_once __DIR__.'/intelligence-core.php';
 require_once __DIR__.'/publication-overview.php';
+require_once __DIR__.'/analytics-core.php';
 function dashboardEnabled(array $cfg):bool{
     return ($cfg['portal']['enabled']??false)===true&&($cfg['growth']['enabled']??false)===true&&($cfg['intelligence_dashboard']['enabled']??false)===true;
 }
@@ -64,5 +65,51 @@ function dashboardSnapshot(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=
     $data['publications']=creativeEnabled($cfg)&&($cfg['social']['enabled']??false)===true?publicationOverview($db,$cfg,'/publications'):null;
     $data['attention']=($data['publications']!==null)?reportPublicationAttention($db):null;
     $data['connections']=($cfg['oauth_lifecycle']['enabled']??false)===true?oauthStatus($db,$cfg,$now->getTimestamp()):null;
+    $data['web_analytics']=analyticsEnabled($cfg)?dashboardWebAnalytics($db,$days,$now):null;
     return $data;
+}
+
+function dashboardWebAnalytics(PDO $db,int $days,DateTimeImmutable $now):array{
+    if(!in_array($days,[7,30],true))throw new InvalidArgumentException('Period');
+    $end=$now->setTimezone(new DateTimeZone('Asia/Kolkata'))->setTime(0,0);
+    $start=$end->modify('-'.$days.' days');$rows=[];
+    for($d=$start;$d<$end;$d=$d->modify('+1 day'))$rows[$d->format('Y-m-d')]=null;
+    $q=$db->prepare("SELECT event_day,COUNT(*) AS events,SUM(event_type='page_view') AS views,COUNT(DISTINCT CASE WHEN event_type='page_view' THEN session_hash END) AS tab_days,SUM(event_type='page_view' AND automation_signal=1) AS signals,SUM(event_type='service_interest') AS interests,SUM(event_type='call_click') AS call_clicks,SUM(event_type='email_click') AS email_clicks,SUM(event_type='chat_open') AS chat_opens FROM growth_analytics_events WHERE event_day>=? AND event_day<? GROUP BY event_day ORDER BY event_day");
+    $q->execute([$start->format('Y-m-d'),$end->format('Y-m-d')]);
+    foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r){$day=$r['event_day'];unset($r['event_day']);$rows[$day]=array_map('intval',$r);}
+    return ['start'=>$start->format('Y-m-d'),'end'=>$end->format('Y-m-d'),'daily'=>$rows];
+}
+function dashboardCsvCell(string|int|null $v):string{
+    if($v===null)return '';
+    $s=(string)$v;
+    return preg_match('/^[\s\x00-\x1f]*[=+@\x2d]/u',$s)||preg_match('/^[\t\r\n]/',$s)?"'".$s:$s;
+}
+function dashboardCsv(array $data):string{
+    $f=fopen('php://temp','w+');if(!$f)throw new RuntimeException('Export unavailable');
+    $write=static function(array $row)use($f):void{
+        if(count($row)!==7||fputcsv($f,array_map('dashboardCsvCell',$row),',','"','')===false)throw new RuntimeException('Export unavailable');
+    };
+    try{
+        $write(['section','window_start','window_end_exclusive','day','category','metric','value']);
+        $p=$data['period'];$start=$p['start'];$end=$p['end'];
+        foreach($data['leads'] as $k=>$n)$write(['inquiry_current_status_utc',$start,$end,'',$k,'count',$n]);
+        foreach($data['tasks'] as $k=>$n)$write(['task_current_status_all_time','','','',$k,'count',$n]);
+        foreach($data['opportunities']??[] as $k=>$n)$write(['opportunity_current_status_all_time','','','',$k,'count',$n]);
+        foreach($data['services'] as $id=>$r)foreach(['pending_review','qualified','rejected'] as $k)$write(['opportunity_service_all_time','','','',$id,$k,$r[$k]]);
+        foreach($data['communications']??[] as $c=>$r){
+            $write(['communications_utc',$start,$end,'',$c,'days_reported',$r['days_reported']]);
+            foreach(['received','answered','missed'] as $k)$write(['communications_utc',$start,$end,'',$c,$k,$r[$k]]);
+            foreach($r['daily'] as $day=>$daily)foreach($daily as $k=>$n)$write(['communications_utc_daily',$start,$end,$day,$c,$k,$n]);
+        }
+        if($data['web_analytics']!==null){
+            $a=$data['web_analytics'];
+            foreach($a['daily'] as $day=>$r){
+                $write(['consented_web_ist',$a['start'],$a['end'],$day,'website','recorded_data',$r===null?0:1]);
+                if($r!==null)foreach($r as $k=>$n)$write(['consented_web_ist',$a['start'],$a['end'],$day,'website',$k,$n]);
+            }
+        }
+        foreach($data['attention']??[] as $k=>$n)$write(['publication_all_time','','','','all_ledgers',$k,$n]);
+        rewind($f);$raw=stream_get_contents($f,262145);
+        if(!is_string($raw)||strlen($raw)>262144)throw new RuntimeException('Export too large');return $raw;
+    }finally{fclose($f);}
 }
