@@ -11,19 +11,20 @@ function creativeBatchMatrix(PDO $db,array $cfg,string $objective):array{
     }
     return $cells;
 }
-function creativeBatchPlan(PDO $db,array $cfg,string $objective):array{
+function creativeBatchPlan(PDO $db,array $cfg,string $objective,int $limit=126):array{
+    if($limit<1||$limit>126)throw new InvalidArgumentException('Batch limit must be 1–126');
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     creativeActive($db);$cells=creativeBatchMatrix($db,$cfg,$objective);$missing=[];$total=0;
     foreach($cells as $service=>$channels)foreach($channels as $channel=>$counts){++$total;if(array_sum($counts)===0)$missing[]=['service'=>$service,'channel'=>$channel];}
     if($total>126)throw new RuntimeException('Review changed catalog');
-    return ['objective'=>$objective,'total'=>$total,'missing'=>$missing,'digest'=>hash('sha256',json_encode(['creative-batch-v1',$objective,$cells],JSON_THROW_ON_ERROR))];
+    return ['objective'=>$objective,'total'=>$total,'missing'=>$missing,'limit'=>$limit,'selected'=>array_slice($missing,0,$limit),'digest'=>hash('sha256',json_encode(['creative-batch-v2',$objective,$limit,$cells],JSON_THROW_ON_ERROR))];
 }
-function creativeBatchApply(PDO $db,array $cfg,string $objective,string $digest):array{
-    $p=creativeBatchPlan($db,$cfg,$objective);
+function creativeBatchApply(PDO $db,array $cfg,string $objective,string $digest,int $limit=126):array{
+    $p=creativeBatchPlan($db,$cfg,$objective,$limit);
     if(!preg_match('/^[a-f0-9]{64}$/D',$digest)||!hash_equals($p['digest'],$digest))throw new RuntimeException('Coverage changed; review a new plan');
     $db->exec('SAVEPOINT creative_batch');
     try{
-        $ids=[];foreach($p['missing'] as $cell)$ids[]=creativeCreate($db,$cell['service'],$cell['channel'],$objective);
+        $ids=[];foreach($p['selected'] as $cell)$ids[]=creativeCreate($db,$cell['service'],$cell['channel'],$objective);
         if($ids)growthAudit($db,null,null,'creative_batch_created','private_cli');
         $db->exec('RELEASE SAVEPOINT creative_batch');
         return $ids;
