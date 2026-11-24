@@ -133,3 +133,7 @@
 ## V10.6C security (pending runtime)
 
 - [ ] Independent default-OFF bridge and per-channel authorization, fixed HTTPS URL, no arbitrary URL input, public IPv4 pinning/no redirects/proxy, bounded response, private bearer and independent HMAC key, exact signed payload and generation/freshness checks, no raw data/secret output, immutable aggregates. Source Git blob SHA-1 checks detect drift, not signed release authenticity. Release DB checks are read-only; unresolved evidence blocks and is never automatically modified. Verify actual process shutdown, grants, backup/restore and provider acceptance separately.
+
+## V10.6D security (pending runtime)
+
+- [ ] Review CLI separately OFF; owner-authorized operator, stop workers, pause, independently review provider evidence (store securely outside Git), exact state/evidence hashes, append-only review with no publication mutation or replay. Review is an attestation, not automated provider verification; unresolved evidence must remain blocked. Backup dump restricted private file/directory, independent expected SHA256, bounded streaming decompression and no SQL execution; encrypt and protect backup at rest separately. Candidate inspection does not expose token; exact digest, current mailbox and expiry rechecked; manual activation only, scope verification remains mandatory.

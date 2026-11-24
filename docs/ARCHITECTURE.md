@@ -128,3 +128,7 @@ Explicit private Gmail renewal candidate uses configured authorized refresh gran
 ## V10.6C signed communications and release gates
 
 Private CLI fetches one authorized per-channel HTTPS aggregate endpoint using a pinned public IPv4, explicit bearer and separate HMAC key. Signed payload binds credential generation, channel, completed UTC day, freshness and counts; strict validation and pause gates before read and commit. Existing immutable aggregate ledger and owner reports reused; no customer details or native provider API connection. Release inventory pins 30 schema/migration/fixture Git blob hashes; read-only DB checker reports unresolved worker/lease, publication and bearer evidence, blocks until reviewed. See V106C_COMMUNICATIONS_RELEASE.md.
+
+## V10.6D reviewed reconciliation and backup integrity
+
+Private paused CLI inspects unknown publication across 12 allowlisted ledgers, hashes the full stored row and intermediate resource evidence, records immutable owner-attested confirmed-present/absent review with independent evidence digest. No original status change, retry, or provider write. Release gate treats only unchanged reviewed unknown rows separately; all in-flight/processing and other blockers remain. Private gzip backup verifier checks SHA256 and bounded decompression, no SQL execution. Gmail candidate local inspection and digest-bound identity revalidation do not activate credentials. See V106D_RECONCILIATION_BACKUP.md.
