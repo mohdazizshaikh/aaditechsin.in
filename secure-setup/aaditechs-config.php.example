@@ -21,6 +21,14 @@ return [
         'feeds' => [], // See docs/V931_SOURCE_ADAPTER.md. No providers connected by default.
     ],
     'creative' => ['enabled' => false], // Local model review workflow only.
+    'social' => [
+        'enabled' => false,
+        'telegram_channel' => [
+            'enabled' => false,
+            'chat_id' => 'REPLACE_WITH_APPROVED_BUSINESS_CHANNEL_ID',
+            'bot_token' => 'REPLACE_WITH_SEPARATE_BUSINESS_POSTING_BOT_TOKEN',
+        ],
+    ],
     'growth' => [
         'enabled' => false,
         'telegram' => [
