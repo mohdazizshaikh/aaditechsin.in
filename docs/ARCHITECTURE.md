@@ -42,3 +42,7 @@ Lead intake → admin qualifies → creates case and optionally assigns partner 
 - PHP >= 8.1, PDO MySQL, MySQL/MariaDB, TLS; `mbstring` optional fallback for validation, `openssl` for secure sessions/randomness.
 - Composer + PHPMailer for optional SMTP; cURL required for existing Google Reviews endpoint.
 - JS browser support: modern evergreen browsers, no external JS framework.
+
+## V9–V10 growth architecture (development snapshot)
+
+Private owner Telegram webhook → reviewed growth tasks and audit ledger → separately enabled analytics/discovery/creative/social/report modules. V9.7 local PC claims catalog-only jobs via authenticated HTTPS lease API; no inbound model port. V9.8 PNG/MP4 generated and retained on private PC; only metadata hashes registered. V9.9 public static guide is separate from private structured expert drafts. V10.0 read-only local SEO audit → private CLI summary → owner Telegram; no page modification or external crawl. All external actions require separately authorized destinations and approved revisions. Database additions are additive through V10.0. See PROJECT_STATUS.md for verification and blockers.
