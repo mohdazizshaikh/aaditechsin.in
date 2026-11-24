@@ -148,3 +148,7 @@ Separate fixed HTTPS SMS and terminal inbound voice status callback endpoints ve
 ## V10.6H mixed carousel and communications reviews
 
 Existing carousel ledger adds typed children with default image for legacy rows. Image-only digest is unchanged; a mixed bundle binds ordered type/hash/size, one exact approved manifest MP4 and one to four JPEG derivatives. Separate provider flags; per-stage and fetch revalidation, existing bounded bearer access and explicit parent/publish steps. Internal communication reviews link one imported missed-count aggregate to a due date and status, not a customer or message; retention refuses to delete eligible aggregates with open reviews. See V106H_MIXED_REVIEWS.md.
+
+## V10.6I Search Console boundary
+
+Explicit private CLI uses a dedicated authorized webmasters.readonly OAuth refresh grant with exact scope verification and fixed Google endpoints, no persisted access token or active config replacement. Exact Aaditechs property allowlist, property-access check and finalized web-search date aggregation over seven Pacific Time days ending three days before today. Stores one generation/property-bound aggregate snapshot with reported-day coverage, clicks, impressions and impression-weighted position. No keywords, query text, URLs from results, or raw provider payload retained. Owner reports label missing and stale evidence. See V106I_SEARCH_CONSOLE.md.

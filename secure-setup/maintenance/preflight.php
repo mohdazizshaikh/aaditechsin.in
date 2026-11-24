@@ -124,6 +124,7 @@ $flags = [
     'intelligence_dashboard.csv_enabled' => ['intelligence_dashboard','csv_enabled'],
     'communications.batch_import_enabled' => ['communications','batch_import_enabled'],
     'reconciliation.enabled' => ['reconciliation','enabled'],
+    'seo.search_console.enabled' => ['seo','search_console','enabled'],
     'communications.reviews_enabled' => ['communications','reviews_enabled'],
     'media_upload.threads_mixed_carousel_enabled' => ['media_upload','threads_mixed_carousel_enabled'],
     'media_upload.instagram_mixed_carousel_enabled' => ['media_upload','instagram_mixed_carousel_enabled'],
@@ -220,7 +221,7 @@ if ($checkDb) {
 } else {
     warning('No database connection attempted. Use --check-db on staging with restricted DB access');
 }
-warning('For the current 45-table column contract and paused growth check, run release-check.php --check-db separately. This does not validate backups or provider acceptance.');
+warning('For the current 46-table column contract and paused growth check, run release-check.php --check-db separately. This does not validate backups or provider acceptance.');
 warning('Check HTTPS, SMTP delivery, real roles/CSRF and lead lifecycle in an approved staging acceptance session');
 echo ($failures === 0 ? 'LOCAL PREFLIGHT: CHECKS PASSED' : 'LOCAL PREFLIGHT: BLOCKERS FOUND') . "\n";
 exit($failures === 0 ? 0 : 1);

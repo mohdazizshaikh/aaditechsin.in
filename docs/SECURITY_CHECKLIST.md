@@ -153,3 +153,7 @@
 ## V10.6H security (pending runtime)
 
 - [ ] Mixed media OFF separately per provider; private exact manifest MP4, typed ordered digest, current approval and target, limited bearer lifetime and fetch count, no logs or automatic retry. Communication reviews OFF; no personal identifiers, no inferred unanswered counts, no outbound follow-up, retention blocks open reviews and cascades closed reviews when approved aggregate cleanup executes. Audit retained. No deployment.
+
+## V10.6I security (pending runtime)
+
+- [ ] Search Console independently OFF, authorized dedicated webmasters.readonly grant, fixed Google HTTPS endpoints, bounded response and no proxy/redirect; reject broader/missing scope and unexpected refresh rotation. Exact property allowlist and returned property verification, no user-supplied destination or query terms; in-memory access token only, private refresh credentials, generation/expiry/revocation gate. Snapshot contains only aggregate counts/position/date coverage and property hash; no active config overwrite or automated schedule. Actual consent, secret storage and provider acceptance required.

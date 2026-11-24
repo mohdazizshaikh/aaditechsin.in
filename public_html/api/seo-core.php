@@ -21,14 +21,15 @@ function seoRegister(PDO $db,array $r):array {
     return ['status'=>$q->rowCount()===1?'recorded':'duplicate_summary','sha256'=>$hash];
 }
 function seoCommand(PDO $db,array $cfg,string $command):?string {
+    if($command==='/searchconsole'){require_once __DIR__.'/search-console-core.php';return scSummary($db,$cfg);}
     if($command!=='/seo'&&!preg_match('/^\\/seotopics(?: |$)/D',$command))return null;
     if(!seoEnabled($cfg))return 'SEO module disabled.';
     if($command==='/seo'){
         $r=$db->query('SELECT page_count,counts_json,created_at FROM growth_seo_reports ORDER BY id DESC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
-        if(!$r)return 'No source SEO audit summary recorded. Live rankings, traffic and Search Console unavailable.';
+        if(!$r)return 'No source SEO audit summary recorded. Use /searchconsole for separately authorized search analytics.';
         $lines=['Last distinct source SEO summary: '.$r['created_at'],'Pages inspected: '.$r['page_count']];
         foreach(json_decode($r['counts_json'],true,32,JSON_THROW_ON_ERROR) as $k=>$n)$lines[]=$k.': '.$n;
-        $lines[]='No live crawl, ranking, search volume or Search Console data. Review detailed local report before changes.';
+        $lines[]='Source audit only, not live rankings or traffic. Use /searchconsole for separate evidence.';
         return implode("\n",$lines);
     }
     if(preg_match('/^\\/seotopics ([a-z0-9-]+)$/D',$command,$m)&&isset(seoTopics()[$m[1]]))return "Suggested topics (not measured keywords):\n".implode("\n",seoTopics()[$m[1]]);
