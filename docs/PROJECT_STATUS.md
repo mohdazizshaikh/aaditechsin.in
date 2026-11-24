@@ -117,3 +117,8 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 ## V9.1 growth foundation (source-only)
 - Added 14-service registry, review-only task tables and audit, version-checked approve/reject/regenerate request, paused control default, owner-only Telegram webhook source and private CLI draft intake.
 - Growth and Telegram flags default OFF. No bot provisioned or webhook registered, no real publishing/outreach, no analytics or AI generator. Verify the new offline and disposable MariaDB CI jobs, then stage separately. See docs/V9_GROWTH_FOUNDATION.md.
+
+## V9.2 optional website analytics (source only)
+- V9.1 final CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45354481922.
+- Added consent-gated first-party event collector, strict event API, day-scoped tab-session estimates, service interactions, broad traffic channels, click/automation-signal counts, IST saved-lead reports, Telegram query commands and dry-run retention CLI.
+- Both analytics flags default OFF. No Hostinger collection, real bot delivery, GA4/Search Console, actual call/mail/message data, campaign-to-lead attribution or social connectors. Validate latest CI and separately perform browser/staging acceptance. See docs/V92_ANALYTICS.md.

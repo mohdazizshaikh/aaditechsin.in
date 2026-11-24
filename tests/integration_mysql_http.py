@@ -142,6 +142,8 @@ def run() -> None:
   'rate_limit_salt' => 'CI_ONLY_RANDOM_SALT_NOT_PRODUCTION_32_BYTES_LONG',
   'database' => ['enabled'=>true, 'host'=>%s, 'port'=>%s, 'name'=>%s, 'username'=>%s, 'password'=>%s],
   'leads' => ['enabled'=>true],
+  'growth' => ['enabled'=>true, 'telegram'=>['enabled'=>false]],
+  'analytics' => ['enabled'=>true, 'salt'=>'CI_ONLY_ANALYTICS_SALT_SYNTHETIC_32_BYTES'],
   'portal' => ['enabled'=>true, 'admin_email'=>%s, 'admin_password_hash'=>%s,
                'admin_totp_enabled'=>false, 'admin_totp_secret'=>''],
   'mail' => ['enabled'=>true], 'google' => ['enabled'=>false]
@@ -172,6 +174,48 @@ def run() -> None:
                 public.verify = False
                 reviews = public.get(base + '/api/google-reviews.php', timeout=5)
                 assert reviews.status_code == 503, 'Unapproved Google review API unexpectedly active'
+                # Test-only consent analytics, using the simulated TLS proxy.
+                event = {'event_id':'a'*32,'session':'b'*32,'page':'home','event':'page_view',
+                         'service':'','channel':'search','automation':False,'consent':True}
+                ep = base + '/api/analytics.php'
+                headers = {'Origin':'https://ci-staging.invalid','User-Agent':'SyntheticBrowser'}
+                assert public.post(ep, json=event, headers={**headers,'Origin':'https://evil.example'}, timeout=5).status_code == 403
+                assert public.post(ep, json={**event,'consent':False}, headers=headers, timeout=5).status_code == 422
+                assert public.post(ep, json={**event,'page':'track'}, headers=headers, timeout=5).status_code == 422
+                assert public.post(ep, json={**event,'raw_url':'sensitive'}, headers=headers, timeout=5).status_code == 422
+                assert public.post(ep, json=event, headers={**headers,'Sec-GPC':'1'}, timeout=5).status_code == 204
+                cursor.execute('SELECT COUNT(*) FROM growth_analytics_events')
+                assert cursor.fetchone()[0] == 0, 'Rejected/opt-out event persisted'
+                a = public.post(ep, json=event, headers=headers, timeout=5)
+                assert a.status_code == 200 and a.json()['status']=='accepted', ('Analytics event',a.status_code,a.text[:150])
+                a = public.post(ep, json=event, headers=headers, timeout=5)
+                assert a.status_code == 200 and a.json()['status']=='duplicate'
+                a = public.post(ep, json={**event,'event_id':'c'*32,'event':'service_interest','service':'it-procurement'},headers=headers,timeout=5)
+                assert a.status_code==200 and a.json()['status']=='accepted'
+                a = public.post(ep, json={**event,'event_id':'d'*32,'automation':True},headers=headers,timeout=5)
+                assert a.status_code==200 and a.json()['status']=='accepted'
+                cursor.execute('SELECT COUNT(*),COUNT(DISTINCT session_hash),SUM(automation_signal) FROM growth_analytics_events')
+                assert cursor.fetchone()==(3,1,1), 'Analytics counts/replay/session mismatch'
+                cursor.execute('SELECT session_hash FROM growth_analytics_events LIMIT 1')
+                assert len(cursor.fetchone()[0])==64, 'Session hash missing'
+                # Global cap reached: no new row or counter inflation.
+                cursor.execute('UPDATE growth_analytics_budget SET accepted_count=10000')
+                assert public.post(ep,json={**event,'event_id':'e'*32},headers=headers,timeout=5).status_code==429
+                cursor.execute('UPDATE growth_analytics_budget SET accepted_count=3')
+                # Test retention only against an isolated, synthetic old record.
+                cursor.execute("INSERT INTO growth_analytics_events(event_day,event_id,session_hash,page_id,event_type,service_id,channel) VALUES('2000-01-01',%s,%s,'home','page_view','','direct')",('f'*32,'f'*64))
+                cmd=['php',str(ROOT/'secure-setup/maintenance/analytics-prune.php')]
+                dry=subprocess.run(cmd,cwd=str(ROOT),text=True,capture_output=True,timeout=10)
+                assert dry.returncode==0 and 'Eligible analytics events: 1' in dry.stdout and 'READ-ONLY' in dry.stdout
+                cursor.execute('SELECT COUNT(*) FROM growth_analytics_events')
+                assert cursor.fetchone()[0]==4
+                run_prune=subprocess.run(cmd+['--run'],cwd=str(ROOT),text=True,capture_output=True,timeout=10)
+                assert run_prune.returncode==0 and 'Deleted analytics events: 1' in run_prune.stdout
+                cursor.execute('SELECT COUNT(*) FROM growth_analytics_events')
+                assert cursor.fetchone()[0]==3
+                report=subprocess.run(['php',str(ROOT/'secure-setup/maintenance/growth-owner.php'),'--today'],cwd=str(ROOT),text=True,capture_output=True,timeout=10)
+                assert report.returncode==0 and 'Consented page views: 2' in report.stdout and 'Estimated tab sessions (not people): 1' in report.stdout
+                print('V9.2 synthetic analytics HTTP consent, quotas, reports and retention: PASS')
                 payload = {
                     'fullName': 'CI Synthetic Alice', 'email': 'alice-ci@example.invalid',
                     'phone': '0000000000', 'service': 'Data Recovery',

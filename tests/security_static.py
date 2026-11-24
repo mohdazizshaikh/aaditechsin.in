@@ -34,3 +34,10 @@ prune=(root/'secure-setup/maintenance/prune.php').read_text()
 assert "$argv[1] ?? '--dry-run'" in prune
 assert "--run" in prune and "READ-ONLY" in prune
 assert '$e->getMessage()' not in prune, 'Prune must not log sensitive raw exceptions'
+
+# V9.2 analytics remains opt-in and off at both boundaries.
+assert re.search(r'analytics:\s*false', public)
+assert "'salt' => 'REPLACE_WITH_INDEPENDENT_RANDOM_ANALYTICS_SALT'" in config
+analytics=(root/'public_html/assets/analytics.js').read_text()
+assert 'consent:true' in analytics and "referrerPolicy:'no-referrer'" in analytics
+assert 'location.href' not in analytics

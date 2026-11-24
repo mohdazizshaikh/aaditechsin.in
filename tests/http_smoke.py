@@ -20,6 +20,8 @@ try:
     assert status==503,('unconfigured google api',status)
     status,_=request('/api/lead.php','POST',b'{}','application/json')
     assert status==403,('HTTP lead blocked',status)
+    status,_=request('/api/analytics.php','POST',b'{}','application/json')
+    assert status==403,('HTTP analytics blocked',status)
     status,_=request('/track/?token=invalid')
     assert status==404,('invalid tracking token',status)
     status,body=request('/data-recovery/')
