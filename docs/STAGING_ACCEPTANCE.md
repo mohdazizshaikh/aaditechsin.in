@@ -122,3 +122,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2G acceptance (pending live)
 
 - [ ] Apply after V10.2F. Enable lifecycle enforcement before live OAuth activation; test expired, revoked, malformed/missing metadata and rotation, sanitized read-only checks, stale evidence and actual provider scopes/renewal/revocation. No automated consent/refresh acceptance.
+
+## V10.2H acceptance (pending runtime)
+
+- [ ] Apply after V10.2G; verify persistent image resource receipt before post, audit failure blocks next provider action, crash reconciliation, no replay or token leaks. Actual video/carousel work pending.

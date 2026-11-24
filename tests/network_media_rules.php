@@ -18,7 +18,10 @@ foreach(['linkedin','x'] as $provider){
         nmCheck($data['media']['media_ids']===['789'],'X attachment');return ['http'=>201,'json'=>['data'=>['id'=>'99']]];
     };
     $binary=static function($p,$u,$id,$b)use($url,$li,$bytes){nmCheck($u===$url&&$id===$li&&$b===$bytes,'Exact LinkedIn bytes');return ['http'=>201];};
-    nmCheck(nmSend($p,$row,$bytes,$mock,$binary,static fn()=>null)['status']==='accepted','Mock '.$provider);
+    $events=[];$remember=static function($id,$phase)use(&$events){$events[]=$phase.':'.$id;};
+    nmCheck(nmSend($p,$row,$bytes,$mock,$binary,static fn()=>null,$remember)['status']==='accepted','Mock '.$provider);
+    nmCheck($events===($provider==='linkedin'?['initialized:urn:li:image:abc','uploaded:urn:li:image:abc']:['uploaded:789']),'Intermediate receipts');
+    nmCheck(nmSend($p,$row,$bytes,$mock,$binary,static fn()=>null,static function(){throw new RuntimeException('audit failed');})['status']==='unknown','Receipt failure stops send');
     nmCheck(nmSend($p,$row,'tampered',$mock,$binary,static fn()=>null)['status']==='failed','Tamper gate');
 }
 if(($argv[1]??'')!=='--database'){echo "Network image mock: PASS\n";exit;}
@@ -35,7 +38,9 @@ try{
     $when=(new DateTimeImmutable('now',new DateTimeZone('UTC')))->modify('+1 day')->format('Y-m-d\TH:i\Z');
     try{networkSchedule($db,$cfg,'x',$id,1,'456',$when);throw new LogicException('Text duplicate');}catch(InvalidArgumentException $e){}
     nmCheck(str_contains(growthCommand($db,"/approvenetmedia $up $manifest x 456",$cfg),'approved'),'Exact approval');
-    $r=nmClaim($db,$cfg,'x',$up);nmFinish($db,$r,networkResult('unknown',null,'publish_unverified'));
+    $r=nmClaim($db,$cfg,'x',$up);nmRememberResource($db,$r,'789','uploaded');
+    nmCheck(str_contains(nmRecoveryReport($db,$cfg,'/mediarecovery'),'uploaded 789'),'Resource recovery report');
+    nmFinish($db,$r,networkResult('unknown',null,'publish_unverified'));
     try{nmClaim($db,$cfg,'x',$up);throw new LogicException('Retry accepted');}catch(RuntimeException $e){}
     nmCheck(str_contains(growthCommand($db,'/publications',$cfg),'x unknown: 1'),'Unified report');
     $db->rollBack();echo "Synthetic network image reservation: PASS\n";

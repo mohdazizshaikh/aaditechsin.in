@@ -6,7 +6,7 @@
 
 ## V9–V10 development addendum (24 November 2026)
 
-Main V9.6 verified; V9.7–V10.2G stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D then V10.2E then V10.2F then V10.2G; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
+Main V9.6 verified; V9.7–V10.2H stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D then V10.2E then V10.2F then V10.2G then V10.2H; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
 
 ## 1 — Deployment model and file destinations
 
@@ -177,3 +177,5 @@ V10.2E: leave fetch_log_redaction_verified=false until staging access/CDN logs a
 V10.2F: private inventory and retention flags OFF. Back up DB/files, stop workers/transfers, pause and verify no in-flight requests before explicit per-file quarantine/restore. No deletion. See docs/V102F_MEDIA_STORAGE.md.
 
 V10.2G: enable oauth_lifecycle before any live social activation; set per-provider generation/deadline, stop workers/pause before private rotation, check identity read-only and revoke old credential through provider console. See docs/V102G_OAUTH_HEALTH.md.
+
+V10.2H: apply media resource ledger migration before existing LinkedIn/X image workers run. Inspect /mediarecovery for uncertain rows; never requeue automatically. See docs/V102H_MEDIA_RECOVERY.md.

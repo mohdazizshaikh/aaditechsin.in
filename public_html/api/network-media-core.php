@@ -59,3 +59,27 @@ function nmFinish(PDO $db,array $row,array $result):void {
     if(!in_array($s,['accepted','failed','unknown'],true)||!is_string($e)||!preg_match('/^[a-z_]{0,32}$/D',$e)||($s==='accepted'&&(!is_string($r)||!preg_match($row['provider']==='linkedin'?'/^urn:li:(?:share|ugcPost):[0-9]{1,30}$/D':'/^[1-9][0-9]{0,30}$/D',$r)))||($s!=='accepted'&&$r!==null))throw new InvalidArgumentException('Invalid receipt');
     $q=$db->prepare("UPDATE growth_network_media SET status=?,receipt=?,error_code=?,finished_at=UTC_TIMESTAMP() WHERE id=? AND status='sending'");$q->execute([$s,$r,$e,$row['id']]);if($q->rowCount()!==1)throw new RuntimeException('State changed');growthAudit($db,(int)$row['task_id'],(int)$row['revision'],'netmedia_'.$s,'private_cli');
 }
+
+function nmRememberResource(PDO $db,array $row,string $id,string $phase):void {
+    if(!$db->inTransaction()||!in_array($phase,['initialized','uploaded'],true))throw new InvalidArgumentException('Invalid resource phase');
+    $provider=$row['provider']??'';
+    if(!in_array($provider,['linkedin','x'],true)||!preg_match($provider==='linkedin'?'/^urn:li:image:[A-Za-z0-9_-]{1,100}$/D':'/^[1-9][0-9]{0,30}$/D',$id)||($provider==='x'&&$phase!=='uploaded'))throw new InvalidArgumentException('Invalid resource');
+    $q=$db->prepare("SELECT provider FROM growth_network_media WHERE id=? AND status='sending' FOR UPDATE");$q->execute([$row['id']]);if($q->fetchColumn()!==$provider)throw new RuntimeException('Publication not in flight');
+    $q=$db->prepare('SELECT provider,resource_id,phase FROM growth_network_media_resources WHERE publication_id=? FOR UPDATE');$q->execute([$row['id']]);$old=$q->fetch(PDO::FETCH_ASSOC);
+    if(!$old){
+        if($provider==='linkedin'&&$phase!=='initialized')throw new RuntimeException('Initialization receipt required');
+        $db->prepare('INSERT INTO growth_network_media_resources(publication_id,provider,resource_id,phase) VALUES(?,?,?,?)')->execute([$row['id'],$provider,$id,$phase]);
+    }else{
+        if($old['provider']!==$provider||$old['resource_id']!==$id||$old['phase']!=='initialized'||$phase!=='uploaded')throw new RuntimeException('Resource transition refused');
+        $db->prepare("UPDATE growth_network_media_resources SET phase='uploaded',recorded_at=UTC_TIMESTAMP() WHERE publication_id=?")->execute([$row['id']]);
+    }
+    growthAudit($db,(int)$row['task_id'],(int)$row['revision'],'netmedia_resource_'.$phase,'private_cli');
+}
+function nmRecoveryReport(PDO $db,array $cfg,string $command):?string {
+    if($command!=='/mediarecovery')return null;
+    if(!creativeEnabled($cfg)||($cfg['social']['enabled']??false)!==true)return 'Recovery report disabled.';
+    $lines=['Network image reconciliation only; do not retry uncertain posts.'];
+    $q=$db->query("SELECT m.id,m.provider,m.status,r.resource_id,r.phase FROM growth_network_media m LEFT JOIN growth_network_media_resources r ON r.publication_id=m.id WHERE m.status IN ('sending','unknown') ORDER BY m.id DESC LIMIT 10");
+    foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='#'.$r['id'].' '.$r['provider'].' '.$r['status'].' '.($r['resource_id']?$r['phase'].' '.$r['resource_id']:'no recorded resource');
+    return count($lines)===1?'No uncertain network image rows.':implode("\n",$lines);
+}

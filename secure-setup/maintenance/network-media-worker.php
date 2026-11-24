@@ -19,6 +19,8 @@ try{
     }elseif($mode==='--run'&&count($argv)===4&&preg_match('/^[1-9][0-9]{0,14}$/D',$argv[3])){
         $db->beginTransaction();$row=nmClaim($db,$cfg,$provider,(int)$argv[3]);$path=$root.'/'.$row['asset_hash'];
         $bytes=uploadPhotoRead($path.'.png',$row['asset_hash'],(int)$row['width'],(int)$row['height'],(int)$row['byte_count']);
-        $db->commit();$r=nmSend($p,$row,$bytes,'networkRequest','nmBinary',static fn()=>sleep(3));$db->beginTransaction();nmFinish($db,$row,$r);$db->commit();echo 'Media #'.$row['id'].' '.$r['status']."\n";
+        $db->commit();
+        $remember=static function(string $id,string $phase)use($db,$row):void{$db->beginTransaction();try{nmRememberResource($db,$row,$id,$phase);$db->commit();}catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}};
+        $r=nmSend($p,$row,$bytes,'networkRequest','nmBinary',static fn()=>sleep(3),$remember);$db->beginTransaction();nmFinish($db,$row,$r);$db->commit();echo 'Media #'.$row['id'].' '.$r['status']."\n";
     }else throw new InvalidArgumentException('Explicit command required');
 }catch(Throwable $e){if(isset($db)&&$db->inTransaction())$db->rollBack();fwrite(STDERR,"BLOCKED: configuration, asset, approval, pause or provider error. Reconcile uncertain sends manually.\n");exit(1);}
