@@ -64,6 +64,7 @@ jobs:
           .ci-venv/bin/python tests/local_media.py
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only
+          php secure-setup/maintenance/release-check.php --source-only
       - name: Scope statement
         run: echo 'Source checks only; no Hostinger deployment, MySQL, SMTP, Google API or production permission test.'
 
@@ -109,6 +110,7 @@ jobs:
           .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 PyMySQL==1.1.1 requests==2.32.3
       - name: Synthetic MySQL + HTTP full workflow
         run: |
+          .ci-venv/bin/python tests/migration_replay.py
           .ci-venv/bin/python tests/integration_mysql_http.py
           php tests/growth_database.php
           php tests/discovery_rules.php --database

@@ -143,7 +143,7 @@ def run() -> None:
   'database' => ['enabled'=>true, 'host'=>%s, 'port'=>%s, 'name'=>%s, 'username'=>%s, 'password'=>%s],
   'leads' => ['enabled'=>true],
   'growth' => ['enabled'=>true, 'telegram'=>['enabled'=>false]],
-  'intelligence_dashboard' => ['enabled'=>true], 'discovery'=>['enabled'=>true,'followups_enabled'=>true], 'communications'=>['enabled'=>true],
+  'intelligence_dashboard' => ['enabled'=>true,'csv_enabled'=>true], 'discovery'=>['enabled'=>true,'followups_enabled'=>true], 'communications'=>['enabled'=>true],
   'analytics' => ['enabled'=>true, 'salt'=>'CI_ONLY_ANALYTICS_SALT_SYNTHETIC_32_BYTES'],
   'portal' => ['enabled'=>true, 'admin_email'=>%s, 'admin_password_hash'=>%s,
                'admin_totp_enabled'=>false, 'admin_totp_secret'=>''],
@@ -252,6 +252,7 @@ def run() -> None:
                 assert cursor.fetchone()[0] == 1, 'Duplicate lead unexpectedly persisted'
 
                 assert public.get(base + '/portal/intelligence.php', timeout=5).status_code == 404, 'Guest accessed intelligence'
+                assert public.get(base + '/portal/intelligence-export.php', timeout=5).status_code == 404, 'Guest exported intelligence'
                 owner = requests.Session()
                 owner.verify = False
                 before = csrf(owner, base)
@@ -264,6 +265,13 @@ def run() -> None:
                 assert dash.status_code == 200 and 'Business intelligence' in dash.text and 'No data' in dash.text, 'Owner intelligence missing'
                 assert 'no-store' in dash.headers.get('Cache-Control','') and 'noindex' in dash.headers.get('X-Robots-Tag',''), 'Private headers missing'
                 assert OWNER_EMAIL not in dash.text and 'ci_only_not_real_password' not in dash.text, 'Private configuration leaked'
+                assert 'Consented website activity' in dash.text and 'Download aggregate CSV report' in dash.text
+                csv_report = owner.get(base + '/portal/intelligence-export.php?days=30', timeout=5)
+                assert csv_report.status_code == 200 and csv_report.headers.get('Content-Type','').startswith('text/csv') and 'no-store' in csv_report.headers.get('Cache-Control','')
+                assert 'aaditechs-aggregate-30d.csv' in csv_report.headers.get('Content-Disposition','') and 'section,window_start,window_end_exclusive,day,category,metric,value' in csv_report.text
+                assert OWNER_EMAIL not in csv_report.text and 'ci_only_not_real_password' not in csv_report.text
+                assert owner.get(base + '/portal/intelligence-export.php?days=365', timeout=5).status_code == 404
+                assert owner.post(base + '/portal/intelligence-export.php', data={'action':'export'}, timeout=5).status_code == 404
                 assert owner.get(base + '/portal/intelligence.php?days=365', timeout=5).status_code == 404
                 assert owner.post(base + '/portal/intelligence.php', data={'action':'approve'}, timeout=5).status_code == 404
                 assert 'Owner notification delivery' in logged.text and 'pending: 1' in logged.text, 'Owner queue summary missing'
@@ -376,6 +384,7 @@ class PHPMailer {
                 partner_login = form(partner, base, {'action':'login', 'email':'partner1-ci@example.invalid','password':PARTNER_PASSWORD})
                 assert 'Your assigned jobs' in partner_login.text and case_code in partner_login.text, 'Partner cannot view assigned case'
                 assert '/portal/intelligence.php' not in partner_login.text and partner.get(base + '/portal/intelligence.php', timeout=5).status_code == 404, 'Partner intelligence access'
+                assert partner.get(base + '/portal/intelligence-export.php', timeout=5).status_code == 404, 'Partner export access'
                 other = requests.Session()
                 other.verify = False
                 other_login = form(other, base, {'action':'login', 'email':'partner2-ci@example.invalid','password':PARTNER_PASSWORD})

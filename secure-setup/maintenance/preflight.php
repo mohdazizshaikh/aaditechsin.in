@@ -120,6 +120,9 @@ $flags = [
     'growth.telegram.enabled' => ['growth', 'telegram', 'enabled'],
     'growth.telegram.reports_enabled' => ['growth','telegram','reports_enabled'],
     'analytics.enabled' => ['analytics', 'enabled'],
+    'intelligence_dashboard.enabled' => ['intelligence_dashboard','enabled'],
+    'intelligence_dashboard.csv_enabled' => ['intelligence_dashboard','csv_enabled'],
+    'communications.batch_import_enabled' => ['communications','batch_import_enabled'],
     'discovery.enabled' => ['discovery','enabled'],
     'creative.enabled' => ['creative','enabled'],
     'social.enabled' => ['social','enabled'],
@@ -204,6 +207,7 @@ if ($checkDb) {
 } else {
     warning('No database connection attempted. Use --check-db on staging with restricted DB access');
 }
+warning('For the current 40-table column contract and paused growth check, run release-check.php --check-db separately. This does not validate backups or provider acceptance.');
 warning('Check HTTPS, SMTP delivery, real roles/CSRF and lead lifecycle in an approved staging acceptance session');
 echo ($failures === 0 ? 'LOCAL PREFLIGHT: CHECKS PASSED' : 'LOCAL PREFLIGHT: BLOCKERS FOUND') . "\n";
 exit($failures === 0 ? 0 : 1);
