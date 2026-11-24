@@ -105,3 +105,7 @@
 ## V10.2H.3 security (pending runtime)
 
 - [ ] Exact ordered bundle approval, image-only 2–5 cap, independent high-entropy bearer digest per child, verified log redaction/no cache, pause and current manifest checks, persist child evidence before next write, revoke on parent/cancel/failure, no raw tokens in reports. Single-range video only after full verified read, request cap retained. Private inbox separate from webroot and storage, exact hashes, no credential persistence, source files retained. No automatic retry or real posting.
+
+## V10.2I/J security (pending runtime)
+
+- [ ] Keep transfer config, SSH key, known_hosts and local artifacts private, verify host fingerprint out of band, dedicated least-privilege SFTP inbox user and no password/agent/proxy, no automatic retry or deletion. Confirm server path cannot expose webroot and permissions/quotas enforced. OAuth alerts contain only sanitized local deadline/health, not secrets or provider responses. Keep live features OFF until accepted.

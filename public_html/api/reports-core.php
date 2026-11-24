@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/growth-core.php';
+require_once __DIR__.'/oauth-health-core.php';
 function ownerReportTarget(array $cfg):?string {
     $t=$cfg['growth']['telegram']??[];
     if(($cfg['growth']['enabled']??false)!==true||($t['enabled']??false)!==true||($t['reports_enabled']??false)!==true)return null;
@@ -31,7 +32,7 @@ function reportErrorText(PDO $db,DateTimeImmutable $now):string {
     $lines=['Recorded module errors today (IST)'];
     foreach($rows as $label=>$n)$lines[]=$label.': '.$n;
     $lines[]='Current dead SMTP owner alerts: '.(int)$db->query("SELECT COUNT(*) FROM notification_outbox WHERE status='dead'")->fetchColumn();
-    $lines[]='Current interrupted/in-flight publication rows: '.(int)$db->query("SELECT COUNT(*) FROM growth_publications WHERE status='sending'")->fetchColumn();
+    foreach(reportPublicationAttention($db) as $label=>$count)$lines[]=$label.': '.$count;
     $lines[]='Not full website/server/telephony/mail or third-party monitoring.';
     return implode("\n",$lines);
 }
@@ -70,6 +71,7 @@ function reportClaim(PDO $db,array $cfg,string $kind,DateTimeImmutable $now):?ar
         if($local->format('H:i')<$after)return null;
         $key=$local->format('Y-m-d');
         $text="Daily snapshot (IST; day-to-date, not full-day)\n".growthCommand($db,'/today',$cfg)."\n\n".reportErrorText($db,$now);
+        if(($cfg['oauth_lifecycle']['alerts_enabled']??false)===true)$text.="\n\n".oauthAlertText($db,$cfg,$now->getTimestamp());
     }elseif($kind==='errors'){
         if((int)$pref['errors_enabled']!==1)return null;
         $end=$now->setTimezone($utc);$end=$end->setTime((int)$end->format('H'),0);
@@ -96,4 +98,18 @@ function reportFinish(PDO $db,int $id,array $r):void {
     if(!in_array($s,['accepted','failed','unknown'],true)||!is_string($error)||!preg_match('/^[a-z_]{0,32}$/D',$error)||($s==='accepted'&&(!is_string($receipt)||!preg_match('/^[1-9][0-9]{0,20}$/D',$receipt)))||($s!=='accepted'&&$receipt!==null))throw new InvalidArgumentException('Receipt');
     $q=$db->prepare("UPDATE growth_report_runs SET status=?,provider_message_id=?,error_code=?,finished_at=UTC_TIMESTAMP() WHERE id=? AND status='sending'");
     $q->execute([$s,$receipt,$error,$id]);if($q->rowCount()!==1)throw new RuntimeException('Report state changed');
+}
+
+function reportPublicationAttention(PDO $db):array {
+    $tables=['growth_publications','growth_meta_publications','growth_network_publications','growth_media_uploads','growth_instagram_uploads','growth_facebook_media','growth_network_media','growth_meta_images','growth_linkedin_video','growth_x_video','growth_carousels'];
+    $uncertain=0;$inflight=0;$processing=0;
+    foreach($tables as $table){
+        $q=$db->query("SELECT status,COUNT(*) AS n FROM $table GROUP BY status");
+        foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r){
+            if(in_array($r['status'],['unknown','failed'],true))$uncertain+=(int)$r['n'];
+            elseif(in_array($r['status'],['sending','uploading','fetching','assembling','publishing'],true))$inflight+=(int)$r['n'];
+            elseif(in_array($r['status'],['processing','parent_ready'],true))$processing+=(int)$r['n'];
+        }
+    }
+    return ['Historical failed/unknown publication rows (all ledgers)'=>$uncertain,'Current in-flight publication rows (all ledgers)'=>$inflight,'Current processing/parent-ready rows (all ledgers)'=>$processing];
 }
