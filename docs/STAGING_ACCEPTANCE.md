@@ -108,3 +108,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2D acceptance (pending runtime)
 
 - [ ] Apply after V10.2C. Verify LinkedIn admin and AVAILABLE owner, X user context and expiry, hash/target/text-image exclusion, uncertain reconciliation and real visibility. No video acceptance.
+
+## V10.2E acceptance (pending runtime)
+
+- [ ] Apply after V10.2D. Verify actual HTTPS positive/negative GET/HEAD, expiry, fetch cap, revocation/pause, log redaction and no caching, private JPEG format/crop, real Meta container readiness/visibility. Explicit public authorization. No carousel/video acceptance.

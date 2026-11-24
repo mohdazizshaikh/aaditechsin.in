@@ -18,6 +18,7 @@ function igRegister(PDO $db,array $cfg,int $task,int $rev,string $manifest,strin
     $p=igTarget($cfg);if(!$p)throw new RuntimeException('Disabled');
     $r=igManifest($db,$task,$rev,$manifest);
     if(!hash_equals($r['video_hash'],$hash)||$bytes<12||$bytes>20*1024*1024||strlen($r['caption'])>900)throw new InvalidArgumentException('Asset mismatch');
+    $q=$db->prepare('SELECT id FROM growth_meta_images WHERE task_id=? AND revision=?');$q->execute([$task,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for image');
     $q=$db->prepare('SELECT id FROM growth_instagram_uploads WHERE task_id=? AND revision=?');$q->execute([$task,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Already staged');
     $db->prepare('INSERT INTO growth_instagram_uploads(task_id,revision,manifest_hash,video_hash,byte_count,page_id,target_id,caption) VALUES(?,?,?,?,?,?,?,?)')->execute([$task,$rev,$manifest,$hash,$bytes,$p['page'],$p['id'],$r['caption']]);
     $id=(int)$db->lastInsertId();growthAudit($db,$task,$rev,'ig_staged','private_cli');return $id;

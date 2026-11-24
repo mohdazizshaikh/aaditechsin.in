@@ -17,6 +17,7 @@ function metaSchedule(PDO $db,array $cfg,string $provider,int $id,int $rev,strin
     $q=$db->prepare("SELECT t.id FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id JOIN growth_creative_results r ON r.task_id=t.id AND r.revision=t.revision WHERE t.id=? AND t.revision=? AND t.status='approved' AND c.channel=? FOR UPDATE");
     $q->execute([$id,$rev,$provider]);if(!$q->fetchColumn())throw new InvalidArgumentException('Approved current matching revision required');
     if($provider==='facebook'){$q=$db->prepare('SELECT id FROM growth_facebook_media WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for media');}
+    if($provider==='threads'){$q=$db->prepare('SELECT id FROM growth_meta_images WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for image');}
     $q=$db->prepare('SELECT id FROM growth_meta_publications WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Already scheduled');
     $db->prepare('INSERT INTO growth_meta_publications(task_id,revision,provider,target_id,due_at) VALUES(?,?,?,?,?)')->execute([$id,$rev,$provider,$target,$date->format('Y-m-d H:i:s')]);
     $pub=(int)$db->lastInsertId();growthAudit($db,$id,$rev,'meta_scheduled','owner');return $pub;
@@ -27,7 +28,7 @@ function metaCommand(PDO $db,array $cfg,string $cmd):?string {
     if($cmd==='/metatarget'){
         $lines=['Configured targets (not live authorization):'];
         foreach(['facebook','threads'] as $provider){$p=metaTarget($cfg,$provider);$lines[]=$provider.': '.($p?$p['id']:'disabled');}
-        $lines[]='Instagram: not implemented (media transport pending).';return implode("\n",$lines);
+        $lines[]='Instagram: separate staged media workflows.';return implode("\n",$lines);
     }
     if($cmd==='/meta'){
         $lines=['Meta text publication ledger (not reach or delivery metrics):'];
