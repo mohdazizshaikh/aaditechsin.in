@@ -30,6 +30,10 @@ try{
     inCheck(str_contains(growthCommand($db,"/followup $id $day",$cfg),'Qualified opportunity required'),'Qualification gate');
     growthCommand($db,"/qualify $id",$cfg);
     inCheck(str_contains(growthCommand($db,"/followup $id $day",$cfg),'reminder set')&&str_contains(growthCommand($db,'/followups',$cfg),'1 due/overdue'),'Due reminder');
+    inCheck(str_contains(growthCommand($db,'/discoveryruns',$cfg),'ci-intel completed'),'Local run visible');
+    $cfg['growth']['telegram']=['enabled'=>true,'reports_enabled'=>true,'owner_user_id'=>'12345','owner_chat_id'=>'12345','bot_token'=>'123456:'.str_repeat('a',30),'daily_after_ist'=>'00:00'];
+    growthCommand($db,'/notifydaily on',$cfg);$report=reportClaim($db,$cfg,'daily',$now);
+    inCheck($report!==null&&str_contains($report['text'],'42 messages, 7 unread')&&str_contains($report['text'],'1 due/overdue'),'Daily intelligence digest');
     $s=growthCommand($db,'/intelligence',$cfg);inCheck(str_contains($s,'1 due/overdue')&&str_contains($s,'42 messages, 7 unread'),'Combined report');
     inCheck(str_contains(growthCommand($db,"/completefollowup $id",$cfg),'completed')&&str_contains(followSummary($db),'0 due/overdue'),'Complete');
     growthCommand($db,'/pause',$cfg);

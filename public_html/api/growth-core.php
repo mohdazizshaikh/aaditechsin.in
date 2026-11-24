@@ -118,7 +118,7 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     $creative=creativeCommand($db,$cfg,$command);
     if($creative!==null)return $creative;
     if($command==='/discoveryruns'){
-        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||($cfg['discovery']['feeds_enabled']??false)!==true)return 'External discovery feeds disabled or unconfigured.';
+        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||(($cfg['discovery']['feeds_enabled']??false)!==true&&($cfg['discovery']['local_batch_enabled']??false)!==true))return 'Discovery feeds and local batches disabled or unconfigured.';
         $lines=['Recent source runs (up to 10; not confirmed leads):'];
         foreach($db->query('SELECT source_id,status,imported_count,duplicate_count,skipped_count,error_code FROM growth_source_runs ORDER BY id DESC LIMIT 10')->fetchAll(PDO::FETCH_ASSOC) as $r)
             $lines[]=$r['source_id'].' '.$r['status'].' | imported '.$r['imported_count'].' duplicate '.$r['duplicate_count'].' skipped '.$r['skipped_count'].($r['error_code']!==''?' | '.$r['error_code']:'');
