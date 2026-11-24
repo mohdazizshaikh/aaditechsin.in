@@ -84,3 +84,7 @@ Owner-only existing HTTPS admin session and exact hash-verified referenced media
 ## V10.2G OAuth boundary
 
 Private configured credential and non-secret generation/deadline -> optional source-compatible expiry guard (mandatory for live release) -> existing identity preflight -> sanitized latest read-only health record. Local revoke blocks target resolution, not provider consent. No automatic refresh or secrets in DB. See V102G_OAUTH_HEALTH.md.
+
+## V10.2H intermediate media evidence
+
+LinkedIn initialization and uploaded image URN, X uploaded image ID are persisted before final publication. Failure to persist evidence stops send. Read-only reconciliation, no replay or provider token persistence. Video and carousel adapters remain pending. See V102H_MEDIA_RECOVERY.md.

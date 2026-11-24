@@ -89,3 +89,7 @@
 ## V10.2G OAuth security (pending runtime)
 
 - [ ] Private token config 0600, no secrets in DB/logs/Telegram/Git, mandatory lifecycle enforcement at release, fail closed on missing/expired/revoked metadata, manual paused rotation and actual provider revocation. Identity health is not scope or publish proof.
+
+## V10.2H media reconciliation security
+
+- [ ] Persist only validated intermediate resource ID, no signed URL/token or raw response. No automatic retry; inspect uncertain rows and reconcile provider-side. Test audit failure and worker interruption.
