@@ -50,3 +50,7 @@ Private owner Telegram webhook → reviewed growth tasks and audit ledger → se
 ## V10.1 Meta boundary
 
 Separate text-only Meta ledger for Facebook Pages and Threads. Explicit owner schedule, exact approved channel/revision/account, global pause at claim, private CLI identity check and fixed provider HTTPS endpoint. No retries after claim, ambiguous states require manual reconciliation; pause cannot revoke an in-flight send. Instagram and all media uploads remain pending. See V101_META.md.
+
+## V10.2 network boundary
+
+Separate LinkedIn organization, X user-context and GBP account/location text ledger, fixed HTTPS hosts and scoped destination preflight, owner-approved exact revisions, no uncertain retries. Unified /publications counts all three ledgers. Instagram and YouTube require actual authorized binary transfer and upload. See V102_NETWORKS.md.
