@@ -169,3 +169,7 @@
 ## V10.6L security (pending runtime)
 
 - [ ] Discovery cadence/recovery separately OFF, existing fixed HTTPS public-IP feed controls unchanged, growth-control lock for admission and each import, unresolved run blocks new fetch, recovered old run cannot continue importing. Explicit stopped-worker attestation and exact state digest before marking interrupted ledger failed; no opportunity mutation or automatic retry. No cron or real provider access. Local batch savepoint prevents partial writes when caller catches errors. Actual source consent and scheduling approval required.
+
+## V10.6M security (pending runtime)
+
+- [ ] Batch creation independently OFF; private CLI, exact matrix digest, bounded 126 requests per objective, pause/transaction lock, no auto approval or publishing. Twilio retention OFF; paused exact plan, hash-only replay table, no raw callbacks/contact/message data. Stable secret key and target namespace required for replay protection; no automatic key rotation, replay hash deletion or infinite-cap claim. Confirm real retention approval and isolated restore. Release check uses shared ledgers and rejects empty/negative/noninteger state summaries. No production changes.

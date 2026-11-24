@@ -202,3 +202,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6L acceptance (pending runtime)
 
 - [ ] Verify source authorization, exact feed schema and matching rules, source admission lock, pause during fetch and between records, cadence across failed/completed attempts, unresolved-run blocking, local batch rollback and operator recovery with stale/changed digest refusal. Confirm actual workers stopped and imported evidence reviewed, no automatic retry or outreach. Verify actual scheduling, source terms, hosted backup/restore and staging separately.
+
+## V10.6M acceptance (pending runtime)
+
+- [ ] Verify 126 service/channel combinations, exact objective plan, stale digest, existing/rejected cells, pause, transaction rollback, owner-only inventory and separate generation/review/publication. Verify Twilio receipt metadata compaction, retained keyed replay hash, duplicate replay after cleanup, cutoff/cap and restored tables. Confirm real callback configuration, approved retention, trusted local AI quality, actual workers stopped and hosted restore before activation. 126 synthetic cases are test coverage, not 126 deployed features or generated marketing assets.

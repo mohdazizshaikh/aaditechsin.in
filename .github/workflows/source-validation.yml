@@ -39,6 +39,7 @@ jobs:
           php tests/discovery_rules.php
           php tests/discovery_feed.php
           php tests/creative_rules.php
+          php tests/creative_batch_matrix.php
           php tests/social_rules.php
           php tests/meta_rules.php
           php tests/network_rules.php
@@ -131,6 +132,7 @@ jobs:
           php tests/growth_database.php
           php tests/discovery_rules.php --database
           php tests/discovery_feed.php --database
+          php tests/creative_batch_matrix.php --database
           php tests/creative_rules.php --database
           php tests/social_rules.php --database
           php tests/meta_rules.php --database
