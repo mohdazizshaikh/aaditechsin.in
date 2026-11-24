@@ -22,7 +22,7 @@ return [
     ],
     'seo' => ['enabled' => false], // Source-only private report summaries.
     'expert' => ['enabled' => false], // Owner-only technical drafts.
-    'media_upload' => ['enabled' => false, 'facebook_enabled' => false, 'instagram' => ['enabled' => false, 'page_id' => 'REPLACE_WITH_PAGE_ID', 'account_id' => 'REPLACE_WITH_IG_ID', 'access_token' => 'REPLACE_WITH_AUTHORIZED_PAGE_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_VERSION'], 'private_root' => 'REPLACE_WITH_PRIVATE_0700_DIRECTORY', 'youtube' => ['enabled' => false, 'channel_id' => 'REPLACE_WITH_CHANNEL_ID', 'access_token' => 'REPLACE_WITH_AUTHORIZED_TOKEN']],
+    'media_upload' => ['enabled' => false, 'linkedin_enabled' => false, 'x_enabled' => false, 'facebook_enabled' => false, 'instagram' => ['enabled' => false, 'page_id' => 'REPLACE_WITH_PAGE_ID', 'account_id' => 'REPLACE_WITH_IG_ID', 'access_token' => 'REPLACE_WITH_AUTHORIZED_PAGE_TOKEN', 'api_version' => 'REPLACE_WITH_VERIFIED_VERSION'], 'private_root' => 'REPLACE_WITH_PRIVATE_0700_DIRECTORY', 'youtube' => ['enabled' => false, 'channel_id' => 'REPLACE_WITH_CHANNEL_ID', 'access_token' => 'REPLACE_WITH_AUTHORIZED_TOKEN']],
     'media' => ['enabled' => false], // Private local media, metadata only.
     'creative_transport' => ['enabled' => false, 'token_sha256' => 'REPLACE_WITH_WORKER_TOKEN_SHA256'],
     'creative' => ['enabled' => false], // Local model review workflow only.

@@ -20,6 +20,7 @@ function networkSchedule(PDO $db,array $cfg,string $provider,int $id,int $rev,st
     if(!$date||$date->format('Y-m-d\TH:i\Z')!==$when||$date<$now||$date>$now->modify('+30 days'))throw new InvalidArgumentException('Schedule outside window');
     $q=$db->prepare("SELECT t.id FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id JOIN growth_creative_results r ON r.task_id=t.id AND r.revision=t.revision WHERE t.id=? AND t.revision=? AND t.status='approved' AND c.channel=? FOR UPDATE");
     $q->execute([$id,$rev,$provider]);if(!$q->fetchColumn())throw new InvalidArgumentException('Approved current matching revision required');
+    if(in_array($provider,['linkedin','x'],true)){$q=$db->prepare('SELECT id FROM growth_network_media WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for media');}
     $q=$db->prepare('SELECT id FROM growth_network_publications WHERE task_id=? AND revision=?');$q->execute([$id,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Already scheduled');
     $db->prepare('INSERT INTO growth_network_publications(task_id,revision,provider,target_id,due_at) VALUES(?,?,?,?,?)')->execute([$id,$rev,$provider,$target,$date->format('Y-m-d H:i:s')]);
     $pub=(int)$db->lastInsertId();growthAudit($db,$id,$rev,'network_scheduled','owner');return $pub;

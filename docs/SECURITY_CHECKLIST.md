@@ -71,3 +71,7 @@
 ## V10.2C media security (pending live)
 
 - [ ] No public asset URLs, exact in-memory bytes, fixed host, private storage, exclusive revision reservation, explicit Page/type approval, bounded upload, manual uncertain reconciliation. Verify actual file rights, provider specifications and retention.
+
+## V10.2D image security (pending runtime)
+
+- [ ] Exact image hash, size, scoped upload URL, no redirects or token logs, owner/expiry check, public approval, exclusive revision, no blind retries.
