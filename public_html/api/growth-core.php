@@ -43,22 +43,32 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
         (string)$m['from']['id']===$owner&&(string)$m['chat']['id']===$chat&&
         is_string($m['text']??null)&&strlen($m['text'])<=200;
 }
-function growthCommand(PDO $db,string $command): string {
+function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.1 owner controls\n/today /health /approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; no publishing or outreach connector.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.2 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; no publishing or outreach connector.";
     if(in_array($command,['/pause','/resume'],true)){
         $paused=$command==='/pause'?1:0;
         $db->prepare('UPDATE growth_control SET paused=? WHERE id=1')->execute([$paused]);
         growthAudit($db,null,null,$paused?'paused':'resumed','owner');
         return $paused?'Growth control paused.':'Growth control resumed; external execution is still not implemented.';
     }
-    if($command==='/health'||$command==='/today'){
+    if(in_array($command,['/today','/health','/leads','/visitors','/pages','/services','/sources','/calls'],true)){
+        require_once __DIR__.'/analytics-core.php';
+        if(in_array($command,['/visitors','/pages','/services','/sources','/calls'],true))return analyticsReport($db,$cfg,$command);
+        $tz=new DateTimeZone('Asia/Kolkata');$utc=new DateTimeZone('UTC');$start=new DateTimeImmutable('today',$tz);
+        $q=$db->prepare('SELECT source,COUNT(*) total FROM leads WHERE created_at>=? AND created_at<? GROUP BY source');
+        $q->execute([$start->setTimezone($utc)->format('Y-m-d H:i:s'),$start->modify('+1 day')->setTimezone($utc)->format('Y-m-d H:i:s')]);
+        $rows=$q->fetchAll(PDO::FETCH_ASSOC);
+        $lines=['Aaditechs V9.2 — '.$start->format('Y-m-d').' IST','Saved leads today: '.array_sum(array_column($rows,'total'))];
+        foreach($rows as $r)$lines[]='Lead intake '.$r['source'].': '.$r['total'];
+        if($command==='/leads')return implode("\n",$lines)."\nSaved inquiries, not won projects or marketing-source attribution.";
         $paused=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
         if($paused===false)throw new RuntimeException('Control missing');
-        $lines=['Aaditechs V9.1','Total saved leads: '.(int)$db->query('SELECT COUNT(*) FROM leads')->fetchColumn(),'Growth control: '.((int)$paused?'PAUSED':'RESUMED')];
-        foreach($db->query('SELECT status,COUNT(*) AS total FROM growth_tasks GROUP BY status')->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]=$r['status'].': '.$r['total'];
-        $lines[]='Visitors, calls, reach, social, outbound sales and daily attribution: not connected.';
+        $lines[]='Growth control: '.((int)$paused?'PAUSED':'RESUMED');
+        foreach($db->query('SELECT status,COUNT(*) AS total FROM growth_tasks GROUP BY status')->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='Task inventory '.$r['status'].': '.$r['total'];
+        $lines[]=analyticsReport($db,$cfg,'/visitors');
+        $lines[]='Actual calls, messages, reach, social, outbound sales and external errors: not connected.';
         $lines[]='Database query succeeded; not a full system health test.';
         return implode("\n",$lines);
     }

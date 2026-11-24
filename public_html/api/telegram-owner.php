@@ -16,7 +16,7 @@ try{
     $db=opsDb($cfg);$db->beginTransaction();
     $q=$db->prepare('INSERT IGNORE INTO growth_telegram_updates(update_id) VALUES(?)');$q->execute([$u['update_id']]);
     if($q->rowCount()!==1){$db->commit();jsonResponse(200,['ok'=>true]);}
-    $reply=growthCommand($db,$u['message']['text']);
+    $reply=growthCommand($db,$u['message']['text'],$cfg);
     $db->commit();
     // Direct webhook response. Telegram delivery is NOT confirmed.
     jsonResponse(200,['method'=>'sendMessage','chat_id'=>$cfg['growth']['telegram']['owner_chat_id'],'text'=>$reply]);

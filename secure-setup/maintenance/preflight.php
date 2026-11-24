@@ -116,6 +116,9 @@ $flags = [
     'portal.enabled' => ['portal', 'enabled'],
     'google.enabled' => ['google', 'enabled'],
     'mail.enabled' => ['mail', 'enabled'],
+    'growth.enabled' => ['growth', 'enabled'],
+    'growth.telegram.enabled' => ['growth', 'telegram', 'enabled'],
+    'analytics.enabled' => ['analytics', 'enabled'],
 ];
 foreach ($flags as $name => $keys) {
     $enabled = setValue($config, $keys) === true;
@@ -156,6 +159,15 @@ if (setValue($config, ['mail', 'enabled']) === true) {
 if (setValue($config, ['google', 'enabled']) === true) {
     warning('Google Business Profile approval and OAuth authorization must be independently verified');
 }
+if (setValue($config, ['analytics','enabled']) === true) {
+    $salt = setValue($config, ['analytics','salt']);
+    outcome('Independent analytics salt configured', hasPrivateValue($salt) && strlen($salt)>=32);
+    outcome('Analytics requires enabled database', setValue($config,['database','enabled'])===true);
+    warning('Review analytics consent and retention before enabling browser collection');
+}
+if (setValue($config, ['growth','enabled']) === true) {
+    outcome('Growth requires enabled database', setValue($config,['database','enabled'])===true);
+}
 if ($checkDb) {
     if (setValue($config, ['database', 'enabled']) !== true || !extension_loaded('pdo_mysql')) {
         outcome('Read-only DB smoke test prerequisites', false);
@@ -169,7 +181,7 @@ if ($checkDb) {
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
             outcome('Read-only DB SELECT 1', $pdo->query('SELECT 1')->fetchColumn() !== false);
-            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox'] as $table) {
+            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox', 'growth_tasks', 'growth_audit', 'growth_control', 'growth_telegram_updates', 'growth_analytics_events', 'growth_analytics_budget'] as $table) {
                 $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?');
                 $stmt->execute([$table]);
                 outcome('Database table present: ' . $table, (int)$stmt->fetchColumn() >= 1);

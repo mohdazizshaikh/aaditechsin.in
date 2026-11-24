@@ -17,7 +17,7 @@ try{
             if(!is_int($input['id']??null)||!is_int($input['revision']??null)||!is_string($input['draft']??null))throw new InvalidArgumentException('Invalid replacement');
             $reply=growthReplace($db,$input['id'],$input['revision'],$input['draft'])?'Revised draft pending review':'No matching regeneration request';
         }
-    }elseif($mode==='--today')$reply=growthCommand($db,'/today');
+    }elseif($mode==='--today')$reply=growthCommand($db,'/today',$cfg);
     else throw new InvalidArgumentException('Unsupported command');
     $db->commit();echo $reply."\n";
 }catch(Throwable $e){
