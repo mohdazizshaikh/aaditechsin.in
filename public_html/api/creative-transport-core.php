@@ -41,3 +41,30 @@ function creativeLeaseFinish(PDO $db,int $id,int $rev,string $token,?array $resu
     $db->prepare("UPDATE growth_creative_leases SET status=?,result_hash=? WHERE task_id=? AND revision=?")->execute([$state,$hash,$id,$rev]);
     return ['status'=>$result===null?'failed':'pending_review'];
 }
+
+function creativeTransportCommand(PDO $db,array $cfg,string $command):?string {
+    if($command!=='/creativeworker'&&!preg_match('/^\\/retrycreative(?: |$)/D',$command))return null;
+    if(!creativeTransportEnabled($cfg))return 'Creative transport disabled or unconfigured.';
+    if($command==='/creativeworker'){
+        $lines=['Creative transport (latest pending generation tasks, not PC connectivity):'];
+        $q=$db->query("SELECT t.id,t.revision,l.attempts,l.status,l.expires_at<=UTC_TIMESTAMP() AS expired FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id LEFT JOIN growth_creative_leases l ON l.task_id=t.id AND l.revision=t.revision WHERE t.status='regeneration_requested' ORDER BY t.id DESC LIMIT 10");
+        foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r){
+            $n=(int)($r['attempts']??0);
+            $state=$r['status']??'unclaimed';
+            if($state==='leased'&&(int)$r['expired']===1)$state='expired';
+            if($n>=3&&in_array($state,['failed','expired'],true))$state='exhausted — /retrycreative '.$r['id'].' '.$r['revision'];
+            $lines[]='#'.$r['id'].' rev '.$r['revision'].' attempts '.$n.'/3 | '.$state;
+        }
+        return count($lines)===1?'No pending creative generation tasks.':implode("\n",$lines);
+    }
+    if(!preg_match('/^\\/retrycreative ([1-9][0-9]{0,14}) ([1-9][0-9]{0,8})$/D',$command,$m))return 'Use /retrycreative ID REV.';
+    $paused=$db->query('SELECT paused FROM growth_control WHERE id=1 FOR UPDATE')->fetchColumn();
+    if($paused===false||(int)$paused!==0)return 'Growth paused.';
+    $id=(int)$m[1];$rev=(int)$m[2];
+    $q=$db->prepare("SELECT t.id FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id JOIN growth_creative_leases l ON l.task_id=t.id AND l.revision=t.revision WHERE t.id=? AND t.revision=? AND t.status='regeneration_requested' AND l.attempts>=3 AND (l.status='failed' OR (l.status='leased' AND l.expires_at<=UTC_TIMESTAMP())) FOR UPDATE");
+    $q->execute([$id,$rev]);
+    if(!$q->fetchColumn())return 'Task not exhausted at that revision. Refresh /creativeworker.';
+    $db->prepare("UPDATE growth_tasks SET revision=revision+1 WHERE id=? AND revision=? AND status='regeneration_requested'")->execute([$id,$rev]);
+    growthAudit($db,$id,$rev,'creative_retry','owner');
+    return 'New creative revision requested. Previous lease cannot submit a draft.';
+}

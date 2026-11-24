@@ -57,6 +57,12 @@ try{
         creativeCheck(creativeLeaseFinish($db,$id3,1,$c['lease'],null)['status']==='failed','Report failed generation');
     }
     creativeCheck(creativeLeaseClaim($db)===['status'=>'empty'],'Bounded attempts');
+    creativeCheck(str_contains(growthCommand($db,'/creativeworker',$tcfg),'exhausted'),'Owner sees exhausted job');
+    creativeCheck(str_contains(growthCommand($db,"/retrycreative $id3 1",$tcfg),'New creative revision'),'Owner can retry exhausted task');
+    $new=creativeLeaseClaim($db);
+    creativeCheck($new['job']['task_id']===$id3&&$new['job']['revision']===2,'Retry increments revision');
+    creativeCheck(creativeLeaseFinish($db,$id3,1,$c['lease'],array_replace($result,['task_id'=>$id3]))['status']==='conflict','Old revision cannot replace draft'); 
+    creativeCheck(creativeLeaseFinish($db,$id3,2,$new['lease'],array_replace($result,['task_id'=>$id3,'revision'=>2]))['status']==='pending_review','New revision completes');
     $id4=creativeCreate($db,'infrastructure','linkedin','education');
     $old=creativeLeaseClaim($db);
     $db->prepare("UPDATE growth_creative_leases SET expires_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE task_id=?")->execute([$id4]);
