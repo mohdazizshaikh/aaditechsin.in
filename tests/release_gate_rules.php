@@ -6,7 +6,7 @@ $root=dirname(__DIR__);$contract=json_decode(file_get_contents($root.'/secure-se
 releaseSourceIntegrity($root,$contract);
 $bad=$contract;$bad['source_git_blob_sha1']['secure-setup/schema.sql']=str_repeat('0',40);
 try{releaseSourceIntegrity($root,$bad);throw new LogicException('Drift accepted');}catch(RuntimeException $e){}
-rgCheck(releaseWorkerClear(['a'=>0,'b'=>0])&&!releaseWorkerClear(['a'=>1,'b'=>0]),'Block state');
+rgCheck(releaseWorkerClear(['a'=>0,'b'=>0])&&!releaseWorkerClear(['a'=>1,'b'=>0])&&!releaseWorkerClear([])&&!releaseWorkerClear(['a'=>1,'b'=>-1])&&!releaseWorkerClear(['a'=>'0']),'Block state');
 if(($argv[1]??'')!=='--database'){echo "Release source integrity and worker-state rules: PASS\n";exit;}
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1'||getenv('CI_DB_PASSWORD')!=='ci_only_not_real_password')exit(2);
 $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aaditechs_ci;charset=utf8mb4','aaditechs_ci',getenv('CI_DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false]);

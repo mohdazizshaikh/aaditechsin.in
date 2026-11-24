@@ -2,12 +2,13 @@
 declare(strict_types=1);
 require dirname(__DIR__).'/public_html/api/twilio-inbound-core.php';
 require dirname(__DIR__).'/secure-setup/maintenance/whatsapp-retention-lib.php';
+require dirname(__DIR__).'/secure-setup/maintenance/twilio-retention-lib.php';
 require dirname(__DIR__).'/public_html/api/intelligence-core.php';
 function tiCheck(bool $ok,string $m):void{if(!$ok)throw new RuntimeException($m);}
 function tiBlocked(callable $fn):void{try{$fn();}catch(RuntimeException|InvalidArgumentException $e){return;}throw new LogicException('Expected refusal');}
 $now=new DateTimeImmutable('now',new DateTimeZone('UTC'));$day=$now->modify('-1 day')->format('Y-m-d');
 $base=['enabled'=>true,'authorized'=>true,'log_redaction_verified'=>true,'account'=>'AC'.str_repeat('a',32),'to'=>'+12025550101','auth_token'=>str_repeat('b',32),'dedupe_key_hex'=>str_repeat('c',64)];
-$cfg=['growth'=>['enabled'=>true],'communications'=>['enabled'=>true,'whatsapp_retention_enabled'=>true,'twilio_inbound'=>['sms'=>$base+['url'=>'https://example.invalid/api/twilio-sms-inbound.php'],'calls'=>$base+['url'=>'https://example.invalid/api/twilio-voice-inbound.php']]]];
+$cfg=['growth'=>['enabled'=>true],'communications'=>['enabled'=>true,'whatsapp_retention_enabled'=>true,'twilio_retention_enabled'=>true,'twilio_inbound'=>['sms'=>$base+['url'=>'https://example.invalid/api/twilio-sms-inbound.php'],'calls'=>$base+['url'=>'https://example.invalid/api/twilio-voice-inbound.php']]]];
 $s=twInboundConfig($cfg,'sms');$v=twInboundConfig($cfg,'calls');
 tiCheck($s!==null&&$v!==null&&twInboundConfig([],'sms')===null,'Default off');
 $sign=static function(array $p,array $fields):array{ksort($fields,SORT_STRING);$data=$p['url'];foreach($fields as $k=>$x)$data.=$k.$x;return [http_build_query($fields,'','&',PHP_QUERY_RFC3986),base64_encode(hash_hmac('sha1',$data,$p['auth_token'],true))];};
@@ -32,6 +33,7 @@ try{
     $summary=twInboundSummary($db,$cfg,$now);tiCheck(str_contains($summary,'sms: 1 distinct recorded callbacks')&&str_contains($summary,'calls: 1 distinct recorded callbacks')&&!str_contains($summary,$base['to']),'Counts only');
     tiCheck(str_contains(growthCommand($db,'/twinbound',$cfg),'distinct recorded callbacks'),'Owner command');
     tiBlocked(static fn()=>waRetentionPlan($db,$cfg,$now));
+    tiBlocked(static fn()=>twRetentionPlan($db,$cfg,$now));
     growthCommand($db,'/pause',$cfg);tiBlocked(static fn()=>twInboundRecord($db,$cfg,'sms',$raw,$sig,$now));
     $q=$db->prepare('INSERT INTO growth_whatsapp_inbound(event_hash,account_hash,day_utc) VALUES(?,?,?)');
     $old=str_repeat('1',64);$keep=str_repeat('2',64);$extra=str_repeat('3',64);$acct=str_repeat('4',64);
@@ -41,5 +43,18 @@ try{
     $plan=waRetentionPlan($db,$cfg,$now);tiCheck(waRetentionApply($db,$cfg,$plan['digest'],$now)===count($plan['rows']),'Exact cleanup');
     $q=$db->prepare('SELECT COUNT(*) FROM growth_whatsapp_inbound WHERE event_hash=?');$q->execute([$keep]);tiCheck((int)$q->fetchColumn()===1,'Boundary preserved');
     $q=$db->prepare('SELECT COUNT(*) FROM growth_twilio_inbound WHERE event_hash=?');$q->execute([$h]);tiCheck((int)$q->fetchColumn()===1,'Twilio replay digest preserved');
+    $future=$now->modify('+30 days');$plan=twRetentionPlan($db,$cfg,$future);
+    tiCheck(in_array($h,array_column($plan['rows'],'event_hash'),true),'Eligible callback');
+    tiBlocked(static fn()=>twRetentionApply($db,$cfg,str_repeat('0',64),$future));
+    $keepHash=str_repeat('8',64);$q=$db->prepare("INSERT INTO growth_twilio_inbound(event_hash,account_hash,channel,day_utc) VALUES(?,?,'sms',?)");
+    $q->execute([$keepHash,twInboundAccount($s),$now->format('Y-m-d')]);
+    $q->execute([str_repeat('9',64),twInboundAccount($s),$day]);
+    tiBlocked(static fn()=>twRetentionApply($db,$cfg,$plan['digest'],$future));
+    $plan=twRetentionPlan($db,$cfg,$future);
+    tiCheck(!in_array($keepHash,array_column($plan['rows'],'event_hash'),true),'Boundary');
+    tiCheck(twRetentionApply($db,$cfg,$plan['digest'],$future)===count($plan['rows']),'Compaction');
+    $q=$db->prepare('SELECT COUNT(*) FROM growth_twilio_replay WHERE event_hash=?');$q->execute([$h]);tiCheck((int)$q->fetchColumn()===1,'Replay tombstone');
+    $q=$db->prepare('SELECT COUNT(*) FROM growth_twilio_inbound WHERE event_hash=?');$q->execute([$h]);tiCheck((int)$q->fetchColumn()===0,'Receipt metadata removed');
+    growthCommand($db,'/resume',$cfg);tiCheck(!twInboundRecord($db,$cfg,'sms',$raw,$sig,$future),'Old signed callback blocked after compaction');
     $db->rollBack();echo "Synthetic Twilio callbacks and WhatsApp retention: PASS\n";
 }catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Inbound/retention test failed: '.$e->getMessage()."\n");exit(1);}

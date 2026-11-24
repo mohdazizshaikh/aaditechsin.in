@@ -37,7 +37,8 @@
     "2026-11-24-v106g.sql",
     "2026-11-24-v106h.sql",
     "2026-11-24-v106i.sql",
-    "2026-11-25-v106j.sql"
+    "2026-11-25-v106j.sql",
+    "2026-11-25-v106m.sql"
   ],
   "tables": {
     "leads": [
@@ -546,6 +547,9 @@
       "report_hash",
       "counts_json",
       "captured_at"
+    ],
+    "growth_twilio_replay": [
+      "event_hash"
     ]
   },
   "source_git_blob_sha1": {
@@ -577,7 +581,7 @@
     "secure-setup/migrations/2026-11-24-v97.sql": "fd7a96fe364d5a38cc2cdb2ac979525a89826465",
     "secure-setup/migrations/2026-11-24-v98.sql": "3c4aea432fc9dd7a3de48b9a67cb2da9c8bddc9d",
     "secure-setup/migrations/2026-11-24-v99.sql": "7cb363b74d5ef55bc7ab95ee19771f94e490f538",
-    "secure-setup/schema.sql": "86d10948114aa26f88eb9eade4fefe05ddb82808",
+    "secure-setup/schema.sql": "b3bdf3c10984f473094ca01dab4ece390f37d2de",
     "tests/fixtures/schema-v96.sql": "46d52307d885813b1db73b969304ec96d323e64c",
     "secure-setup/migrations/2026-11-24-v106d.sql": "be253fd75692ae648a95c4f5f2f1e1dc7fa8c258",
     "secure-setup/migrations/2026-11-24-v106e.sql": "5bc5d0fc79cbddf114ddeaa68dc65d39afbb533b",
@@ -585,6 +589,7 @@
     "secure-setup/migrations/2026-11-24-v106g.sql": "89ee239e4bac8797eb26dee0a68a9c4dcda67e2e",
     "secure-setup/migrations/2026-11-24-v106h.sql": "3238235de29fee05efbe37b33600bce3061ceb68",
     "secure-setup/migrations/2026-11-24-v106i.sql": "a5b2b1f871ee3e3b6a73ca2a433be4c319aa4d01",
-    "secure-setup/migrations/2026-11-25-v106j.sql": "bdfd14c39724fa1ce8c4ce1f0e9aeb7f9b20a6c3"
+    "secure-setup/migrations/2026-11-25-v106j.sql": "bdfd14c39724fa1ce8c4ce1f0e9aeb7f9b20a6c3",
+    "secure-setup/migrations/2026-11-25-v106m.sql": "b5cee97afb1543602c9df8b48c7796b032cfd755"
   }
 }
