@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/growth-core.php';
+require_once __DIR__.'/creative-core.php';
 function communicationsEnabled(array $cfg):bool{return ($cfg['growth']['enabled']??false)===true&&($cfg['communications']['enabled']??false)===true;}
 function communicationsValidate(array $row,?DateTimeImmutable $now=null):array{
     $keys=['channel','day_utc','received','answered','missed'];
