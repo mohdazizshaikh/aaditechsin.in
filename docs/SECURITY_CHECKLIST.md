@@ -109,3 +109,7 @@
 ## V10.2I/J security (pending runtime)
 
 - [ ] Keep transfer config, SSH key, known_hosts and local artifacts private, verify host fingerprint out of band, dedicated least-privilege SFTP inbox user and no password/agent/proxy, no automatic retry or deletion. Confirm server path cannot expose webroot and permissions/quotas enforced. OAuth alerts contain only sanitized local deadline/health, not secrets or provider responses. Keep live features OFF until accepted.
+
+## V10.2K/V10.3 security (pending runtime)
+
+- [ ] Separate Telegram business bot and owner bot, bounded fixed-host HTTPS multipart without redirects/proxy, exact channel verification, explicit approval, no automatic retry, no raw tokens or response logging. Communications: aggregate counts only, explicit authorized import, no personal identifiers, contents, recordings, credential harvesting or outreach. Verify lawful source authorization and retention before activation.

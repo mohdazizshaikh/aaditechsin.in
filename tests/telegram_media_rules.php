@@ -42,5 +42,5 @@ try{
     $r=tgMediaClaim($db,$cfg,$up);tgMediaFinish($db,$r,['status'=>'unknown','receipt'=>null,'error'=>'ambiguous_response']);
     try{tgMediaClaim($db,$cfg,$up);throw new LogicException('Retry accepted');}catch(RuntimeException $e){}
     tgCheck(str_contains(growthCommand($db,'/publications',$cfg),'telegram unknown: 1'),'Unified reporting');
-    $db->rollBack();echo "Synthetic Facebook media reservation and approval: PASS\n";
-}catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Facebook media test failed: '.$e->getMessage()."\n");exit(1);}
+    $db->rollBack();echo "Synthetic Telegram media reservation and approval: PASS\n";
+}catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Telegram media test failed: '.$e->getMessage()."\n");exit(1);}
