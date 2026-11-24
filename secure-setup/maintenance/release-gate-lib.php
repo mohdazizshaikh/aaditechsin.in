@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/reconciliation-lib.php';
 function releaseBlobHash(string $raw):string{return sha1('blob '.strlen($raw)."\0".$raw);}
 function releaseSourceIntegrity(string $root,array $contract):void{
     $expected=$contract['source_git_blob_sha1']??null;
@@ -30,6 +31,7 @@ function releaseWorkerState(PDO $db):array{
             elseif($r['status']==='unknown')$out['publication_unknown']+=(int)$r['n'];
         }
     }
+    $out['publication_unknown']=recUnknownCounts($db)['unreviewed'];
     return $out;
 }
 function releaseWorkerClear(array $state):bool{return array_sum($state)===0;}

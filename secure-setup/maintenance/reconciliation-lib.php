@@ -20,7 +20,7 @@ function recState(PDO $db,string $ledger,int $id,bool $lock=false):array{
 }
 function recRecord(PDO $db,array $cfg,string $ledger,int $id,string $digest,string $outcome,string $evidence):void{
     if(($cfg['reconciliation']['enabled']??false)!==true)throw new RuntimeException('Disabled');recPause($db);
-    if(!in_array($outcome,['confirmed_present','confirmed_absent','unresolved'],true)||!preg_match('/^[a-f0-9]{64}$/D',$digest)||!preg_match('/^[a-f0-9]{64}$/D',$evidence))throw new InvalidArgumentException('Invalid review');
+    if(!in_array($outcome,['confirmed_present','confirmed_absent'],true)||!preg_match('/^[a-f0-9]{64}$/D',$digest)||!preg_match('/^[a-f0-9]{64}$/D',$evidence))throw new InvalidArgumentException('Invalid review');
     $r=recState($db,$ledger,$id,true);if(!hash_equals($r['state_hash'],$digest))throw new RuntimeException('State changed');
     $q=$db->prepare('INSERT INTO growth_publication_reviews(ledger,publication_id,state_hash,evidence_hash,outcome) VALUES(?,?,?,?,?)');$q->execute([$ledger,$id,$digest,$evidence,$outcome]);
     growthAudit($db,$r['task_id'],$r['revision'],'publication_review','private_cli');

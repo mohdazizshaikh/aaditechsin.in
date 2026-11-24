@@ -50,6 +50,8 @@ jobs:
           php tests/credential_retention_rules.php
           php tests/communications_bridge_rules.php
           php tests/release_gate_rules.php
+          php tests/reconciliation_rules.php
+          python3 tests/backup_verify.py
           php tests/intelligence_rules.php
           php tests/dashboard_rules.php
           php tests/network_media_rules.php
@@ -130,6 +132,7 @@ jobs:
           php tests/credential_retention_rules.php --database
           php tests/communications_bridge_rules.php --database
           php tests/release_gate_rules.php --database
+          php tests/reconciliation_rules.php --database
           php tests/intelligence_rules.php --database
           php tests/dashboard_rules.php --database
           php tests/network_media_rules.php --database

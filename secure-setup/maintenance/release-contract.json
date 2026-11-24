@@ -30,7 +30,8 @@
     "2026-11-24-v102h2.sql",
     "2026-11-24-v102h3.sql",
     "2026-11-24-v102k.sql",
-    "2026-11-24-v103a-v104.sql"
+    "2026-11-24-v103a-v104.sql",
+    "2026-11-24-v106d.sql"
   ],
   "tables": {
     "leads": [
@@ -476,6 +477,14 @@
       "due_on",
       "status",
       "updated_at"
+    ],
+    "growth_publication_reviews": [
+      "ledger",
+      "publication_id",
+      "state_hash",
+      "evidence_hash",
+      "outcome",
+      "reviewed_at"
     ]
   },
   "source_git_blob_sha1": {
@@ -507,7 +516,8 @@
     "secure-setup/migrations/2026-11-24-v97.sql": "fd7a96fe364d5a38cc2cdb2ac979525a89826465",
     "secure-setup/migrations/2026-11-24-v98.sql": "3c4aea432fc9dd7a3de48b9a67cb2da9c8bddc9d",
     "secure-setup/migrations/2026-11-24-v99.sql": "7cb363b74d5ef55bc7ab95ee19771f94e490f538",
-    "secure-setup/schema.sql": "1b0be3bf9083761a0191ca6851be561ce825ee52",
-    "tests/fixtures/schema-v96.sql": "46d52307d885813b1db73b969304ec96d323e64c"
+    "secure-setup/schema.sql": "d7900d8bf8569bcb7d6dcfa0d9f68ea0f2925050",
+    "tests/fixtures/schema-v96.sql": "46d52307d885813b1db73b969304ec96d323e64c",
+    "secure-setup/migrations/2026-11-24-v106d.sql": "be253fd75692ae648a95c4f5f2f1e1dc7fa8c258"
   }
 }
