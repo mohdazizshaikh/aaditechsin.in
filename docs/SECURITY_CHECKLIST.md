@@ -173,3 +173,7 @@
 ## V10.6M security (pending runtime)
 
 - [ ] Batch creation independently OFF; private CLI, exact matrix digest, bounded 126 requests per objective, pause/transaction lock, no auto approval or publishing. Twilio retention OFF; paused exact plan, hash-only replay table, no raw callbacks/contact/message data. Stable secret key and target namespace required for replay protection; no automatic key rotation, replay hash deletion or infinite-cap claim. Confirm real retention approval and isolated restore. Release check uses shared ledgers and rejects empty/negative/noninteger state summaries. No production changes.
+
+## V10.6N security (pending runtime)
+
+- [ ] Verify limit-bound v2 plans, pause and feature flags, UTF-8/catalog refusals and result collision rollback in synthetic CI and isolated staging. No old v1 plan reuse, auto approval or publication. No actual provider calls or production changes.

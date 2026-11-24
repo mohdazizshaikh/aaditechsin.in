@@ -168,3 +168,7 @@ Remote feed admission locks growth control, blocks unresolved source runs and op
 ## V10.6M bulk coverage and replay retention
 
 One independently enabled private creative planner computes missing service/channel cells for one objective across the 14×9 catalog. Paused growth blocks plan/apply; exact matrix digest and global growth lock serialize creation. Existing tasks in any status prevent duplicate coverage, savepoint makes batch atomic; all new requests remain regeneration_requested and require separate generation/review/publication gates. Owner /coveragegrid OBJECTIVE reports coverage, not publishing. Twilio historical cleanup moves eligible keyed replay digests into a dedicated hash-only table and removes associated day/account/channel metadata transactionally, retaining duplicate protection under the same stable key and target. Shared reconciliation ledger registry used by release worker-state check. See V106M_BULK_COVERAGE_RELEASE.md.
+
+## V10.6N bounded creative review
+
+Private batch plan binds full inventory, chosen objective and chunk limit (1–126); applies only reviewed selected cells. Creative result import uses a savepoint for draft, result and audit consistency, and validates UTF-8 and stored catalog dimensions. No new schema, external calls or publication. See V106N_BOUNDED_CREATIVE_REVIEW.md.

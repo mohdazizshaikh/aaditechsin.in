@@ -206,3 +206,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6M acceptance (pending runtime)
 
 - [ ] Verify 126 service/channel combinations, exact objective plan, stale digest, existing/rejected cells, pause, transaction rollback, owner-only inventory and separate generation/review/publication. Verify Twilio receipt metadata compaction, retained keyed replay hash, duplicate replay after cleanup, cutoff/cap and restored tables. Confirm real callback configuration, approved retention, trusted local AI quality, actual workers stopped and hosted restore before activation. 126 synthetic cases are test coverage, not 126 deployed features or generated marketing assets.
+
+## V10.6N acceptance (pending)
+
+- [ ] In isolated staging only, verify plan limit 1–126, selected cell count, changed digest/limit/objective refusal, rejection and regenerated revision behavior, invalid UTF-8 and atomic failure; confirm no generation/publishing from batch CLI. Synthetic CI is not hosted acceptance. See V106N_BOUNDED_CREATIVE_REVIEW.md.

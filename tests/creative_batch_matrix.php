@@ -37,5 +37,50 @@ try{
     $matrix=creativeBatchMatrix($db,$cfg,$objective);
     foreach($matrix as $rows)foreach($rows as $cell)cbCheck($cell['approved']===1&&array_sum($cell)===1,'One approved synthetic task per cell');
     cbCheck(str_contains(growthCommand($db,'/coveragegrid case-planning',$cfg),'9/9 channels requested, 9 with approved draft'),'Owner coverage');
-    $db->rollBack();echo "Synthetic service/channel workflows: $cases/126 PASS (rolled back; no model calls or publication)\n";
+    // A different objective exercises controlled chunks, negative inputs and review paths.
+    $objective='awareness';$reviewed=0;$seen=[];$chunks=0;
+    cbBlocked(static fn()=>creativeBatchPlan($db,$cfg,$objective,0));
+    cbBlocked(static fn()=>creativeBatchPlan($db,$cfg,$objective,127));
+    while(true){
+        $plan=creativeBatchPlan($db,$cfg,$objective,18);
+        if(!$plan['selected'])break;
+        cbCheck(count($plan['selected'])===18&&$plan['limit']===18,'Exact chunk size');
+        cbBlocked(static fn()=>creativeBatchApply($db,$cfg,$objective,$plan['digest'],19));
+        cbBlocked(static fn()=>creativeBatchApply($db,$cfg,'education',$plan['digest'],18));
+        $chunk=creativeBatchApply($db,$cfg,$objective,$plan['digest'],18);++$chunks;
+        cbCheck(count($chunk)===count($plan['selected']),'Selected only');
+        cbBlocked(static fn()=>creativeBatchApply($db,$cfg,$objective,$plan['digest'],18));
+        foreach($chunk as $i=>$id){
+            $cell=$plan['selected'][$i];$key=$cell['service'].'/'.$cell['channel'];
+            cbCheck(!isset($seen[$key]),'Unique cell');$seen[$key]=true;
+            $job=creativeExport($db,$id);cbCheck($job['objective']===$objective&&$job['service']['id']===$cell['service']&&$job['channel']===$cell['channel'],'Exact chunk export');
+            $v=['version'=>1,'task_id'=>$id,'revision'=>1,'model'=>'synthetic:1b','caption'=>'Review requirements before planning.','visual_brief'=>'Illustrative diagram','video_brief'=>'Illustrative motion','review_notes'=>'Synthetic review only'];
+            cbBlocked(static fn()=>creativeImport($db,array_replace($v,['caption'=>"bad\xFF"])));
+            cbCheck(creativeExport($db,$id)['revision']===1,'Invalid UTF-8 leaves placeholder unchanged');
+            cbCheck(creativeImport($db,$v),'Valid result');
+            if($reviewed%2===0){
+                cbCheck(str_contains(growthCommand($db,"/reject $id 1",$cfg),'rejected'),'Explicit rejection');
+                cbCheck(str_contains(growthCommand($db,"/approve $id 1",$cfg),'not pending'),'Rejected draft cannot approve');
+            }else{
+                cbCheck(str_contains(growthCommand($db,"/regenerate $id 1",$cfg),'Revision requested'),'Explicit regeneration');
+                cbCheck(!creativeImport($db,$v),'Stale revision denied');
+                cbCheck(creativeImport($db,array_replace($v,['revision'=>2])),'Current revision accepted');
+                cbCheck(str_contains(growthCommand($db,"/approve $id 2",$cfg),'approved'),'Current approval');
+            }
+            ++$reviewed;
+        }
+    }
+    cbCheck($reviewed===126&&count($seen)===126&&$chunks===7,'126 independent review-path cells');
+    $m=creativeBatchMatrix($db,$cfg,$objective);$approved=0;$rejected=0;
+    foreach($m as $rows)foreach($rows as $cell){cbCheck(array_sum($cell)===1,'One task per awareness cell');$approved+=$cell['approved'];$rejected+=$cell['rejected'];}
+    cbCheck($approved===63&&$rejected===63,'Exact outcome totals');
+    cbCheck(count(creativeBatchPlan($db,$cfg,'education',18)['missing'])===126,'Other objective untouched');
+    // Force an existing result collision and prove caught import failure cannot leave a reviewable draft.
+    $id=creativeCreate($db,'infrastructure','linkedin','enquiry');
+    $v=['version'=>1,'task_id'=>$id,'revision'=>1,'model'=>'synthetic:1b','caption'=>'Review requirements.','visual_brief'=>'Illustrative diagram','video_brief'=>'Illustrative motion','review_notes'=>'Synthetic review only'];
+    $db->prepare('INSERT INTO growth_creative_results(task_id,revision,model_label,caption,visual_brief,video_brief,review_notes) VALUES(?,?,?,?,?,?,?)')->execute([$id,1,$v['model'],$v['caption'],$v['visual_brief'],$v['video_brief'],$v['review_notes']]);
+    try{creativeImport($db,$v);throw new LogicException('Expected result collision');}catch(PDOException $e){}
+    cbCheck(creativeExport($db,$id)['revision']===1,'Failed result insert restores generation state');
+    cbCheck(str_contains(growthCommand($db,"/approve $id 1",$cfg),'not pending'),'Failed result cannot become approved');
+    $db->rollBack();echo "Synthetic service/channel workflows: $cases/126 baseline, $reviewed/126 additional review cases PASS (rolled back; no model calls or publication)\n";
 }catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'Creative matrix failed: '.$e->getMessage()."\n");exit(1);}
