@@ -32,7 +32,7 @@ function feedFetch(array $src):string {
     $ch=curl_init($src['url']);if(!$ch)throw new RuntimeException('transport_failed');
     $body='';
     try{
-        curl_setopt_array($ch,[CURLOPT_FOLLOWLOCATION=>false,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,
+        if(!curl_setopt_array($ch,[CURLOPT_FOLLOWLOCATION=>false,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,
             CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_CONNECTTIMEOUT=>5,CURLOPT_TIMEOUT=>15,
             CURLOPT_PROXY=>'',CURLOPT_IPRESOLVE=>CURL_IPRESOLVE_V4,
             CURLOPT_RESOLVE=>[$src['host'].':443:'.$ips[0]],CURLOPT_HTTPHEADER=>['Accept: application/json'],
@@ -40,7 +40,7 @@ function feedFetch(array $src):string {
             CURLOPT_WRITEFUNCTION=>function($ch,string $chunk)use(&$body):int{
                 if(strlen($body)+strlen($chunk)>262144)return 0;
                 $body.=$chunk;return strlen($chunk);
-            }]);
+            }]))throw new RuntimeException('transport_failed');
         if(curl_exec($ch)!==true)throw new RuntimeException('transport_failed');
         if(curl_getinfo($ch,CURLINFO_RESPONSE_CODE)!==200)throw new RuntimeException('http_status');
         $type=strtolower(trim(explode(';',(string)curl_getinfo($ch,CURLINFO_CONTENT_TYPE))[0]));
