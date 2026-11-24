@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "source": "assets/enhancements.js",
+  "services": [
+    {
+      "id": "infrastructure",
+      "title": "Infrastructure Services",
+      "description": "Server deployment, structured cabling, network planning and reliable infrastructure operations.",
+      "category": "infrastructure",
+      "capabilities": [
+        "Server installation and configuration",
+        "Structured cabling, network switches and routing",
+        "Office network setup and infrastructure assessment"
+      ]
+    },
+    {
+      "id": "software-web",
+      "title": "Software & Web Development",
+      "description": "Business websites, web applications, CMS platforms and custom software workflows.",
+      "category": "digital",
+      "capabilities": [
+        "Responsive business websites and redesigns",
+        "Custom web applications and CMS solutions",
+        "API integration and software process improvements"
+      ]
+    },
+    {
+      "id": "it-amc",
+      "title": "Support & Maintenance (AMC)",
+      "description": "Scheduled care and responsive support to keep business devices and users productive.",
+      "category": "support",
+      "capabilities": [
+        "Desktop, laptop and software troubleshooting",
+        "IT support contracts and periodic maintenance",
+        "Remote and onsite support requirements"
+      ]
+    },
+    {
+      "id": "cloud",
+      "title": "Cloud & Modern IT",
+      "description": "Cloud adoption, migration assessment, hybrid infrastructure and collaboration solutions.",
+      "category": "infrastructure",
+      "capabilities": [
+        "AWS, Azure and Google Cloud planning",
+        "Cloud migrations and infrastructure design",
+        "Hybrid collaboration and storage workflows"
+      ]
+    },
+    {
+      "id": "security",
+      "title": "Security & Compliance",
+      "description": "Practical network protection, access security and infrastructure hardening.",
+      "category": "security",
+      "capabilities": [
+        "Firewall, VPN and endpoint security planning",
+        "Access control and basic compliance readiness",
+        "Security posture and risk discussions"
+      ]
+    },
+    {
+      "id": "data-backup",
+      "title": "Data Management & Backup",
+      "description": "Protect business information through backup, storage management and recovery planning.",
+      "category": "security",
+      "capabilities": [
+        "Backup strategy and retention planning",
+        "Storage architecture and access management",
+        "Business continuity and disaster recovery assessment"
+      ]
+    },
+    {
+      "id": "it-procurement",
+      "title": "IT Asset & Procurement",
+      "description": "Hardware selection, purchasing support and lifecycle planning for enterprise devices.",
+      "category": "support",
+      "capabilities": [
+        "Hardware and software procurement consulting",
+        "IT inventory and asset lifecycle planning",
+        "Device upgrades and replacement strategy"
+      ]
+    },
+    {
+      "id": "smart-office",
+      "title": "Smart Office & Add-ons",
+      "description": "Workplace automation and integrated technology for modern offices.",
+      "category": "digital",
+      "capabilities": [
+        "CCTV, access control and surveillance planning",
+        "Meeting room and collaboration systems",
+        "Connected office integration"
+      ]
+    },
+    {
+      "id": "special-projects",
+      "title": "Special Plans & Projects",
+      "description": "Flexible IT packages for startups, events, health checks and focused engagements.",
+      "category": "support",
+      "capabilities": [
+        "Startup IT setup and transition assistance",
+        "Event technology and temporary infrastructure",
+        "Annual IT health-check and modernization plans"
+      ]
+    },
+    {
+      "id": "video-conferencing",
+      "title": "Video Conferencing & Meeting Rooms",
+      "description": "Conference room cameras, microphones, displays and hybrid meeting integration coordinated with AV specialists.",
+      "category": "av",
+      "capabilities": [
+        "Teams/Zoom-capable conference room equipment",
+        "Cameras, microphones, displays and speaker integration",
+        "New rooms, upgrades and site survey coordination"
+      ]
+    },
+    {
+      "id": "auditorium-av",
+      "title": "Auditorium AV Solutions",
+      "description": "Sound reinforcement, presentation displays, projection and control for auditoriums and training facilities.",
+      "category": "av",
+      "capabilities": [
+        "Auditorium PA audio and microphone systems",
+        "Projection, displays and AV control",
+        "Site survey, installation and commissioning coordination"
+      ]
+    },
+    {
+      "id": "professional-sound",
+      "title": "Professional Sound & PA Systems",
+      "description": "Commercial speakers, amplifiers, microphones and reliable public-address systems.",
+      "category": "av",
+      "capabilities": [
+        "Commercial PA and distributed audio",
+        "Amplifier, mixer and microphone planning",
+        "Sound system installation, upgrades and support"
+      ]
+    },
+    {
+      "id": "av-maintenance",
+      "title": "AV Installation & Maintenance",
+      "description": "Site surveys, equipment sourcing, installation coordination and maintenance proposals.",
+      "category": "av",
+      "capabilities": [
+        "Room assessment and requirements scoping",
+        "Coordination with specialist AV installation partners",
+        "Support and maintenance planning"
+      ]
+    },
+    {
+      "id": "data-recovery",
+      "title": "Data Recovery",
+      "description": "Assessment guidance for deleted, formatted, inaccessible and physically damaged storage.",
+      "category": "security",
+      "capabilities": [
+        "HDD, SSD / NVMe and external drive assessments",
+        "USB drives, memory cards and RAID / NAS inquiries",
+        "Recovery feasibility review and transparent next steps",
+        "Advanced physical recovery depends on confirmed capability or partners"
+      ]
+    }
+  ]
+}
