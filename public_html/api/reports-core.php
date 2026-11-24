@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/growth-core.php';
 require_once __DIR__.'/oauth-health-core.php';
+require_once __DIR__.'/communications-core.php';
 function ownerReportTarget(array $cfg):?string {
     $t=$cfg['growth']['telegram']??[];
     if(($cfg['growth']['enabled']??false)!==true||($t['enabled']??false)!==true||($t['reports_enabled']??false)!==true)return null;
@@ -71,6 +72,7 @@ function reportClaim(PDO $db,array $cfg,string $kind,DateTimeImmutable $now):?ar
         if($local->format('H:i')<$after)return null;
         $key=$local->format('Y-m-d');
         $text="Daily snapshot (IST; day-to-date, not full-day)\n".growthCommand($db,'/today',$cfg)."\n\n".reportErrorText($db,$now);
+        if(communicationsEnabled($cfg))$text.="\n\n".communicationsSummary($db,$now);
         if(($cfg['oauth_lifecycle']['alerts_enabled']??false)===true)$text.="\n\n".oauthAlertText($db,$cfg,$now->getTimestamp());
     }elseif($kind==='errors'){
         if((int)$pref['errors_enabled']!==1)return null;
@@ -101,7 +103,7 @@ function reportFinish(PDO $db,int $id,array $r):void {
 }
 
 function reportPublicationAttention(PDO $db):array {
-    $tables=['growth_publications','growth_meta_publications','growth_network_publications','growth_media_uploads','growth_instagram_uploads','growth_facebook_media','growth_network_media','growth_meta_images','growth_linkedin_video','growth_x_video','growth_carousels'];
+    $tables=['growth_publications','growth_meta_publications','growth_network_publications','growth_media_uploads','growth_instagram_uploads','growth_facebook_media','growth_network_media','growth_meta_images','growth_linkedin_video','growth_x_video','growth_carousels','growth_telegram_media'];
     $uncertain=0;$inflight=0;$processing=0;
     foreach($tables as $table){
         $q=$db->query("SELECT status,COUNT(*) AS n FROM $table GROUP BY status");

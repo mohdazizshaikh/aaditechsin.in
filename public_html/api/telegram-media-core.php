@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/media-core.php';
 require_once __DIR__.'/social-core.php';
 function tgMediaTarget(array $cfg):?array {
-    if(!mediaEnabled($cfg)||($cfg['media_upload']['enabled']??false)!==true||($cfg['media_upload']['facebook_enabled']??false)!==true)return null;
+    if(!mediaEnabled($cfg)||($cfg['media_upload']['enabled']??false)!==true||($cfg['media_upload']['telegram_media_enabled']??false)!==true)return null;
     $target=socialTarget($cfg);return $target===null?null:['id'=>$target,'token'=>$cfg['social']['telegram_channel']['bot_token']];
 }
 function tgMediaManifest(PDO $db,int $task,int $rev,string $manifest,string $kind):array {
