@@ -190,3 +190,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6I acceptance (pending runtime)
 
 - [ ] Verify authorized Aaditechs property and dedicated Google read-only scope, exact OAuth response scope/expiry and property permission, no credentials or raw payload logs; confirm finalized web search period and date row behavior, weighted position, missing coverage, stale/rotated snapshot rejection, pause before network/commit, private owner report. Actual live Search Console consent, data accuracy, live crawl, other provider renewal, isolated backup/restore and staging release remain pending.
+
+## V10.6J acceptance (pending runtime)
+
+- [ ] Verify correct canonical property, authorized read-only grant, 7/30 PT date coverage, overlapping captures and revised day replacement, generation separation, old observations and cap/retention policy. Verify live robots policy, fixed seven paths, TLS/public IP and nonredirect behavior, partial failure/missing metrics and private aggregate report import. Confirm no indexing/ranking or uptime claims from HTML observations. Actual authorized crawl, provider evidence, AI runtime and staging restore remain pending.

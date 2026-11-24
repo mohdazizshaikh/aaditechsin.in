@@ -152,3 +152,7 @@ Existing carousel ledger adds typed children with default image for legacy rows.
 ## V10.6I Search Console boundary
 
 Explicit private CLI uses a dedicated authorized webmasters.readonly OAuth refresh grant with exact scope verification and fixed Google endpoints, no persisted access token or active config replacement. Exact Aaditechs property allowlist, property-access check and finalized web-search date aggregation over seven Pacific Time days ending three days before today. Stores one generation/property-bound aggregate snapshot with reported-day coverage, clicks, impressions and impression-weighted position. No keywords, query text, URLs from results, or raw provider payload retained. Owner reports label missing and stale evidence. See V106I_SEARCH_CONSOLE.md.
+
+## V10.6J SEO history and public observation
+
+Search Console keeps optional per-property/per-generation/per-PT-day finalized observations, replaces revised values instead of summing overlapping captures, and exposes 7/30 observed-day windows with missing dates distinct from zero. Default property aligned with source sitemap aaditechs.in; previous aaditechsin.in allowlist retained only for explicitly authorized verified properties. Separate local bounded crawler fetches robots and seven fixed public pages via pinned IPv4 HTTPS, no redirect/proxy/cookies or arbitrary path; operator imports sanitized aggregate only. No remote execution, live indexing claim or source mutation. See V106J_SEO_HISTORY_CRAWL.md.

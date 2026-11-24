@@ -157,3 +157,7 @@
 ## V10.6I security (pending runtime)
 
 - [ ] Search Console independently OFF, authorized dedicated webmasters.readonly grant, fixed Google HTTPS endpoints, bounded response and no proxy/redirect; reject broader/missing scope and unexpected refresh rotation. Exact property allowlist and returned property verification, no user-supplied destination or query terms; in-memory access token only, private refresh credentials, generation/expiry/revocation gate. Snapshot contains only aggregate counts/position/date coverage and property hash; no active config overwrite or automated schedule. Actual consent, secret storage and provider acceptance required.
+
+## V10.6J security (pending runtime)
+
+- [ ] Separate history and live-import OFF gates, exact property and generation binding, global bounded history cap; no keyword or raw payload storage. Local crawler explicit operator authorization, fixed HTTPS host/path and public IPv4 pin, no redirects/proxy/credentials, conservative reviewed robots match, body cap and request pacing. No private routes or link discovery. Report is operator-supplied evidence, not signed remote attestation; import checks coverage/freshness and rejects older/duplicate capture. No scheduling or automatic deletion. Approve retention and actual network/hosting acceptance first.

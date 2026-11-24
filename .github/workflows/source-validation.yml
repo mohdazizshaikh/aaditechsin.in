@@ -56,6 +56,8 @@ jobs:
           php tests/twilio_retention_rules.php
           php tests/mixed_review_rules.php
           php tests/search_console_rules.php
+          php tests/seo_history_rules.php
+          python3 tests/live_seo_crawl.py
           python3 tests/backup_verify.py
           php tests/intelligence_rules.php
           php tests/dashboard_rules.php
@@ -145,6 +147,7 @@ jobs:
           php tests/twilio_retention_rules.php --database
           php tests/mixed_review_rules.php --database
           php tests/search_console_rules.php --database
+          php tests/seo_history_rules.php --database
           php tests/intelligence_rules.php --database
           php tests/dashboard_rules.php --database
           php tests/network_media_rules.php --database

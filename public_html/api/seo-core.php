@@ -21,6 +21,8 @@ function seoRegister(PDO $db,array $r):array {
     return ['status'=>$q->rowCount()===1?'recorded':'duplicate_summary','sha256'=>$hash];
 }
 function seoCommand(PDO $db,array $cfg,string $command):?string {
+    if($command==='/searchhistory'){require_once __DIR__.'/search-console-core.php';return scHistorySummary($db,$cfg);}
+    if($command==='/liveseo'){require_once __DIR__.'/live-seo-core.php';return liveSeoSummary($db,$cfg);}
     if($command==='/searchconsole'){require_once __DIR__.'/search-console-core.php';return scSummary($db,$cfg);}
     if($command!=='/seo'&&!preg_match('/^\\/seotopics(?: |$)/D',$command))return null;
     if(!seoEnabled($cfg))return 'SEO module disabled.';
