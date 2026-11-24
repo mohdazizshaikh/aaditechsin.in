@@ -44,6 +44,7 @@ jobs:
           php tests/network_rules.php
           php tests/upload_rules.php
           php tests/instagram_rules.php
+          php tests/facebook_media_rules.php
           php tests/report_rules.php
           python3 tests/local_creative.py
           python3 tests/local_expert.py
@@ -106,6 +107,7 @@ jobs:
           php tests/network_rules.php --database
           php tests/upload_rules.php --database
           php tests/instagram_rules.php --database
+          php tests/facebook_media_rules.php --database
           php tests/report_rules.php --database
       - name: Scope statement
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'

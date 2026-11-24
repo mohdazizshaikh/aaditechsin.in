@@ -40,4 +40,9 @@ with tempfile.TemporaryDirectory() as d:
         raise AssertionError("Tampering undetected")
     fake=m.render(job,Path(d),font,"local-diffusion",generate=lambda j,p:Image.new("RGB",(768,768),"blue"))
     assert json.loads((fake/"manifest.json").read_text())["renderer"]=="local-diffusion"
+    meta=json.loads((fake/"manifest.json").read_text()); meta["width"]=1
+    (fake/"manifest.json").write_text(json.dumps(meta))
+    try: m.verify(fake)
+    except ValueError: pass
+    else: raise AssertionError("Manifest profile mismatch accepted")
 print("Actual synthetic PNG/MP4 render, profile, private root, fake AI adapter, integrity: PASS")

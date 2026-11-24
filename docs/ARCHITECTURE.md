@@ -62,3 +62,7 @@ Trusted PC -> manual authenticated private transfer -> CLI SHA256-bound content-
 ## V10.2B Instagram boundary
 
 Private hash-verified MP4 -> owner-approved public Reel -> fixed Meta resumable binary endpoint -> processing container ledger -> read-only FINISHED status -> separate explicit publish CLI and receipt. No publicly served binary or provider-supplied upload URL. Recheck Page/linked account at each stage. See V102B_INSTAGRAM.md.
+
+## V10.2C Facebook media boundary
+
+Approved private PNG/MP4 -> hash and profile check -> exclusive text-or-media reservation -> explicit owner approval of kind and Page -> direct multipart exact bytes to fixed Meta host. Local Pillow/FFmpeg/ffprobe verify trusted source assets; server checks hash/basic profile. See V102C_FACEBOOK_MEDIA.md.

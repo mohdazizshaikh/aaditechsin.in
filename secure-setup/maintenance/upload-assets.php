@@ -22,3 +22,23 @@ function uploadStore(string $root,string $hash,string $bytes):void {
     catch(Throwable $e){fclose($f);unlink($path);throw $e;}
     fclose($f);
 }
+
+
+function uploadPhotoRead(string $path,string $hash,int $width,int $height,int $expected=0):string {
+    if(is_link($path)||!is_file($path))throw new RuntimeException('Not a regular file');
+    $f=fopen($path,'rb');if(!$f)throw new RuntimeException('Cannot open');
+    try{$bytes=stream_get_contents($f,10*1024*1024+1);}finally{fclose($f);}
+    if(!is_string($bytes)||strlen($bytes)<24||strlen($bytes)>10*1024*1024||($expected!==0&&strlen($bytes)!==$expected)||!hash_equals($hash,hash('sha256',$bytes)))throw new RuntimeException('Photo hash mismatch');
+    $info=@getimagesizefromstring($bytes);
+    if(!$info||$info[2]!==IMAGETYPE_PNG||$info[0]!==$width||$info[1]!==$height)throw new RuntimeException('PNG profile mismatch');
+    return $bytes;
+}
+function uploadPhotoStore(string $root,string $hash,string $bytes,int $width,int $height):void {
+    if(!preg_match('/^[a-f0-9]{64}$/D',$hash)||!hash_equals($hash,hash('sha256',$bytes)))throw new RuntimeException('Hash mismatch');
+    $path=$root.'/'.$hash.'.png';
+    if(file_exists($path)||is_link($path)){uploadPhotoRead($path,$hash,$width,$height,strlen($bytes));return;}
+    $f=fopen($path,'xb');if(!$f)throw new RuntimeException('Cannot create');
+    try{if(!chmod($path,0600)||fwrite($f,$bytes)!==strlen($bytes))throw new RuntimeException('Write failed');}
+    catch(Throwable $e){fclose($f);unlink($path);throw $e;}
+    fclose($f);
+}

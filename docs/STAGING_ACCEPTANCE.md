@@ -100,3 +100,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2B acceptance (pending runtime)
 
 - [ ] Apply V10.2B after V10.2A. Verify Meta Page/linked professional account, version, roles/scopes, real video format and disclosure, private transfer and processing status. Test mismatch, cancellation, expired container, ambiguous upload/publish, provider receipts and actual visibility separately. Explicit owner authorization for public test Reel required.
+
+## V10.2C acceptance (pending runtime)
+
+- [ ] Apply after V10.2B; verify Page role/scope/version, local media decoding, host size/memory, private hash/profile checks, text/media exclusion, wrong type/target, no uncertain retry, actual resource processing and visibility. Explicit public test authorization required.

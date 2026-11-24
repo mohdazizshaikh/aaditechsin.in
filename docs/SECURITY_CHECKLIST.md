@@ -67,3 +67,7 @@
 ## V10.2B Instagram security (pending live)
 
 - [ ] Direct binary upload only to fixed Meta host. Validate linked Page/IG identity, manifest/byte count, separate public Reel approval, FINISHED gate, no URL exposure, no retries, manually reconcile in-flight/uncertain/expired states. Review media rights and disclosures.
+
+## V10.2C media security (pending live)
+
+- [ ] No public asset URLs, exact in-memory bytes, fixed host, private storage, exclusive revision reservation, explicit Page/type approval, bounded upload, manual uncertain reconciliation. Verify actual file rights, provider specifications and retention.
