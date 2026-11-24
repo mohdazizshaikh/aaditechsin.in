@@ -132,6 +132,7 @@ $flags = [
     'communications.reviews_enabled' => ['communications','reviews_enabled'],
     'media_upload.threads_mixed_carousel_enabled' => ['media_upload','threads_mixed_carousel_enabled'],
     'media_upload.instagram_mixed_carousel_enabled' => ['media_upload','instagram_mixed_carousel_enabled'],
+    'communications.twilio_retention_enabled' => ['communications','twilio_retention_enabled'],
     'communications.whatsapp_retention_enabled' => ['communications','whatsapp_retention_enabled'],
     'communications.twilio_inbound.sms.enabled' => ['communications','twilio_inbound','sms','enabled'],
     'communications.twilio_inbound.calls.enabled' => ['communications','twilio_inbound','calls','enabled'],

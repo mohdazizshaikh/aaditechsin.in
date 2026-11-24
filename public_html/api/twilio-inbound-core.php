@@ -41,6 +41,7 @@ function twInboundRecord(PDO $db,array $cfg,string $channel,string $raw,string $
     $h=twInboundDecode($p,$raw,$sig);creativeActive($db);
     $q=$db->prepare('SELECT account_hash,channel FROM growth_twilio_inbound WHERE event_hash=?');$q->execute([$h]);$old=$q->fetch(PDO::FETCH_ASSOC);
     $account=twInboundAccount($p);if($old){if($old['account_hash']!==$account||$old['channel']!==$channel)throw new RuntimeException('Conflict');return false;}
+    $q=$db->prepare('SELECT COUNT(*) FROM growth_twilio_replay WHERE event_hash=?');$q->execute([$h]);if((int)$q->fetchColumn()>0)return false;
     if((int)$db->query('SELECT COUNT(*) FROM growth_twilio_inbound')->fetchColumn()>=50000)throw new RuntimeException('Retention cap');
     $day=($now??new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d');
     $db->prepare('INSERT INTO growth_twilio_inbound(event_hash,account_hash,channel,day_utc) VALUES(?,?,?,?)')->execute([$h,$account,$channel,$day]);return true;

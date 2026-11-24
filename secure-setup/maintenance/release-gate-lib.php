@@ -24,7 +24,7 @@ function releaseWorkerState(PDO $db):array{
     ];
     $out=[];foreach($queries as $key=>$sql)$out[$key]=(int)$db->query($sql)->fetchColumn();
     $out['publication_inflight']=0;$out['publication_processing']=0;$out['publication_unknown']=0;
-    foreach(['growth_publications','growth_meta_publications','growth_network_publications','growth_media_uploads','growth_instagram_uploads','growth_facebook_media','growth_network_media','growth_meta_images','growth_linkedin_video','growth_x_video','growth_carousels','growth_telegram_media'] as $table){
+    foreach(recLedgers() as $table){
         foreach($db->query("SELECT status,COUNT(*) AS n FROM $table GROUP BY status")->fetchAll(PDO::FETCH_ASSOC) as $r){
             if(in_array($r['status'],['sending','uploading','fetching','assembling','publishing'],true))$out['publication_inflight']+=(int)$r['n'];
             elseif(in_array($r['status'],['processing','parent_ready'],true))$out['publication_processing']+=(int)$r['n'];
@@ -34,4 +34,4 @@ function releaseWorkerState(PDO $db):array{
     $out['publication_unknown']=recUnknownCounts($db)['unreviewed'];
     return $out;
 }
-function releaseWorkerClear(array $state):bool{return array_sum($state)===0;}
+function releaseWorkerClear(array $state):bool{if(!$state)return false;foreach($state as $n)if(!is_int($n)||$n!==0)return false;return true;}
