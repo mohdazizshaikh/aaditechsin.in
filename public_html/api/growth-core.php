@@ -46,13 +46,16 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
 function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.6 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate Telegram channel scheduling required.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.6 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/creativeworker /retrycreative ID REV\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate Telegram channel scheduling required.";
     require_once __DIR__.'/reports-core.php';
     $report=reportCommand($db,$cfg,$command);
     if($report!==null)return $report;
     require_once __DIR__.'/social-core.php';
     $social=socialCommand($db,$cfg,$command);
     if($social!==null)return $social;
+    require_once __DIR__.'/creative-transport-core.php';
+    $transport=creativeTransportCommand($db,$cfg,$command);
+    if($transport!==null)return $transport;
     require_once __DIR__.'/creative-core.php';
     $creative=creativeCommand($db,$cfg,$command);
     if($creative!==null)return $creative;
