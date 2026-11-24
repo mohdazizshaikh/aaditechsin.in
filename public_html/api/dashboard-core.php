@@ -61,6 +61,7 @@ function dashboardSnapshot(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=
         }
     }
     $data['communications']=communicationsEnabled($cfg)?dashboardCommunications($db,$period):null;
+    $data['native_usage']=communicationsEnabled($cfg)&&($cfg['communications']['native_usage_enabled']??false)===true?nativeUsageSummary($db,$cfg,$now):null;
     $data['gmail']=communicationsEnabled($cfg)&&($cfg['communications']['gmail']['enabled']??false)===true?gmailSummary($db,$cfg,$now):null;
     $data['publications']=creativeEnabled($cfg)&&($cfg['social']['enabled']??false)===true?publicationOverview($db,$cfg,'/publications'):null;
     $data['attention']=($data['publications']!==null)?reportPublicationAttention($db):null;

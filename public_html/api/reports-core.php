@@ -4,6 +4,7 @@ require_once __DIR__.'/growth-core.php';
 require_once __DIR__.'/oauth-health-core.php';
 require_once __DIR__.'/communications-core.php';
 require_once __DIR__.'/gmail-health-core.php';
+require_once __DIR__.'/native-usage-core.php';
 require_once __DIR__.'/opportunity-followup-core.php';
 function ownerReportTarget(array $cfg):?string {
     $t=$cfg['growth']['telegram']??[];
@@ -75,6 +76,7 @@ function reportClaim(PDO $db,array $cfg,string $kind,DateTimeImmutable $now):?ar
         $key=$local->format('Y-m-d');
         $text="Daily snapshot (IST; day-to-date, not full-day)\n".growthCommand($db,'/today',$cfg)."\n\n".reportErrorText($db,$now);
         if(communicationsEnabled($cfg))$text.="\n\n".communicationsSummary($db,$now);
+        if(communicationsEnabled($cfg)&&($cfg['communications']['native_usage_enabled']??false)===true)$text.="\n\n".nativeUsageSummary($db,$cfg,$now);
         if(($cfg['communications']['gmail']['enabled']??false)===true)$text.="\n\n".gmailSummary($db,$cfg,$now);
         if(followEnabled($cfg))$text.="\n\n".followSummary($db,$now);
         if(($cfg['oauth_lifecycle']['alerts_enabled']??false)===true)$text.="\n\n".oauthAlertText($db,$cfg,$now->getTimestamp());

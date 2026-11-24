@@ -132,3 +132,7 @@ Private CLI fetches one authorized per-channel HTTPS aggregate endpoint using a 
 ## V10.6D reviewed reconciliation and backup integrity
 
 Private paused CLI inspects unknown publication across 12 allowlisted ledgers, hashes the full stored row and intermediate resource evidence, records immutable owner-attested confirmed-present/absent review with independent evidence digest. No original status change, retry, or provider write. Release gate treats only unchanged reviewed unknown rows separately; all in-flight/processing and other blockers remain. Private gzip backup verifier checks SHA256 and bounded decompression, no SQL execution. Gmail candidate local inspection and digest-bound identity revalidation do not activate credentials. See V106D_RECONCILIATION_BACKUP.md.
+
+## V10.6E native usage and synthetic restore
+
+Private explicit GET-only adapters request account-scoped WABA sent/delivered analytics and Twilio inbound SMS/call usage for the previous completed UTC day. Strict account/category/time and local credential gates, latest sanitized snapshot per source, no message or call records requested. Owner reports distinguish provider usage from received/answered/missed aggregates. Disposable CI adds actual MariaDB dump and restore with metadata and synthetic record comparisons, not a production restore. See V106E_NATIVE_USAGE_RESTORE.md.

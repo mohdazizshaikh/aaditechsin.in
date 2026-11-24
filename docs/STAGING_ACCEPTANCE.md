@@ -170,3 +170,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6D acceptance (pending runtime)
 
 - [ ] Apply new review ledger migration in order after verified backup and isolated restoration. Check exact unknown row, independent provider evidence, state/evidence hash, pause and changed-state rejection, immutable review and unchanged publication status, release block for unreviewed/in-flight/processing rows. Verify private gzip artifact SHA256/CRC and actual restore/schema/data integrity independently. Verify Gmail candidate private permissions, expected digest, expiry, mailbox revalidation and manual rotation; no scope inference from identity. No live acceptance or release authorization inferred.
+
+## V10.6E acceptance (pending runtime)
+
+- [ ] Verify approved WABA account analytics permission and exact UTC window, sent/delivered semantics and actual response shape; authorized restricted Twilio usage-read key, exact account/category/unit/date, pagination refusal, missing versus zero and reporting lag. Confirm local expiry/generation and pause gates, no personal details stored, usage separate from answered/missed counts. Verify actual authorized isolated backup restore and schema/data integrity, not just synthetic CI. No live connector, inbound webhook, reply or release acceptance inferred.
