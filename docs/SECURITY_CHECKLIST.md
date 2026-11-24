@@ -125,3 +125,7 @@
 ## V10.5A/V10.6A security (pending runtime)
 
 - [ ] Owner-only HTTPS CSV, separate OFF flag, bounded aggregate columns, formula escaping, no customer/session IDs, no messages or credential fields, private download storage and retention review. Communication batch CLI only with explicit source authorization, independent flag, bounded payload and atomic rollback. Release checker read-only, no raw credentials/errors, no database changes. Migration replay uses synthetic loopback CI database only; never run destructive test reset on live/staging data. Verify actual backup and restore separately.
+
+## V10.6B security (pending runtime)
+
+- [ ] Private authorized OAuth client/refresh secret, fixed HTTPS token endpoint, no redirects/proxies/raw response output, exact scope/identity checks, no active config overwrite, exclusive candidate 0600 in private 0700 root. Candidate contains a live access token if actually issued; do not share or commit, inspect and dispose privately after rotation. Retention independently OFF, paused workers, verified backups, exact plan hash and transaction, no scheduled cleanup or audit/publication deletion.
