@@ -49,7 +49,7 @@ function nmCommand(PDO $db,array $cfg,string $cmd):?string {
     return 'Use /netmedia /netasset ID /approvenetmedia ID SHA256 PROVIDER ACCOUNT_ID /cancelnetmedia ID.';
 }
 function nmClaim(PDO $db,array $cfg,string $provider,int $id):array {
-    creativeActive($db);$p=nmTarget($cfg);if(!$p)throw new RuntimeException('Disabled');
+    creativeActive($db);$p=nmTarget($cfg,$provider);if(!$p)throw new RuntimeException('Disabled');
     $q=$db->prepare("SELECT u.*,m.width,m.height FROM growth_network_media u JOIN growth_tasks t ON t.id=u.task_id AND t.revision=u.revision AND t.status='approved' JOIN growth_media_manifests m ON m.task_id=u.task_id AND m.revision=u.revision AND m.manifest_hash=u.manifest_hash AND m.status='approved' AND u.asset_hash=m.image_hash WHERE u.id=? AND u.provider=? AND u.target_id=? AND u.status='approved' FOR UPDATE");$q->execute([$id,$provider,$p['id']]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new RuntimeException('No approved media');
     $db->prepare("UPDATE growth_network_media SET status='sending' WHERE id=?")->execute([$id]);growthAudit($db,(int)$r['task_id'],(int)$r['revision'],'netmedia_claimed','private_cli');return $r;
 }
