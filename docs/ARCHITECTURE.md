@@ -70,3 +70,9 @@ Approved private PNG/MP4 -> hash and profile check -> exclusive text-or-media re
 ## V10.2D network image boundary
 
 Private PNG, exact revision/hash/target, exclusive text-or-image reservation, explicit public owner approval, bounded provider upload/readiness and attachment, no blind retries. See V102D_NETWORK_MEDIA.md.
+
+## V10.2E Meta image boundary
+
+Private JPEG separately reviewed and approved -> expiring bearer capability (digest only, 15 minutes, 20 fetches, exact hash) -> Meta container -> FINISHED check -> revoke token and explicit publish. Anyone holding URL can fetch during window; non-sensitive public marketing only, log redaction mandatory. No permanent public files. See V102E_META_IMAGES.md.
+
+V10.2E uses a separately reviewed 1080x1350 Instagram JPEG derivative while preserving the original 1080x1920 Reel manifest profile. Fetch requires explicit log-redaction verification flag.

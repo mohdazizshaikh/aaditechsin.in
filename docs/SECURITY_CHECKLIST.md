@@ -75,3 +75,9 @@
 ## V10.2D image security (pending runtime)
 
 - [ ] Exact image hash, size, scoped upload URL, no redirects or token logs, owner/expiry check, public approval, exclusive revision, no blind retries.
+
+## V10.2E bearer media security (pending runtime)
+
+- [ ] 256-bit token digest, 15-minute window, 20 requests, no caching or token logs, exact bytes and current approval, revoke on cancel/publish, no sensitive content. Bearer URLs are accessible to anyone holding them; do not enable unless hosting/CDN log redaction confirmed. Verify rate limits and retention.
+
+- [ ] Keep fetch_log_redaction_verified OFF until actual query log redaction is independently checked. No public endpoint activation by default.

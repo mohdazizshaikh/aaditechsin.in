@@ -6,7 +6,7 @@
 
 ## V9–V10 development addendum (24 November 2026)
 
-Main V9.6 verified; V9.7–V10.2D stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
+Main V9.6 verified; V9.7–V10.2E stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D then V10.2E; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
 
 ## 1 — Deployment model and file destinations
 
@@ -169,3 +169,7 @@ V10.2B: use authorized Facebook Login for Business linked professional Instagram
 V10.2C: verify private PNG/MP4 and PHP cURL/CURLStringFile, memory and quota before actual approved Facebook Page media test. Local Pillow, FFmpeg and ffprobe required. Explicit public approval; no media cron. See docs/V102C_FACEBOOK_MEDIA.md.
 
 V10.2D: independent LinkedIn/X PNG flags, verify permissions, version, quotas, storage and upload URL before approved test. See docs/V102D_NETWORK_MEDIA.md.
+
+V10.2E: before enabling media fetch, validate HTTPS route, CDN/access log query redaction, no cache, quota, approved JPEG and token expiry. No customer data or permanent public assets. See docs/V102E_META_IMAGES.md.
+
+V10.2E: leave fetch_log_redaction_verified=false until staging access/CDN logs actually redact bearer queries. Instagram photo derivative 1080x1350, Threads 1080x1080. Positive synthetic core delivery is not live HTTPS acceptance.
