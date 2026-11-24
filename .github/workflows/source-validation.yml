@@ -80,6 +80,8 @@ jobs:
           python3 -m venv .ci-venv
           .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 PyMySQL==1.1.1 requests==2.32.3
       - name: Synthetic MySQL + HTTP full workflow
-        run: .ci-venv/bin/python tests/integration_mysql_http.py
+        run: |
+          .ci-venv/bin/python tests/integration_mysql_http.py
+          php tests/growth_database.php
       - name: Scope statement
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'

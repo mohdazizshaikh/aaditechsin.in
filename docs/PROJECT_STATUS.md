@@ -113,3 +113,7 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - [x] Added disposable PHPMailer test double to synthetic MariaDB workflow: six failed attempts, retry backoff/terminal state, authenticated owner requeue and eventual fake success. No network SMTP delivery.
 - [x] GitHub CI passed for V8.6 notification failure-path extension on commit `a47ea9121ed91ee254bb755de0fdd922fd7fc05f`; offline checks and disposable MariaDB integration both passed. Run: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45209185309
 - [ ] Hostinger staging, real SMTP inbox delivery, backup/restore, privacy authorization and production release remain pending.
+
+## V9.1 growth foundation (source-only)
+- Added 14-service registry, review-only task tables and audit, version-checked approve/reject/regenerate request, paused control default, owner-only Telegram webhook source and private CLI draft intake.
+- Growth and Telegram flags default OFF. No bot provisioned or webhook registered, no real publishing/outreach, no analytics or AI generator. Verify the new offline and disposable MariaDB CI jobs, then stage separately. See docs/V9_GROWTH_FOUNDATION.md.
