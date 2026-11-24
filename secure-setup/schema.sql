@@ -575,3 +575,13 @@ CREATE TABLE IF NOT EXISTS growth_opportunity_followups (
  INDEX idx_followup_due(status,due_on),
  CONSTRAINT fk_followup_opp FOREIGN KEY(opportunity_id) REFERENCES growth_opportunities(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS growth_publication_reviews (
+ ledger VARCHAR(40) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ publication_id BIGINT UNSIGNED NOT NULL,
+ state_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ evidence_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ outcome ENUM('confirmed_present','confirmed_absent','unresolved') NOT NULL,
+ reviewed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ PRIMARY KEY(ledger,publication_id,state_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
