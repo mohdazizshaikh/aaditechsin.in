@@ -51,6 +51,7 @@ jobs:
           php tests/oauth_health_rules.php
           php tests/linkedin_video_rules.php
           php tests/x_video_rules.php
+          php tests/carousel_rules.php
           php tests/report_rules.php
           python3 tests/local_creative.py
           python3 tests/local_expert.py
@@ -120,6 +121,7 @@ jobs:
           php tests/oauth_health_rules.php --database
           php tests/linkedin_video_rules.php --database
           php tests/x_video_rules.php --database
+          php tests/carousel_rules.php --database
           php tests/report_rules.php --database
       - name: Scope statement
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'

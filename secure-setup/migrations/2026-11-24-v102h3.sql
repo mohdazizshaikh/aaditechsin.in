@@ -25,5 +25,6 @@ CREATE TABLE IF NOT EXISTS growth_carousel_items (
  fetch_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
  container_id VARCHAR(32) NULL,
  PRIMARY KEY(carousel_id,position_no),
+ UNIQUE KEY uq_carousel_child(carousel_id,container_id),
  CONSTRAINT fk_carousel_item FOREIGN KEY(carousel_id) REFERENCES growth_carousels(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

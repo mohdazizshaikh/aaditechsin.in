@@ -75,8 +75,8 @@ function caClaim(PDO $db,array $cfg,string $provider,int $id,string $stage):arra
 function caId(mixed $id):bool{return is_string($id)&&preg_match('/^[1-9][0-9]{0,30}$/D',$id)===1;}
 function caRemember(PDO $db,array $row,int $position,string $id):void{
     if(!$db->inTransaction()||!caId($id))throw new InvalidArgumentException('Invalid receipt');
-    $q=$db->prepare("UPDATE growth_carousel_items i JOIN growth_carousels c ON c.id=i.carousel_id SET i.container_id=? WHERE c.id=? AND c.status='fetching' AND i.position_no=? AND i.container_id IS NULL AND NOT EXISTS (SELECT 1 FROM (SELECT carousel_id,container_id FROM growth_carousel_items) AS old WHERE old.carousel_id=c.id AND old.container_id=?)");
-    $q->execute([$id,$row['id'],$position,$id]);if($q->rowCount()!==1)throw new RuntimeException('Invalid child transition');
+    $q=$db->prepare("UPDATE growth_carousel_items i JOIN growth_carousels c ON c.id=i.carousel_id SET i.container_id=? WHERE c.id=? AND c.status='fetching' AND i.position_no=? AND i.container_id IS NULL");
+    $q->execute([$id,$row['id'],$position]);if($q->rowCount()!==1)throw new RuntimeException('Invalid child transition');
     growthAudit($db,(int)$row['task_id'],(int)$row['revision'],'carousel_child','private_cli');
 }
 function caFinish(PDO $db,array $row,string $stage,bool $ok,?string $receipt=null):void{
