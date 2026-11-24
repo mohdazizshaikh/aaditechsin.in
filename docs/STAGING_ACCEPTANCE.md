@@ -198,3 +198,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6K acceptance (pending runtime)
 
 - [ ] Verify local Ollama trusted process, installed digest, actual structured synthetic inference and model/codec resource limits, egress isolation and real draft quality. Verify approved SEO 180-day PT retention, dry-run, changed-plan rejection, cutoff and restoration. Verify authorized exact GBP account/location scoped media list, response shape and permission; independently approve upload access and authentic media policy before any write adapter. Actual local inference, native video generation, GBP write, Hostinger backup/restore and staging remain pending.
+
+## V10.6L acceptance (pending runtime)
+
+- [ ] Verify source authorization, exact feed schema and matching rules, source admission lock, pause during fetch and between records, cadence across failed/completed attempts, unresolved-run blocking, local batch rollback and operator recovery with stale/changed digest refusal. Confirm actual workers stopped and imported evidence reviewed, no automatic retry or outreach. Verify actual scheduling, source terms, hosted backup/restore and staging separately.

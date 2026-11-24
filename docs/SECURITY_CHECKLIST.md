@@ -165,3 +165,7 @@
 ## V10.6K security (pending runtime)
 
 - [ ] Local diagnostic fixed loopback only, no redirects or proxy, exact digest and bounded response, synthetic prompt only; tag/digest checks are not cryptographic execution attestation or proof Ollama cannot use network. Enforce trusted offline runtime and egress isolation separately. Private SEO cleanup independently OFF, paused workers, backup/restore, exact plan and transaction; no automatic deletion. GBP read check independently OFF with existing target/OAuth gate, fixed read-only media path and no response/credential output, never infer write permission. No actual activation or deployment.
+
+## V10.6L security (pending runtime)
+
+- [ ] Discovery cadence/recovery separately OFF, existing fixed HTTPS public-IP feed controls unchanged, growth-control lock for admission and each import, unresolved run blocks new fetch, recovered old run cannot continue importing. Explicit stopped-worker attestation and exact state digest before marking interrupted ledger failed; no opportunity mutation or automatic retry. No cron or real provider access. Local batch savepoint prevents partial writes when caller catches errors. Actual source consent and scheduling approval required.

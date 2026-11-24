@@ -15,8 +15,12 @@ function discoveryBatch(PDO $db,array $cfg,string $id,string $raw):array{
     if(!is_array($doc)||count($doc)!==2||!array_key_exists('version',$doc)||!array_key_exists('items',$doc))throw new InvalidArgumentException('Exact feed contract');
     $parsed=feedItems($raw,$src);
     if($parsed['skipped']!==0||!$parsed['records'])throw new InvalidArgumentException('Every record must pass source and service validation');
+    $db->exec('SAVEPOINT discovery_batch');
+    try{
     $new=0;$duplicates=0;
     foreach($parsed['records'] as $item){$r=discoveryImport($db,$item);if($r['status']==='duplicate')++$duplicates;else ++$new;}
     $db->prepare("INSERT INTO growth_source_runs(source_id,status,imported_count,duplicate_count,skipped_count,finished_at) VALUES(?,'completed',?,?,0,UTC_TIMESTAMP())")->execute([$id,$new,$duplicates]);
+    $db->exec('RELEASE SAVEPOINT discovery_batch');
     return ['imported'=>$new,'duplicates'=>$duplicates];
+    }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT discovery_batch');$db->exec('RELEASE SAVEPOINT discovery_batch');throw $e;}
 }
