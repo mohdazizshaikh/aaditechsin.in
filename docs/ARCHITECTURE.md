@@ -46,3 +46,7 @@ Lead intake → admin qualifies → creates case and optionally assigns partner 
 ## V9–V10 growth architecture (development snapshot)
 
 Private owner Telegram webhook → reviewed growth tasks and audit ledger → separately enabled analytics/discovery/creative/social/report modules. V9.7 local PC claims catalog-only jobs via authenticated HTTPS lease API; no inbound model port. V9.8 PNG/MP4 generated and retained on private PC; only metadata hashes registered. V9.9 public static guide is separate from private structured expert drafts. V10.0 read-only local SEO audit → private CLI summary → owner Telegram; no page modification or external crawl. All external actions require separately authorized destinations and approved revisions. Database additions are additive through V10.0. See PROJECT_STATUS.md for verification and blockers.
+
+## V10.1 Meta boundary
+
+Separate text-only Meta ledger for Facebook Pages and Threads. Explicit owner schedule, exact approved channel/revision/account, global pause at claim, private CLI identity check and fixed provider HTTPS endpoint. No retries after claim, ambiguous states require manual reconciliation; pause cannot revoke an in-flight send. Instagram and all media uploads remain pending. See V101_META.md.

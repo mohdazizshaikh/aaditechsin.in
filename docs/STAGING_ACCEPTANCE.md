@@ -82,3 +82,8 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 - [ ] V9.9 static guide browser acceptance, local expert output safety and human review; no public live AI.
 - [ ] V10.0 run source audit, review findings, register synthetic summary, test /seo and /seotopics. Search Console and live SEO acceptance separate.
 - [ ] Confirm all features default OFF, local credentials private and no unintended publishing or outreach. Separate owner decision for production.
+
+## V10.1 additional acceptance (pending)
+
+- [ ] Apply V10.1 after V10.0 in release order. Verify official Meta app access, exact scopes, API versions, approved test identities and private token storage.
+- [ ] Test target mismatch, revoked token, pause, approved revision, cancellation, ambiguous response and reconciliation before scheduling any authorized test publication. Confirm actual post independently. No Instagram/media acceptance implied.
