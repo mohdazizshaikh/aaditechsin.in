@@ -97,3 +97,7 @@
 ## V10.2H.1 security (pending runtime)
 
 - [ ] Private exact hash, exclusive revision, explicit public approval, pinned signed URL without OAuth bearer, bounded multipart, persistent URN and Reel container, no secret logging or blind retries. Verify actual host quotas and provider rights.
+
+## V10.2H.2 security (pending runtime)
+
+- [ ] Private exact video hash, exclusive text/image/video reservation, separate explicit public approval, no secrets in receipts or reports, X bounded fixed-host upload, fail closed on processing/expiry, Threads short-lived bearer (any holder can fetch), mandatory verified log redaction, cap and revocation, no sensitive assets. Check actual memory/rate limits, stop workers before emergency pause, no uncertain replay.

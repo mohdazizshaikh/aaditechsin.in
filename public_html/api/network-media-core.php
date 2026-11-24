@@ -17,7 +17,7 @@ function nmRegister(PDO $db,array $cfg,int $task,int $rev,string $manifest,strin
     $p=nmTarget($cfg,$provider);if(!$p)throw new RuntimeException('Disabled');
     $r=nmManifest($db,$task,$rev,$manifest,$provider);
     if(!hash_equals($r['asset_hash'],$hash)||$bytes<12||$bytes>($provider==='x'?5:10)*1000000||strlen($r['caption'])>($provider==='x'?280:900))throw new InvalidArgumentException('Asset mismatch');
-    foreach(['growth_network_media','growth_network_publications','growth_linkedin_video'] as $table){
+    foreach(['growth_network_media','growth_network_publications','growth_linkedin_video','growth_x_video'] as $table){
         $q=$db->prepare("SELECT id FROM $table WHERE task_id=? AND revision=?");$q->execute([$task,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision already reserved for media or text');
     }
     $db->prepare('INSERT INTO growth_network_media(task_id,revision,manifest_hash,asset_kind,asset_hash,byte_count,target_id,caption,provider) VALUES(?,?,?,?,?,?,?,?,?)')->execute([$task,$rev,$manifest,'photo',$hash,$bytes,$p['id'],$r['caption'],$provider]);
@@ -81,7 +81,7 @@ function nmRecoveryReport(PDO $db,array $cfg,string $command):?string {
     $lines=['Media reconciliation only; do not retry uncertain posts.'];
     $q=$db->query("SELECT m.id,m.provider,m.status,r.resource_id,r.phase FROM growth_network_media m LEFT JOIN growth_network_media_resources r ON r.publication_id=m.id WHERE m.status IN ('sending','unknown') ORDER BY m.id DESC LIMIT 10");
     foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='#'.$r['id'].' '.$r['provider'].' '.$r['status'].' '.($r['resource_id']?$r['phase'].' '.$r['resource_id']:'no recorded resource');
-    foreach(["SELECT id,'linkedin video' AS provider,status,video_id AS resource_id FROM growth_linkedin_video WHERE status IN ('uploading','publishing','unknown') ORDER BY id DESC LIMIT 5","SELECT id,'instagram reel' AS provider,status,container_id AS resource_id FROM growth_instagram_uploads WHERE status IN ('uploading','publishing','unknown') ORDER BY id DESC LIMIT 5"] as $sql){
+    foreach(["SELECT id,CONCAT(provider,' ',asset_kind) AS provider,status,container_id AS resource_id FROM growth_meta_images WHERE status IN ('fetching','publishing','unknown') ORDER BY id DESC LIMIT 5","SELECT id,'x video' AS provider,status,video_id AS resource_id FROM growth_x_video WHERE status IN ('uploading','publishing','unknown') ORDER BY id DESC LIMIT 5","SELECT id,'linkedin video' AS provider,status,video_id AS resource_id FROM growth_linkedin_video WHERE status IN ('uploading','publishing','unknown') ORDER BY id DESC LIMIT 5","SELECT id,'instagram reel' AS provider,status,container_id AS resource_id FROM growth_instagram_uploads WHERE status IN ('uploading','publishing','unknown') ORDER BY id DESC LIMIT 5"] as $sql){
         foreach($db->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='#'.$r['id'].' '.$r['provider'].' '.$r['status'].' '.($r['resource_id']??'no recorded resource');
     }
     return count($lines)===1?'No uncertain media rows.':implode("\n",$lines);

@@ -130,3 +130,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.2H.1 acceptance (pending runtime)
 
 - [ ] Verify LinkedIn video format/rights and scopes, exact org, ranges/ETags, receipt persistence failure, separate AVAILABLE gate and actual visibility; Instagram receipt before binary, unified uncertain report, text/image/video exclusivity and storage protection. No automatic retry or other video/carousel acceptance.
+
+## V10.2H.2 acceptance (pending runtime)
+
+- [ ] Apply after V10.2H.1. Verify existing Meta image rows remain images, X scope and exact user, ordered chunks, durable ID before append, finalize/processing/expiry, exact public approval and no duplicate, Threads video type/hash and HTTPS GET/HEAD delivery, pause/cap/expiry/revocation, no caching/log leakage, container FINISHED and provider visibility. Validate real format and quotas, HTTP Range behavior, crash reconciliation and storage references. No carousel or partial-upload resume acceptance.

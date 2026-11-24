@@ -6,7 +6,7 @@
 
 ## V9–V10 development addendum (24 November 2026)
 
-Main V9.6 verified; V9.7–V10.2H.1 stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D then V10.2E then V10.2F then V10.2G then V10.2H then V10.2H.1; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
+Main V9.6 verified; V9.7–V10.2H.2 stacked development branches are not deployed. Use [PROJECT_STATUS](docs/PROJECT_STATUS.md) for latest evidence. Review all missing additive migrations in release order (V8, V8.4, V9.1–V9.9, V10.0 then V10.1 then V10.2 then V10.2A then V10.2B then V10.2C then V10.2D then V10.2E then V10.2F then V10.2G then V10.2H then V10.2H.1 then V10.2H.2; do not use lexical filename order); never blindly reimport a live schema. Fresh isolated database uses full schema.sql. Keep all growth/analytics/discovery/creative/creative_transport/media/expert/seo/social/owner-report flags OFF until individual acceptance. Private CLI scripts go in secure/maintenance, local Python workers on the trusted PC, no models or generated assets in public_html. Follow module runbooks and staging gates. SEO is source-only and has no authorized Search Console connection yet.
 
 ## 1 — Deployment model and file destinations
 
@@ -181,3 +181,5 @@ V10.2G: enable oauth_lifecycle before any live social activation; set per-provid
 V10.2H: apply media resource ledger migration before existing LinkedIn/X image workers run. Inspect /mediarecovery for uncertain rows; never requeue automatically. See docs/V102H_MEDIA_RECOVERY.md.
 
 V10.2H.1: apply after V10.2H, LinkedIn video flag OFF. Verify actual API scope/version, private MP4, signed multipart ranges and intermediate URN/ETag finalization; Reel receipt before binary. See docs/V102H1_VIDEO_BATCH.md.
+
+V10.2H.2: apply migration after V10.2H.1, including X ledger and default image asset_kind on existing Meta rows. New flags x_video_enabled and threads_video_enabled OFF. Verify X user scope/processing/expiry and Threads HTTPS full MP4 fetch, redacted logs, no cache and host memory/quotas before enabling. No HTTP Range support; actual provider compatibility unverified. See docs/V102H2_VIDEO_BATCH.md.

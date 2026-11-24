@@ -11,7 +11,7 @@ function networkRequest(array $p,string $method,string $path,array $data=[]):arr
     curl_setopt_array($ch,[CURLOPT_HTTPHEADER=>$headers,CURLOPT_FOLLOWLOCATION=>false,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_PROXY=>'',CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>30,
         CURLOPT_HEADERFUNCTION=>static function($ch,string $line)use(&$receipt):int{if(preg_match('/^HTTP\//i',$line))$receipt=null;if(stripos($line,'x-restli-id:')===0)$receipt=trim(substr($line,12));return strlen($line);},
         CURLOPT_WRITEFUNCTION=>static function($ch,string $chunk)use(&$body):int{if(strlen($body)+strlen($chunk)>65536)return 0;$body.=$chunk;return strlen($chunk);}]);
-    if($method==='POST'){curl_setopt($ch,CURLOPT_POST,true);curl_setopt($ch,CURLOPT_POSTFIELDS,json_encode($data,JSON_THROW_ON_ERROR));}
+    if($method==='POST'){curl_setopt($ch,CURLOPT_POST,true);curl_setopt($ch,CURLOPT_POSTFIELDS,$p['provider']==='x'&&preg_match('#^2/media/upload/[1-9][0-9]{0,18}/finalize$#D',$path)&&$data===[]?'':json_encode($data,JSON_THROW_ON_ERROR));}
     $ok=curl_exec($ch);$code=(int)curl_getinfo($ch,CURLINFO_RESPONSE_CODE);curl_close($ch);
     return ['http'=>$ok===false?0:$code,'json'=>json_decode($body,true,32,JSON_BIGINT_AS_STRING),'receipt'=>$receipt];
 }
