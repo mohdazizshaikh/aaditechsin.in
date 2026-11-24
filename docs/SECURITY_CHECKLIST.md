@@ -113,3 +113,7 @@
 ## V10.2K/V10.3 security (pending runtime)
 
 - [ ] Separate Telegram business bot and owner bot, bounded fixed-host HTTPS multipart without redirects/proxy, exact channel verification, explicit approval, no automatic retry, no raw tokens or response logging. Communications: aggregate counts only, explicit authorized import, no personal identifiers, contents, recordings, credential harvesting or outreach. Verify lawful source authorization and retention before activation.
+
+## V10.3A/V10.4 security (pending runtime)
+
+- [ ] Metadata-only Gmail scope with dedicated authorized business account, fixed HTTPS GET endpoints, no message lists/bodies/headers/IDs, no credentials or mailbox address in DB/reports, short local expiry gate, generation change, latest count snapshot only. Verify OAuth consent and restricted-scope policy before activation. Local discovery only from explicitly authorized sources, no scraping/contact harvesting, bounded batch, exact validation, no automatic outreach; reminders internal only and owner controlled.

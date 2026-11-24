@@ -108,3 +108,7 @@ Explicit local approved manifest digest and exact asset bytes -> private spool -
 ## V10.2K/V10.3 Telegram media and communications boundary
 
 Exact approved private PNG/MP4 -> exclusive Telegram revision -> owner type/manifest/channel approval -> separate business bot identity and channel administrator permission check -> one multipart send -> validated message/channel receipt. No owner bot reuse or unknown replay. Communications: authorized private CLI imports only aggregate channel/completed UTC-day counts, rejects extra fields and conflicting duplicate summaries, no message bodies or identifiers. Existing owner daily reports include previous UTC day only when enabled. See V102K_V103_COMMUNICATIONS.md.
+
+## V10.3A/V10.4 intelligence boundary
+
+Dedicated authorized Gmail metadata credential, exact mailbox profile, fixed INBOX label counts, generation/expiry and pause gates -> single latest sanitized snapshot (no message IDs, headers or bodies). Authorized local discovery JSON uses existing allowlisted feed schema and service matching, transactional batch, duplicate fingerprints and run evidence. Qualified opportunities receive owner-set UTC internal review dates; completion/cancellation audit only, no send. /intelligence and existing daily owner reports aggregate stored evidence. See V103A_V104_INTELLIGENCE.md.
