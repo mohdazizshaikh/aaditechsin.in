@@ -34,7 +34,7 @@ def client(url,token):
             body=response.read(16385)
         if len(body)>16384:
             raise ValueError("Response too large")
-        return json.loads(body)
+        return local.strict_json(body)
     return post
 
 def run_once(post,model,generate=local.generate):
@@ -71,15 +71,47 @@ def run_once(post,model,generate=local.generate):
         raise ValueError("Unexpected acknowledgement")
     return expected
 
+def run_batch(post,model,limit,generate=local.generate):
+    if type(limit) is not int or not 1<=limit<=20:
+        raise ValueError("Batch limit must be 1–20")
+    local.validate_model(model)
+    counts={"completed":0,"failed":0,"stop":"limit"}
+    for _ in range(limit):
+        status=run_once(post,model,generate)
+        if status=="empty":
+            counts["stop"]="empty"
+            break
+        if status=="failed":
+            counts["failed"]+=1
+            counts["stop"]="failed"
+            break
+        counts["completed"]+=1
+    return counts
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--endpoint",required=True)
     p.add_argument("--model",required=True)
+    p.add_argument("--model-digest",help="Independently verified installed model SHA256")
+    p.add_argument("--limit",type=int,default=1,help="Maximum jobs per invocation (1–20)")
     a=p.parse_args()
     try:
-        status=run_once(client(a.endpoint,os.environ.get("AADITECHS_CREATIVE_WORKER_TOKEN","")),a.model)
-        print(status)
-        return 1 if status=="failed" else 0
+        local.validate_model(a.model)
+        if not 1<=a.limit<=20 or (a.limit>1 and not a.model_digest):
+            raise ValueError("Bounded batch requires a pinned model")
+        post=client(a.endpoint,os.environ.get("AADITECHS_CREATIVE_WORKER_TOKEN",""))
+        generate=local.generate
+        if a.model_digest:
+            spec=importlib.util.spec_from_file_location("runtime",Path(__file__).with_name("local-runtime-check.py"))
+            runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
+            generate=runtime.pinned_generator(a.model,a.model_digest)
+        if a.limit==1:
+            status=run_once(post,a.model,generate)
+            print(status)
+            return 1 if status=="failed" else 0
+        counts=run_batch(post,a.model,a.limit,generate)
+        print(json.dumps(counts))
+        return 1 if counts["failed"] else 0
     except Exception:
         print("BLOCKED: worker configuration, lease, generation or transport unavailable.",file=sys.stderr)
         return 1

@@ -180,3 +180,7 @@ Independent default-off scheduler admission requires explicit cadence and config
 ## V10.6P owner coverage intelligence
 
 Existing owner read-only snapshot adds catalog-complete opportunities, four-objective creative channel coverage, and fixed page/source/service aggregate dimensions in the completed IST window. No raw personal identifiers or new collection; no provider writes. See V106P_OWNER_COVERAGE_INTELLIGENCE.md.
+
+## V10.6Q pinned local worker
+
+Optional pinned mode checks exact model inventory before claim and before/after inference. Bounded sequential polling stops at empty/failure/uncertainty. Exact checked-in catalog and strict JSON protect inputs/outputs. No new network destination or publication capability. See V106Q_PINNED_LOCAL_WORKER.md.

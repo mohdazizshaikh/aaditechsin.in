@@ -29,7 +29,24 @@ def tags():
     with opener.open("http://127.0.0.1:11434/api/tags",timeout=10) as r:
         raw=r.read(262145)
     if len(raw)>262144:raise ValueError("Inventory too large")
-    return json.loads(raw)
+    return local.strict_json(raw)
+
+def pinned_generator(model,expected,inventory=tags,transport=local.request_local):
+    # Self-reported inventory is a consistency check, not remote attestation.
+    model_identity(model,expected,inventory())
+    def generate(job,requested):
+        if requested!=model:
+            raise ValueError("Pinned model mismatch")
+        model_identity(model,expected,inventory())
+        def checked(payload):
+            response=transport(payload)
+            if not isinstance(response,dict) or response.get("model")!=model:
+                raise ValueError("Exact returned model required")
+            return response
+        result=local.generate(job,model,checked)
+        model_identity(model,expected,inventory())
+        return result
+    return generate
 
 def smoke(model,transport=local.request_local):
     response=transport({"model":model,"stream":False,"format":{"type":"object","properties":{"status":{"type":"string","enum":["ready"]}},"required":["status"],"additionalProperties":False},"messages":[{"role":"user","content":"Return exactly a JSON object with status ready. This is a synthetic test."}],"options":{"temperature":0,"num_predict":32}})

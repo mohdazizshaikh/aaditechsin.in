@@ -17,3 +17,5 @@ Claims have a 10-minute lease and at most three attempts per revision. A failed 
 
 ## Acceptance still required
 Real Hostinger TLS and header forwarding, rate limiting, credential rotation/revocation, concurrent PC runs, actual local Ollama inference, interruption/restart, manual recovery, migration backup/restore and scheduling. No activation or production deployment by source CI.
+
+V10.6Q adds explicit --model-digest and --limit 1–20 (digest required for multi-job mode); see [pinned worker guide](V106Q_PINNED_LOCAL_WORKER.md). Legacy one-job invocation remains. No scheduler installed.

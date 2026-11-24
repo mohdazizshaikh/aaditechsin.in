@@ -225,3 +225,5 @@ V10.6N: no migration/flag changes. Private creative batch optionally takes LIMIT
 V10.6O: no migration. Discovery scheduler flag OFF. Only after source authorization and staging acceptance enable cadence and scheduler; private discovery-feed.php --schedule-check then --schedule-status; approved scheduler may invoke --scheduled-run. No cron installed; stop workers and pause before recovery. See docs/V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.
 
 V10.6P: no migration or new flags. Existing private dashboard and CSV authorization apply. Creative coverage requires existing creative batch flag; web breakdown requires consented analytics. Confirm complete catalog, missing-vs-zero, private headers and aggregate CSV on isolated staging before enabling. See docs/V106P_OWNER_COVERAGE_INTELLIGENCE.md.
+
+V10.6Q: no migration/new flag. Existing private creative transport gate remains. For multi-job invocation provide independently verified local model digest and --limit 1–20. Check actual offline runtime, protected token, TLS, stop behavior and non-overlap before scheduling. See docs/V106Q_PINNED_LOCAL_WORKER.md.

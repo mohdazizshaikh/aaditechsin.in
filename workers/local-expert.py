@@ -19,14 +19,13 @@ def generate(job,model,transport=local.request_local):
     sid=job["service_id"]
     if sid not in catalog or job["service"]!=catalog[sid] or job["knowledge"]!=kb[sid] or job["intent"] not in ("assessment","planning","escalation"):
         raise ValueError("Only exact local catalog and predefined intent allowed")
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,99}",model) or "cloud" in model.lower():
-        raise ValueError("Use installed local model")
+    local.validate_model(model)
     schema={"type":"object","properties":{k:{"type":"string","maxLength":n} for k,n in limits.items()},"required":list(limits),"additionalProperties":False}
     system="Draft a private technical planning assessment, not a final engineering design. Use the supplied catalog as the only business facts and supplied guidance as the scope. Ask non-sensitive requirements questions. Do not provide exact specs, pricing, credentials, destructive repair, exploit steps, dangerous electrical or rigging instructions, guarantees, personal data or external links. Escalate uncertainties to an authorized human engineer. Do not execute anything. Return JSON in English within UTF-8 byte limits "+json.dumps(limits)
     r=transport({"model":model,"stream":False,"format":schema,"messages":[{"role":"system","content":system},{"role":"user","content":json.dumps({"service":job["service"],"guidance":job["knowledge"],"intent":job["intent"]})}],"options":{"temperature":0.2,"num_predict":800}})
-    if r.get("done") is not True or r.get("message",{}).get("tool_calls"):
-        raise ValueError("Incomplete or tool response")
-    d=json.loads(r["message"]["content"])
+    if not isinstance(r,dict) or r.get("done") is not True or not isinstance(r.get("message"),dict) or r["message"].get("tool_calls") or ("model" in r and r["model"]!=model):
+        raise ValueError("Incomplete, mismatched or tool response")
+    d=local.strict_json(r["message"]["content"])
     if not isinstance(d,dict) or set(d)!=set(limits):
         raise ValueError("Invalid output")
     for k,n in limits.items():
@@ -40,7 +39,7 @@ def main():
     try:
         raw=sys.stdin.buffer.read(16385)
         if len(raw)>16384:raise ValueError("Oversized job")
-        print(json.dumps(generate(json.loads(raw),a.model),ensure_ascii=False))
+        print(json.dumps(generate(local.strict_json(raw),a.model),ensure_ascii=False))
         return 0
     except Exception:
         print("BLOCKED: invalid expert job, model or draft.",file=sys.stderr)
