@@ -223,3 +223,5 @@ V10.6M: apply 2026-11-25-v106m.sql after V10.6J (K/L no migrations). Contract 36
 V10.6N: no migration/flag changes. Private creative batch optionally takes LIMIT (1–126) on both --plan and --apply; review selected cells and use the same limit and fresh v2 digest. Old v1 plans are invalid. Verify synthetic CI and actual private staging before use; no generation or publishing from batch creation. See docs/V106N_BOUNDED_CREATIVE_REVIEW.md.
 
 V10.6O: no migration. Discovery scheduler flag OFF. Only after source authorization and staging acceptance enable cadence and scheduler; private discovery-feed.php --schedule-check then --schedule-status; approved scheduler may invoke --scheduled-run. No cron installed; stop workers and pause before recovery. See docs/V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.
+
+V10.6P: no migration or new flags. Existing private dashboard and CSV authorization apply. Creative coverage requires existing creative batch flag; web breakdown requires consented analytics. Confirm complete catalog, missing-vs-zero, private headers and aggregate CSV on isolated staging before enabling. See docs/V106P_OWNER_COVERAGE_INTELLIGENCE.md.
