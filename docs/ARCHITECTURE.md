@@ -66,3 +66,7 @@ Private hash-verified MP4 -> owner-approved public Reel -> fixed Meta resumable 
 ## V10.2C Facebook media boundary
 
 Approved private PNG/MP4 -> hash and profile check -> exclusive text-or-media reservation -> explicit owner approval of kind and Page -> direct multipart exact bytes to fixed Meta host. Local Pillow/FFmpeg/ffprobe verify trusted source assets; server checks hash/basic profile. See V102C_FACEBOOK_MEDIA.md.
+
+## V10.2D network image boundary
+
+Private PNG, exact revision/hash/target, exclusive text-or-image reservation, explicit public owner approval, bounded provider upload/readiness and attachment, no blind retries. See V102D_NETWORK_MEDIA.md.

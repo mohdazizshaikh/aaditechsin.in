@@ -4,9 +4,9 @@ require_once __DIR__.'/creative-core.php';
 function publicationOverview(PDO $db,array $cfg,string $cmd):?string{
     if($cmd!=='/publications')return null;
     if(!creativeEnabled($cfg)||($cfg['social']['enabled']??false)!==true)return 'Social reporting disabled.';
-    $sql="SELECT provider,status,COUNT(*) AS n FROM (SELECT 'telegram' AS provider,status FROM growth_publications UNION ALL SELECT provider,status FROM growth_meta_publications UNION ALL SELECT provider,status FROM growth_network_publications UNION ALL SELECT 'youtube' AS provider,status FROM growth_media_uploads UNION ALL SELECT 'instagram' AS provider,status FROM growth_instagram_uploads UNION ALL SELECT 'facebook' AS provider,status FROM growth_facebook_media) AS all_posts GROUP BY provider,status ORDER BY provider,status";
+    $sql="SELECT provider,status,COUNT(*) AS n FROM (SELECT 'telegram' AS provider,status FROM growth_publications UNION ALL SELECT provider,status FROM growth_meta_publications UNION ALL SELECT provider,status FROM growth_network_publications UNION ALL SELECT 'youtube' AS provider,status FROM growth_media_uploads UNION ALL SELECT 'instagram' AS provider,status FROM growth_instagram_uploads UNION ALL SELECT 'facebook' AS provider,status FROM growth_facebook_media UNION ALL SELECT provider,status FROM growth_network_media) AS all_posts GROUP BY provider,status ORDER BY provider,status";
     $lines=['All publication ledgers (historical counts, not reach or visibility):'];
     foreach($db->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]=$r['provider'].' '.$r['status'].': '.$r['n'];
-    $lines[]='Facebook media, Instagram Reels and YouTube staged upload source only. Sending/uploading/publishing/unknown require manual reconciliation.';
+    $lines[]='LinkedIn/X images, Facebook media, Instagram Reels and YouTube staged upload source only. Sending/uploading/publishing/unknown require manual reconciliation.';
     return implode("\n",$lines);
 }
