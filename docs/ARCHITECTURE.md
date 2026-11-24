@@ -58,3 +58,7 @@ Separate LinkedIn organization, X user-context and GBP account/location text led
 ## V10.2A media boundary
 
 Trusted PC -> manual authenticated private transfer -> CLI SHA256-bound content-addressed MP4 storage -> immutable metadata and exact manifest/revision/visibility/channel review -> explicit YouTube resumable upload -> receipt ledger. No public media URL. Uncertain sends never requeued. Instagram and other media providers remain pending. See V102A_MEDIA_UPLOAD.md.
+
+## V10.2B Instagram boundary
+
+Private hash-verified MP4 -> owner-approved public Reel -> fixed Meta resumable binary endpoint -> processing container ledger -> read-only FINISHED status -> separate explicit publish CLI and receipt. No publicly served binary or provider-supplied upload URL. Recheck Page/linked account at each stage. See V102B_INSTAGRAM.md.

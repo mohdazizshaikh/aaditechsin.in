@@ -63,3 +63,7 @@
 ## V10.2A private media security (pending live)
 
 - [ ] Verify private directory, trusted files, symlink refusal, exact binary hash, immutable metadata and channel binding, provider URL allowlist, no public paths/credentials, orphan file cleanup and retention policy. Never retry uncertain uploads; review actual files and platform policy.
+
+## V10.2B Instagram security (pending live)
+
+- [ ] Direct binary upload only to fixed Meta host. Validate linked Page/IG identity, manifest/byte count, separate public Reel approval, FINISHED gate, no URL exposure, no retries, manually reconcile in-flight/uncertain/expired states. Review media rights and disclosures.

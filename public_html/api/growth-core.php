@@ -46,7 +46,7 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
 function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/creativeworker /retrycreative ID REV\n/media ID /approvemedia ID REV SHA256 /rejectmedia ID REV SHA256\n/uploads /upload ID /approveupload ID SHA256 VISIBILITY CHANNEL_ID /cancelupload ID\n/expert SERVICE assessment|planning|escalation /experts\n/seo /seotopics SERVICE\n/publications /network /networktarget /networkschedule PROVIDER TASK REV ACCOUNT_ID UTC_TIME /networkcancel ID\n/meta /metatarget /metaschedule PROVIDER TASK REV ACCOUNT_ID UTC_TIME /metacancel ID\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate publication authorization required.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/creativeworker /retrycreative ID REV\n/media ID /approvemedia ID REV SHA256 /rejectmedia ID REV SHA256\n/uploads /upload ID /approveupload ID SHA256 VISIBILITY CHANNEL_ID /cancelupload ID\n/igreels /igreel ID /approveig ID SHA256 ACCOUNT_ID /cancelig ID\n/expert SERVICE assessment|planning|escalation /experts\n/seo /seotopics SERVICE\n/publications /network /networktarget /networkschedule PROVIDER TASK REV ACCOUNT_ID UTC_TIME /networkcancel ID\n/meta /metatarget /metaschedule PROVIDER TASK REV ACCOUNT_ID UTC_TIME /metacancel ID\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate publication authorization required.";
     require_once __DIR__.'/reports-core.php';
     $report=reportCommand($db,$cfg,$command);
     if($report!==null)return $report;
@@ -68,6 +68,9 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     require_once __DIR__.'/expert-core.php';
     $expert=expertCommand($db,$cfg,$command);
     if($expert!==null)return $expert;
+    require_once __DIR__.'/instagram-core.php';
+    $ig=igCommand($db,$cfg,$command);
+    if($ig!==null)return $ig;
     require_once __DIR__.'/upload-core.php';
     $upload=uploadCommand($db,$cfg,$command);
     if($upload!==null)return $upload;
