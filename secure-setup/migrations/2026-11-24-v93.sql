@@ -1,5 +1,5 @@
 
--- V9.3 evidence-backed opportunities; no external contact or delivery.
+-- V9.3 evidence-backed opportunities, no external contact or delivery.
 CREATE TABLE IF NOT EXISTS growth_opportunities (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
  fingerprint CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
