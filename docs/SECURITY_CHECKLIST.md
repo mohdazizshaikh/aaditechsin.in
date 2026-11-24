@@ -121,3 +121,7 @@
 ## V10.5 security (pending runtime)
 
 - [ ] Independent default-OFF dashboard flag, portal owner role only, existing password/TOTP session fingerprint, expiry, HTTPS, GET only, strict period allowlist, server-side escaping, private headers and no external scripts. No personal contact fields, message bodies, drafts, source URLs, raw receipts/tokens or write actions. Confirm staging access controls and performance with realistic sanitized data before activation.
+
+## V10.5A/V10.6A security (pending runtime)
+
+- [ ] Owner-only HTTPS CSV, separate OFF flag, bounded aggregate columns, formula escaping, no customer/session IDs, no messages or credential fields, private download storage and retention review. Communication batch CLI only with explicit source authorization, independent flag, bounded payload and atomic rollback. Release checker read-only, no raw credentials/errors, no database changes. Migration replay uses synthetic loopback CI database only; never run destructive test reset on live/staging data. Verify actual backup and restore separately.

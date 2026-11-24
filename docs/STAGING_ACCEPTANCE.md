@@ -154,3 +154,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.5 acceptance (pending runtime)
 
 - [ ] Verify authorized owner HTTPS access, guest/partner rejection, session inactivity and fingerprint rotation, disabled flag, invalid dates/POST rejection, no-store/noindex/CSP, no customer fields or credentials, 7/30 completed UTC windows and current-status cohort labels, missing vs zero communications coverage, all-ledger and OAuth caveats, mobile table readability and DB/query performance on staging. Verify actual data sources separately. No dashboard mutation or release approval inferred.
+
+## V10.5A/V10.6A acceptance (pending runtime)
+
+- [ ] Verify prior schema baseline and missing migration order using release contract; encrypted/controlled backup and restore rehearsal in isolation; stop workers and pause growth before changes. Run read-only release-check.php --check-db; independently inspect types/indexes/FKs, data integrity, schema engine compatibility and privileges. Verify consented IST activity vs UTC aggregates, 7/30 windows, missing data, CSV owner-only and private headers, no sensitive values or spreadsheet formula injection, authorized communication batch dedupe/conflict rollback. Actual provider connectors, live credentials and production release remain pending.
