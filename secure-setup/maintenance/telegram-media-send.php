@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/telegram-send.php';
 function tgMediaRequest(array $p,string $method,array $data):array {
-    if(PHP_SAPI!=='cli'||!function_exists('curl_init')||!preg_match('/^[0-9]{5,16}:[A-Za-z0-9_-]{20,128}$/D',$p['token']??'')||!in_array($method,['getMe','getChat','getChatMember','sendPhoto','sendVideo'],true))throw new RuntimeException('Invalid request');
+    if(PHP_SAPI!=='cli'||!function_exists('curl_init')||!preg_match('/^[0-9]{5,16}:[A-Za-z0-9_-]{20,128}$/D',$p['token']??'')||!in_array($method,['getMe','getChat','getChatMember','sendPhoto','sendVideo','sendMediaGroup'],true))throw new RuntimeException('Invalid request');
     $ch=curl_init('https://api.telegram.org/bot'.$p['token'].'/'.$method);$body='';
     curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>$data,CURLOPT_FOLLOWLOCATION=>false,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_PROXY=>'',CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>120,CURLOPT_WRITEFUNCTION=>static function($ch,string $chunk)use(&$body):int{if(strlen($body)+strlen($chunk)>65536)return 0;$body.=$chunk;return strlen($chunk);}]);
     try{$ok=curl_exec($ch);return ['http'=>$ok===false?0:(int)curl_getinfo($ch,CURLINFO_RESPONSE_CODE),'body'=>$body];}finally{curl_close($ch);}
