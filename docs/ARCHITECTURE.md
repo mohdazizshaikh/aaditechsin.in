@@ -164,3 +164,7 @@ Explicit local runtime diagnostic checks one installed Ollama model tag and oper
 ## V10.6L discovery automation boundary
 
 Remote feed admission locks growth control, blocks unresolved source runs and optionally limits attempts per source by minimum interval. Checks pause after fetch and before each record, including run state; partial committed imports remain pending owner review. Local batch uses savepoint rollback on failure. Private interrupted-run recovery requires paused growth, stopped workers attested by operator, exact state digest and age at least one hour; marks run failed only, never retries or modifies opportunities. See V106L_DISCOVERY_AUTOMATION.md.
+
+## V10.6M bulk coverage and replay retention
+
+One independently enabled private creative planner computes missing service/channel cells for one objective across the 14×9 catalog. Paused growth blocks plan/apply; exact matrix digest and global growth lock serialize creation. Existing tasks in any status prevent duplicate coverage, savepoint makes batch atomic; all new requests remain regeneration_requested and require separate generation/review/publication gates. Owner /coveragegrid OBJECTIVE reports coverage, not publishing. Twilio historical cleanup moves eligible keyed replay digests into a dedicated hash-only table and removes associated day/account/channel metadata transactionally, retaining duplicate protection under the same stable key and target. Shared reconciliation ledger registry used by release worker-state check. See V106M_BULK_COVERAGE_RELEASE.md.
