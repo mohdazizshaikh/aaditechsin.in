@@ -100,10 +100,10 @@ function feedRun(PDO $db,array $src,callable $fetch,int $minutes=0):array {
         $db->beginTransaction();creativeActive($db);$db->commit();
         foreach($parsed['records'] as $i=>$item){
             $db->beginTransaction();
-            try{creativeActive($db);$r=discoveryImport($db,$item);$db->commit();if($r['status']==='duplicate')++$dups;else ++$n;}
+            try{creativeActive($db);$check=$db->prepare("SELECT COUNT(*) FROM growth_source_runs WHERE id=? AND status='running'");$check->execute([$id]);if((int)$check->fetchColumn()!==1)throw new RuntimeException('source_run_resolved');$r=discoveryImport($db,$item);$db->commit();if($r['status']==='duplicate')++$dups;else ++$n;}
             catch(Throwable $e){
                 if($db->inTransaction())$db->rollBack();
-                if($e->getMessage()==='Growth paused'){$skip+=count($parsed['records'])-$i;$error='growth_paused';$state='partial';break;}
+                if(in_array($e->getMessage(),['Growth paused','source_run_resolved'],true)){$skip+=count($parsed['records'])-$i;$error=$e->getMessage()==='Growth paused'?'growth_paused':'source_run_resolved';$state='partial';break;}
                 ++$skip;$error='record_import_failed';
             }
         }

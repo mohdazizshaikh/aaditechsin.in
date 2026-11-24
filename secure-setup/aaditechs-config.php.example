@@ -19,7 +19,7 @@ return [
         'followups_enabled' => false,
         'local_batch_enabled' => false,
         'enabled' => false,
-        'cadence_enabled' => false, 'minimum_interval_minutes' => 1440,
+        'recovery_enabled' => false, 'cadence_enabled' => false, 'minimum_interval_minutes' => 1440,
         'feeds_enabled' => false, // Explicitly authorize each provider before enabling.
         'feeds' => [], // See docs/V931_SOURCE_ADAPTER.md. No providers connected by default.
     ],
