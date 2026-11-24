@@ -42,3 +42,126 @@
 - [ ] Enroll owner authenticator securely, verify server clock and recovery on **HTTPS staging**, then enable MFA in private config if approved.
 - [ ] Add or evaluate second factor for partners according to risk; currently their sign-in is password-only.
 - [ ] Complete staging DB/SMTP/auth tests, audit privacy copy and verify backup before public launch.
+
+## V9–V10 growth security addendum (pending live verification)
+
+- [ ] Independent owner/publishing/worker credentials, HTTPS, scoped leases, no secrets logged, rate limits and revocation verified.
+- [ ] Local model loopback only; trusted weights, cloud disabled, no customer data in catalog-only job payloads.
+- [ ] Media files private, exact manifest review, no publication permission; expert drafts human reviewed.
+- [ ] SEO audit read-only, approved metadata changes via review, no public report endpoint or invented metrics.
+- [ ] Verify all defaults OFF, backup/restore and staging sign-off before activation.
+
+## V10.1 Meta security gates (pending runtime)
+
+- [ ] Verify least privilege Meta scopes, approved test account IDs and separate tokens, no query secrets/redirects, exact HTTPS identity, scoped revision and receipt ledger.
+- [ ] Test ambiguous send reconciliation and stop worker before pause/credential rotation. No automatic retries. Instagram and private media remain unconnected.
+
+## V10.2 network security gates (pending live verification)
+
+- [ ] Verify scoped organization/user/location identity, separate OAuth tokens, bounded HTTPS transport and no redirects, no logs of secrets or raw errors. No automatic retries, only approved revisions, manual uncertain reconciliation. Confirm actual provider visibility and quotas separately.
+
+## V10.2A private media security (pending live)
+
+- [ ] Verify private directory, trusted files, symlink refusal, exact binary hash, immutable metadata and channel binding, provider URL allowlist, no public paths/credentials, orphan file cleanup and retention policy. Never retry uncertain uploads; review actual files and platform policy.
+
+## V10.2B Instagram security (pending live)
+
+- [ ] Direct binary upload only to fixed Meta host. Validate linked Page/IG identity, manifest/byte count, separate public Reel approval, FINISHED gate, no URL exposure, no retries, manually reconcile in-flight/uncertain/expired states. Review media rights and disclosures.
+
+## V10.2C media security (pending live)
+
+- [ ] No public asset URLs, exact in-memory bytes, fixed host, private storage, exclusive revision reservation, explicit Page/type approval, bounded upload, manual uncertain reconciliation. Verify actual file rights, provider specifications and retention.
+
+## V10.2D image security (pending runtime)
+
+- [ ] Exact image hash, size, scoped upload URL, no redirects or token logs, owner/expiry check, public approval, exclusive revision, no blind retries.
+
+## V10.2E bearer media security (pending runtime)
+
+- [ ] 256-bit token digest, 15-minute window, 20 requests, no caching or token logs, exact bytes and current approval, revoke on cancel/publish, no sensitive content. Bearer URLs are accessible to anyone holding them; do not enable unless hosting/CDN log redaction confirmed. Verify rate limits and retention.
+
+- [ ] Keep fetch_log_redaction_verified OFF until actual query log redaction is independently checked. No public endpoint activation by default.
+
+## V10.2F media retention security (pending runtime)
+
+- [ ] Owner session only, no public preview, exact content-addressed name and hash, no symlinks/hardlinks, bounded bytes, all references protected, no deletion, paused explicit CLI only. Review actual backups, audit recovery, storage quota and retention policy.
+
+## V10.2G OAuth security (pending runtime)
+
+- [ ] Private token config 0600, no secrets in DB/logs/Telegram/Git, mandatory lifecycle enforcement at release, fail closed on missing/expired/revoked metadata, manual paused rotation and actual provider revocation. Identity health is not scope or publish proof.
+
+## V10.2H media reconciliation security
+
+- [ ] Persist only validated intermediate resource ID, no signed URL/token or raw response. No automatic retry; inspect uncertain rows and reconcile provider-side. Test audit failure and worker interruption.
+
+## V10.2H.1 security (pending runtime)
+
+- [ ] Private exact hash, exclusive revision, explicit public approval, pinned signed URL without OAuth bearer, bounded multipart, persistent URN and Reel container, no secret logging or blind retries. Verify actual host quotas and provider rights.
+
+## V10.2H.2 security (pending runtime)
+
+- [ ] Private exact video hash, exclusive text/image/video reservation, separate explicit public approval, no secrets in receipts or reports, X bounded fixed-host upload, fail closed on processing/expiry, Threads short-lived bearer (any holder can fetch), mandatory verified log redaction, cap and revocation, no sensitive assets. Check actual memory/rate limits, stop workers before emergency pause, no uncertain replay.
+
+## V10.2H.3 security (pending runtime)
+
+- [ ] Exact ordered bundle approval, image-only 2–5 cap, independent high-entropy bearer digest per child, verified log redaction/no cache, pause and current manifest checks, persist child evidence before next write, revoke on parent/cancel/failure, no raw tokens in reports. Single-range video only after full verified read, request cap retained. Private inbox separate from webroot and storage, exact hashes, no credential persistence, source files retained. No automatic retry or real posting.
+
+## V10.2I/J security (pending runtime)
+
+- [ ] Keep transfer config, SSH key, known_hosts and local artifacts private, verify host fingerprint out of band, dedicated least-privilege SFTP inbox user and no password/agent/proxy, no automatic retry or deletion. Confirm server path cannot expose webroot and permissions/quotas enforced. OAuth alerts contain only sanitized local deadline/health, not secrets or provider responses. Keep live features OFF until accepted.
+
+## V10.2K/V10.3 security (pending runtime)
+
+- [ ] Separate Telegram business bot and owner bot, bounded fixed-host HTTPS multipart without redirects/proxy, exact channel verification, explicit approval, no automatic retry, no raw tokens or response logging. Communications: aggregate counts only, explicit authorized import, no personal identifiers, contents, recordings, credential harvesting or outreach. Verify lawful source authorization and retention before activation.
+
+## V10.3A/V10.4 security (pending runtime)
+
+- [ ] Metadata-only Gmail scope with dedicated authorized business account, fixed HTTPS GET endpoints, no message lists/bodies/headers/IDs, no credentials or mailbox address in DB/reports, short local expiry gate, generation change, latest count snapshot only. Verify OAuth consent and restricted-scope policy before activation. Local discovery only from explicitly authorized sources, no scraping/contact harvesting, bounded batch, exact validation, no automatic outreach; reminders internal only and owner controlled.
+
+## V10.5 security (pending runtime)
+
+- [ ] Independent default-OFF dashboard flag, portal owner role only, existing password/TOTP session fingerprint, expiry, HTTPS, GET only, strict period allowlist, server-side escaping, private headers and no external scripts. No personal contact fields, message bodies, drafts, source URLs, raw receipts/tokens or write actions. Confirm staging access controls and performance with realistic sanitized data before activation.
+
+## V10.5A/V10.6A security (pending runtime)
+
+- [ ] Owner-only HTTPS CSV, separate OFF flag, bounded aggregate columns, formula escaping, no customer/session IDs, no messages or credential fields, private download storage and retention review. Communication batch CLI only with explicit source authorization, independent flag, bounded payload and atomic rollback. Release checker read-only, no raw credentials/errors, no database changes. Migration replay uses synthetic loopback CI database only; never run destructive test reset on live/staging data. Verify actual backup and restore separately.
+
+## V10.6B security (pending runtime)
+
+- [ ] Private authorized OAuth client/refresh secret, fixed HTTPS token endpoint, no redirects/proxies/raw response output, exact scope/identity checks, no active config overwrite, exclusive candidate 0600 in private 0700 root. Candidate contains a live access token if actually issued; do not share or commit, inspect and dispose privately after rotation. Retention independently OFF, paused workers, verified backups, exact plan hash and transaction, no scheduled cleanup or audit/publication deletion.
+
+## V10.6C security (pending runtime)
+
+- [ ] Independent default-OFF bridge and per-channel authorization, fixed HTTPS URL, no arbitrary URL input, public IPv4 pinning/no redirects/proxy, bounded response, private bearer and independent HMAC key, exact signed payload and generation/freshness checks, no raw data/secret output, immutable aggregates. Source Git blob SHA-1 checks detect drift, not signed release authenticity. Release DB checks are read-only; unresolved evidence blocks and is never automatically modified. Verify actual process shutdown, grants, backup/restore and provider acceptance separately.
+
+## V10.6D security (pending runtime)
+
+- [ ] Review CLI separately OFF; owner-authorized operator, stop workers, pause, independently review provider evidence (store securely outside Git), exact state/evidence hashes, append-only review with no publication mutation or replay. Review is an attestation, not automated provider verification; unresolved evidence must remain blocked. Backup dump restricted private file/directory, independent expected SHA256, bounded streaming decompression and no SQL execution; encrypt and protect backup at rest separately. Candidate inspection does not expose token; exact digest, current mailbox and expiry rechecked; manual activation only, scope verification remains mandatory.
+
+## V10.6E security (pending runtime)
+
+- [ ] Native provider flags independently OFF; private restricted credentials, fixed HTTPS GET hosts and bounded responses, no redirect/proxy, exact account and period, no raw response or credential logs. Store only latest per-source aggregate snapshot and account hash/generation; no contact records, message bodies or recordings. Confirm upstream fields and retention separately. Disposable restore test must never run against real data; inspect actual encrypted backup and isolated restore separately.
+
+## V10.6F security (pending runtime)
+
+- [ ] Separate album flag, exact private PNG/MP4 bytes, one provider request only after distinct approval, validated group and message receipts, no retry of unknown rows. WhatsApp webhook separately OFF with explicit authorization and verified log redaction; verify raw HMAC before DB, exact app/account/phone and bounded payload. Raw webhook may transiently contain personal data; disable payload and query logging, protect verify token and stable HMAC dedupe key, treat keyed digest as pseudonymous, approve retention before enabling. No automatic delete, inbound content store, response or follow-up send.
+
+## V10.6G security (pending runtime)
+
+- [ ] Separate OFF flags, trusted static callback URL, no forwarded host trust, Twilio HMAC-SHA1 per provider protocol, strict form parsing/body cap, dedicated account/destination and stable keyed event digest. Raw callbacks may transiently contain customer details; redact bodies and secrets across logs, rate-limit upstream, no automatic replies/routing or recording. Twilio auth token is sensitive; dedicated subaccount recommended. Replay beyond dedupe lifetime is not solved; no Twilio cleanup enabled. WhatsApp cleanup requires approved 30-day policy, verified backup, paused workers and exact plan digest. No actual deletion or deployment.
+
+## V10.6H security (pending runtime)
+
+- [ ] Mixed media OFF separately per provider; private exact manifest MP4, typed ordered digest, current approval and target, limited bearer lifetime and fetch count, no logs or automatic retry. Communication reviews OFF; no personal identifiers, no inferred unanswered counts, no outbound follow-up, retention blocks open reviews and cascades closed reviews when approved aggregate cleanup executes. Audit retained. No deployment.
+
+## V10.6I security (pending runtime)
+
+- [ ] Search Console independently OFF, authorized dedicated webmasters.readonly grant, fixed Google HTTPS endpoints, bounded response and no proxy/redirect; reject broader/missing scope and unexpected refresh rotation. Exact property allowlist and returned property verification, no user-supplied destination or query terms; in-memory access token only, private refresh credentials, generation/expiry/revocation gate. Snapshot contains only aggregate counts/position/date coverage and property hash; no active config overwrite or automated schedule. Actual consent, secret storage and provider acceptance required.
+
+## V10.6J security (pending runtime)
+
+- [ ] Separate history and live-import OFF gates, exact property and generation binding, global bounded history cap; no keyword or raw payload storage. Local crawler explicit operator authorization, fixed HTTPS host/path and public IPv4 pin, no redirects/proxy/credentials, conservative reviewed robots match, body cap and request pacing. No private routes or link discovery. Report is operator-supplied evidence, not signed remote attestation; import checks coverage/freshness and rejects older/duplicate capture. No scheduling or automatic deletion. Approve retention and actual network/hosting acceptance first.
+
+## V10.6K security (pending runtime)
+
+- [ ] Local diagnostic fixed loopback only, no redirects or proxy, exact digest and bounded response, synthetic prompt only; tag/digest checks are not cryptographic execution attestation or proof Ollama cannot use network. Enforce trusted offline runtime and egress isolation separately. Private SEO cleanup independently OFF, paused workers, backup/restore, exact plan and transaction; no automatic deletion. GBP read check independently OFF with existing target/OAuth gate, fixed read-only media path and no response/credential output, never infer write permission. No actual activation or deployment.
