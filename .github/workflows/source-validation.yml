@@ -137,7 +137,7 @@ jobs:
           python3 -m venv .ci-venv
           .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 PyMySQL==1.1.1 requests==2.32.3
       - name: Install disposable MariaDB dump client
-        run: sudo apt-get update -qq && sudo apt-get install -y mariadb-client
+        run: sudo apt-get update -qq && sudo apt-get install -y mariadb-client ffmpeg
       - name: Synthetic MySQL + HTTP full workflow
         run: |
           .ci-venv/bin/python tests/migration_replay.py
