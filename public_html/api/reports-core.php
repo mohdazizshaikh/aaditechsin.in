@@ -11,6 +11,7 @@ require_once __DIR__.'/native-usage-core.php';
 require_once __DIR__.'/whatsapp-inbound-core.php';
 require_once __DIR__.'/twilio-inbound-core.php';
 require_once __DIR__.'/opportunity-followup-core.php';
+require_once __DIR__.'/lead-intelligence-core.php';
 function ownerReportTarget(array $cfg):?string {
     $t=$cfg['growth']['telegram']??[];
     if(($cfg['growth']['enabled']??false)!==true||($t['enabled']??false)!==true||($t['reports_enabled']??false)!==true)return null;
@@ -90,6 +91,7 @@ function reportClaim(PDO $db,array $cfg,string $kind,DateTimeImmutable $now):?ar
         if(communicationsEnabled($cfg)&&($cfg['communications']['native_usage_enabled']??false)===true)$text.="\n\n".nativeUsageSummary($db,$cfg,$now);
         if(($cfg['communications']['gmail']['enabled']??false)===true)$text.="\n\n".gmailSummary($db,$cfg,$now);
         if(followEnabled($cfg))$text.="\n\n".followSummary($db,$now);
+        if(leadIntelEnabled($cfg))$text.="\n\n".leadIntelSummary($db,$cfg,$now);
         if(($cfg['oauth_lifecycle']['alerts_enabled']??false)===true)$text.="\n\n".oauthAlertText($db,$cfg,$now->getTimestamp());
     }elseif($kind==='errors'){
         if((int)$pref['errors_enabled']!==1)return null;
