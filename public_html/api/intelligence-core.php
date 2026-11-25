@@ -9,6 +9,7 @@ require_once __DIR__.'/whatsapp-inbound-core.php';
 require_once __DIR__.'/twilio-inbound-core.php';
 require_once __DIR__.'/opportunity-followup-core.php';
 require_once __DIR__.'/reports-core.php';
+require_once __DIR__.'/lead-intelligence-core.php';
 function intelligenceSummary(PDO $db,array $cfg,?DateTimeImmutable $now=null):string{
     $lines=['Owner intelligence (stored evidence, not live performance):'];
     $pause=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
@@ -31,6 +32,7 @@ function intelligenceSummary(PDO $db,array $cfg,?DateTimeImmutable $now=null):st
         if(($cfg['communications']['gmail']['enabled']??false)===true)$lines[]=gmailSummary($db,$cfg,$now);
     }else $lines[]='Communications disabled.';
     if(creativeEnabled($cfg)&&($cfg['social']['enabled']??false)===true)foreach(reportPublicationAttention($db) as $label=>$n)$lines[]=$label.': '.$n;
+    if(leadIntelEnabled($cfg))$lines[]=leadIntelSummary($db,$cfg,$now);
     $lines[]='Use /opportunities /followups /communications /gmailhealth /publications /connections for details.';
     return implode("\n",$lines);
 }
