@@ -1,0 +1,21 @@
+# V10.6K local runtime readiness, SEO retention and GBP media access
+
+Source only. Previous PR #36 both CI jobs passed. No new SQL migration. Release contract remains 35 migrations, 48 tables and 37 source hashes. New server flags default OFF. No actual model inference, external provider access, data deletion, merge or deployment.
+
+## Local AI runtime diagnostic
+
+Run python3 workers/local-runtime-check.py --model EXACT_INSTALLED_TAG --digest INDEPENDENTLY_VERIFIED_64_HEX_DIGEST on the trusted local machine. Explicit optional --synthetic-inference sends only a fixed synthetic JSON request to existing loopback Ollama /api/chat, verifies exact returned model tag, done, no tools and exact structured result; inventory checked before and after. Fixed loopback /api/tags checks exact unique tag and digest, positive model size, rejects obvious cloud tag and remote markers. No model pulls, no business inputs, no arbitrary host or proxy/redirect. The model inventory is self-reported, not trusted execution attestation; enforce offline network egress restrictions and trusted installation separately. Model digest must be independently pinned, not blindly copied from an untrusted service. API response fields require actual installed Ollama acceptance. --media-smoke tests real one-second synthetic H.264 encode, probe and decode using trusted FFmpeg in a temporary directory; no actual campaign asset generated. Outputs sanitized pass/not-run flags only. CI mocks model inventory/inference, executes synthetic codec check. Native AI text-to-video, real diffusion and quality/performance acceptance remain pending. No automated scheduling or model activation.
+
+## SEO historical retention
+
+seo.history_retention_enabled independently OFF. Proposed policy: daily Search Console observations strictly older than 180 Pacific calendar days, all property/generation rows, maximum 1000 per batch. Before enabling, obtain owner approval, verified backup and isolated restore, stop workers and pause growth. Private CLI php secure/maintenance/seo-retention.php --dry-run (default) prints counts, cutoff and plan SHA256, rolls back. Explicit --apply PLAN_SHA256 re-locks and hashes exact candidate rows including metrics and captured_at, rejects changed plan, deletes matching primary keys transactionally with savepoint and count checks; sanitized audit. Boundary retained. Repeat fresh dry-run for each batch. Does not touch latest snapshot, public crawl snapshot, source reports, audit, other tables or backup copies. No automated deletion. Proposed policy not approved yet.
+
+## GBP media access readiness
+
+media_upload.gbp_media_check_enabled independently OFF; existing google-business network target, growth/creative/social and OAuth policy gates apply. Private CLI php secure/maintenance/gbp-media-check.php --check-config verifies configuration only; explicit --check-read uses fixed HTTPS GET v4/accounts/ACCOUNT/locations/LOCATION/media?pageSize=1. Validates HTTP success, bounded response through existing networkRequest and exact resource prefix for any returned item. Empty result can indicate successful scoped list, not ownership or write permission. No raw payload, target ID or token output. No upload, startUpload, local-post write or actual account access performed.
+
+Google distinguishes location media (URL or three-step byte upload) from local-post media (URL only). See https://developers.google.com/my-business/content/upload-photos and https://developers.google.com/my-business/reference/rest/v4/accounts.locations.media . A future write adapter needs exact asset and location approval, separate ledger, durable intermediate upload receipt, duplicate protection, independent scope/permission and real provider acceptance, and genuine policy-compliant business imagery; generated illustrative creative must not be passed off as real premises or projects. Media read check does not establish those conditions. No GBP publishing source added in this batch.
+
+## Remaining gates
+
+Final CI pending at writing. Actual trusted local model inference, diffusion/native video, GBP upload implementation and approval, approved retention policy, replay-safe Twilio retention, authorized discovery feeds, broader OAuth activation and actual hosted backup/restore/staging remain pending. The updated cumulative draft is for review only.
