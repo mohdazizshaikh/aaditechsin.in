@@ -9,12 +9,18 @@ import stat
 import sys
 
 def verify(path, expected, max_plain=4*1024**3):
+    if type(max_plain) is not int or not 1<=max_plain<=4*1024**3:
+        raise ValueError("Invalid expanded size limit")
     if not re.fullmatch(r"[a-f0-9]{64}",expected):
         raise ValueError("Expected digest required")
     path=Path(path).expanduser()
     root=Path(__file__).resolve().parents[1]
     resolved=path.resolve(strict=True)
-    if path.is_symlink() or root in resolved.parents or "public_html" in resolved.parts:
+    if path.is_symlink() or root in resolved.parents or resolved==root or "public_html" in resolved.parts:
+        raise ValueError("Private backup required")
+    # Refuse aliases through symlinked intermediate directories as well.
+    if path.absolute()!=resolved:
+        raise ValueError("Use an absolute canonical private backup path")
         raise ValueError("Private backup required")
     parent=resolved.parent.stat()
     if parent.st_mode&0o077:
@@ -33,7 +39,8 @@ def verify(path, expected, max_plain=4*1024**3):
                 size+=len(chunk)
                 if size>max_plain: raise ValueError("Expanded size limit")
         after=os.fstat(raw.fileno())
-        if size==0 or (before.st_size,before.st_mtime_ns,before.st_ctime_ns)!=(after.st_size,after.st_mtime_ns,after.st_ctime_ns):
+        final=resolved.stat(follow_symlinks=False)
+        if size==0 or (before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns,before.st_ctime_ns)!=(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns) or (after.st_dev,after.st_ino,after.st_mode,after.st_nlink)!=(final.st_dev,final.st_ino,final.st_mode,final.st_nlink):
             raise ValueError("Empty or changed backup")
         return before.st_size,size
 

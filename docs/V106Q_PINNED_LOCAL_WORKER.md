@@ -12,3 +12,7 @@ Creative input must match exactly one entry in the locally checked-in public ser
 
 ## Verification
 56 service/objective positive synthetic cases and 56 corresponding tamper denials; 28 additional expert planning/escalation cases; bounded empty/fail/limit/uncertain acknowledgement and pinned-model mismatch/rotation checks. These are tests, not separately shipped production tasks. New CI pending. Actual local Ollama, native video, diffusion, hardware/codec performance, scheduling, provider acceptance and isolated hosted restore still outstanding. No merge/deploy.
+
+## Subsequent CI evidence
+
+Both V10.6Q CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45499069195 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45499077052. Synthetic only; actual inference remains pending.

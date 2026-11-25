@@ -189,3 +189,7 @@
 ## V10.6Q security (pending runtime)
 
 - [ ] Verify independently pinned model and restricted Ollama egress, exact local catalog, strict JSON, bounded sequential polling and stop on uncertain outcome; no overlapping schedulers, secrets or customer context. Inventory is not attestation. Actual runtime acceptance pending.
+
+## V10.6R security (pending runtime)
+
+- [ ] Verify independent reference provenance, private permissions, exact contract and digest, no raw metadata in comparison output, canonical backup path, real isolated restoration and worker shutdown. Metadata parity alone is not release approval.

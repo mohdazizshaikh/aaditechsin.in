@@ -222,3 +222,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6Q acceptance (pending)
 
 - [ ] Trusted local PC, exact tag/digest, actual structured inference, staging TLS/token, batch limits, interrupted/failed lease recovery and independent owner review. No live posting. See V106Q_PINNED_LOCAL_WORKER.md.
+
+## V10.6R acceptance (pending)
+
+- [ ] Capture reference from trusted fresh isolated instance, verify hash independently, compare restored staging metadata (table/column/index/FK), investigate drift, verify business data counts/integrity and actual restore under owner authorization. No production changes. See V106R_SCHEMA_RESTORE_GATE.md.
