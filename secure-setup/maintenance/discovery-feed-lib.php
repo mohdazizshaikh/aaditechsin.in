@@ -26,7 +26,9 @@ function feedDefinition(string $id,array $src):array {
     if(!in_array($type,['tender','company_announcement','authorized_directory','referral','manual_research'],true))throw new InvalidArgumentException('Invalid source type');
     return ['id'=>$id,'url'=>$url,'host'=>$host,'source_type'=>$type];
 }
-function feedFetch(array $src):string {
+function feedFetch(array $src,?string $bearer=null):string {
+    if($bearer!==null&&!preg_match('/^[A-Za-z0-9._~+\/=\-]{16,512}$/D',$bearer))throw new InvalidArgumentException('Invalid private feed credential');
+    $headers=['Accept: application/json'];if($bearer!==null)$headers[]='Authorization: Bearer '.$bearer;
     // Resolve and pin one public IPv4 destination. Fail closed on private DNS answers.
     $ips=gethostbynamel($src['host']);
     if(!$ips)throw new RuntimeException('dns_failed');
@@ -37,7 +39,7 @@ function feedFetch(array $src):string {
         if(!curl_setopt_array($ch,[CURLOPT_FOLLOWLOCATION=>false,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,
             CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_CONNECTTIMEOUT=>5,CURLOPT_TIMEOUT=>15,
             CURLOPT_PROXY=>'',CURLOPT_IPRESOLVE=>CURL_IPRESOLVE_V4,
-            CURLOPT_RESOLVE=>[$src['host'].':443:'.$ips[0]],CURLOPT_HTTPHEADER=>['Accept: application/json'],
+            CURLOPT_RESOLVE=>[$src['host'].':443:'.$ips[0]],CURLOPT_HTTPHEADER=>$headers,
             CURLOPT_USERAGENT=>'AaditechsAuthorizedFeed/1.0',
             CURLOPT_WRITEFUNCTION=>function($ch,string $chunk)use(&$body):int{
                 if(strlen($body)+strlen($chunk)>262144)return 0;
@@ -84,7 +86,7 @@ function feedConfiguredSources(array $cfg,bool $scheduled=false):array{
     if($scheduled&&(($cfg['discovery']['scheduler_enabled']??false)!==true||$minutes===0))throw new RuntimeException('Scheduler disabled or cadence missing');
     $sources=[];
     foreach($feeds as $id=>$src){
-        if(!is_string($id)||!is_array($src))throw new InvalidArgumentException('Invalid source definition');
+        if(!is_string($id)||str_starts_with($id,'tender-feed-')||!is_array($src))throw new InvalidArgumentException('Invalid source definition');
         $sources[]=feedDefinition($id,$src);
     }
     return ['sources'=>$sources,'minutes'=>$minutes];

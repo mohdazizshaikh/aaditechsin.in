@@ -122,10 +122,10 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     $creative=creativeCommand($db,$cfg,$command);
     if($creative!==null)return $creative;
     if($command==='/discoveryruns'){
-        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||(($cfg['discovery']['feeds_enabled']??false)!==true&&($cfg['discovery']['local_batch_enabled']??false)!==true))return 'Discovery feeds and local batches disabled or unconfigured.';
+        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||(($cfg['discovery']['feeds_enabled']??false)!==true&&($cfg['discovery']['local_batch_enabled']??false)!==true&&($cfg['discovery']['tender_poll_enabled']??false)!==true))return 'Discovery feeds and local batches disabled or unconfigured.';
         $lines=['Recent source runs (up to 10; not confirmed leads):'];
         foreach($db->query('SELECT source_id,status,imported_count,duplicate_count,skipped_count,error_code FROM growth_source_runs ORDER BY id DESC LIMIT 10')->fetchAll(PDO::FETCH_ASSOC) as $r)
-            $lines[]=$r['source_id'].' '.$r['status'].' | imported '.$r['imported_count'].' duplicate '.$r['duplicate_count'].' skipped '.$r['skipped_count'].($r['error_code']!==''?' | '.$r['error_code']:'');
+            $lines[]=$r['source_id'].' '.$r['status'].(str_starts_with($r['source_id'],'tender-feed-')?' | research tasks created '.$r['imported_count'].' preserved '.$r['duplicate_count']:' | imported '.$r['imported_count'].' duplicate '.$r['duplicate_count']).' skipped '.$r['skipped_count'].($r['error_code']!==''?' | '.$r['error_code']:'');
         return count($lines)===1?'No source run recorded.':implode("\n",$lines);
     }
     require_once __DIR__.'/discovery-core.php';
@@ -166,9 +166,14 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
             foreach($db->query("SELECT status,COUNT(*) total FROM growth_publications WHERE status IN ('queued','sending','failed','unknown') GROUP BY status")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='Publication inventory '.$r['status'].': '.$r['total'];
         }else $lines[]='Telegram business publishing disabled or unconfigured.';
         if(discoveryEnabled($cfg)&&($cfg['discovery']['feeds_enabled']??false)===true){
-            $q=$db->prepare('SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) imported,COALESCE(SUM(duplicate_count),0) duplicates FROM growth_source_runs WHERE finished_at>=? AND finished_at<?');
-            $q->execute($bounds);$s=$q->fetch(PDO::FETCH_ASSOC);
+            $q=$db->prepare('SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) imported,COALESCE(SUM(duplicate_count),0) duplicates FROM growth_source_runs WHERE finished_at>=? AND finished_at<? AND source_id NOT LIKE ?');
+            $q->execute(array_merge($bounds,['tender-feed-%']));$s=$q->fetch(PDO::FETCH_ASSOC);
             $lines[]='Source runs finished today: '.$s['runs'].' / imported '.$s['imported'].' / duplicates '.$s['duplicates'];
+        }
+        if(discoveryEnabled($cfg)&&($cfg['discovery']['tender_poll_enabled']??false)===true){
+            $q=$db->prepare("SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) created,COALESCE(SUM(duplicate_count),0) preserved FROM growth_source_runs WHERE finished_at>=? AND finished_at<? AND source_id LIKE 'tender-feed-%'");
+            $q->execute($bounds);$s=$q->fetch(PDO::FETCH_ASSOC);
+            $lines[]='Tender polls finished today: '.$s['runs'].' / research tasks created '.$s['created'].' / preserved '.$s['preserved'].' (not qualified leads)';
         }
         $lines[]='Actual calls, sales messages/email, reach, other social providers and full external errors: not connected.';
         $lines[]='Database query succeeded; not a full system health test.';
