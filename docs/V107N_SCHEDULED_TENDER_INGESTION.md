@@ -22,3 +22,5 @@ For each current eligible listed notice, select first matching service from oper
 ## Verification
 
 All 14 service routing choices, exact contract, no provider selection, empty response, expiry, private credential and source authorization tests. Disposable DB tests exercise actual pending task insert, cadence/dedup, malformed response, pause and config change during fake fetch, empty feed. CI pending. No external provider call, actual scheduled hosting, credential, or real research-task import. No new migration. Source implementation for scheduled normalized tender intake complete; actual source rights/endpoint and live staging acceptance remain open. No whole-project percent claim.
+
+Owner reporting integration: `/discoveryruns` works with tender polling enabled even if generic discovery feeds are OFF; tender counts labeled created/preserved research tasks, never blended with generic lead/opportunity source-run totals. Daily health summary separates tender polls. Disposable tests confirm owner queue and ledger.

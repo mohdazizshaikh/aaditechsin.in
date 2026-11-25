@@ -298,3 +298,5 @@ V10.7M owner `/tenders` command and historical observation fixture classificatio
 Authorized normalized HTTPS tender feed worker (1–5 sources, 25 notices/source), optional private bearer, reviewed service routing, cadence, atomic pending research task/ledger write and owner queue. V10.7M all CI passed. No actual provider connection or cron installed; final CI pending. See [V10.7N](V107N_SCHEDULED_TENDER_INGESTION.md).
 
 | V10.7N | Source committed; CI pending | Scheduled authorized normalized tender intake to owner research queue; actual provider/cron/staging pending |
+
+V10.7N follow-up distinguishes tender research-task counts from general discovery metrics and exposes tender-only source run reports. Final CI pending.

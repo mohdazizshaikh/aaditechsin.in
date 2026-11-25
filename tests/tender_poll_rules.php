@@ -46,5 +46,12 @@ $r=tenderPollRun($db,static function()use(&$mutable){return $mutable;},'nicsi',s
 tpCheck($r['status']==='failed'&&$r['created']===0,'Config revoked during fetch');
 $age();$r=tenderPollRun($db,$get,'nicsi',static fn()=>$encode([]),$clock);tpCheck($r['status']==='completed'&&$r['created']===0,'Empty successful run');
 tpCheck((int)$db->query("SELECT COUNT(*) FROM growth_tasks WHERE title='Tender review: nicsi:POLL/CI/2026/A'")->fetchColumn()===1,'One stored research task');
-// Leave normal disposable DB evidence and restore growth state for subsequent tests.
+$db->beginTransaction();
+tpCheck(str_contains(growthCommand($db,'/discoveryruns',$cfg),'research tasks created'),'Tender ledger visible with generic feeds OFF');
+tpCheck(str_contains(growthCommand($db,'/tenders',$cfg),'POLL/CI/2026/A'),'Owner tender queue');
+$db->rollBack();
+// Clean up only dedicated synthetic fixture rows before subsequent tests.
+$db->exec("DELETE FROM growth_audit WHERE task_id IN (SELECT id FROM growth_tasks WHERE title='Tender review: nicsi:POLL/CI/2026/A')");
+$db->exec("DELETE FROM growth_tasks WHERE title='Tender review: nicsi:POLL/CI/2026/A'");
+$db->exec("DELETE FROM growth_source_runs WHERE source_id='tender-feed-nicsi'");
 $changePause('/resume');echo "Disposable scheduled tender ingestion, cadence, dedup, failure, pause and config change PASS\n";
