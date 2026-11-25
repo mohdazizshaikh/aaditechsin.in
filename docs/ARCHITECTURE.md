@@ -192,3 +192,7 @@ Read-only fixed information_schema queries compare trusted reference table, colu
 ## V10.6S local media batches
 
 Canonical digest binds ordered validated job set; sequential private batch render and verification emits index only after success, removes new batch on caught failure. Existing individual review and manifest registration unchanged. Exact private bundle validation and codec checks; no native generative video. See V106S_REVIEWED_MEDIA_BATCHES.md.
+
+## V10.6T reviewed media transfer
+
+Exact completed index binds ordered local bundle manifests. All-bundle validation before sequential pinned SFTP; per-bundle revalidation and private spool. No remote atomic transaction, automatic retry or publication. See V106T_REVIEWED_MEDIA_TRANSFER.md.

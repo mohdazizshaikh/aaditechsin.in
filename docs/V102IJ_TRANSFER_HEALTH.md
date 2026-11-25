@@ -19,3 +19,5 @@ oauth_lifecycle.alerts_enabled defaults false. /connectionalerts reports enabled
 Current /errors and daily report now summarize all eleven publication ledgers: historical failed/unknown, current in-flight and current processing/parent-ready counts; not time-scoped incidents or visibility. Existing hourly completed-period error counts remain limited and unchanged. Reconcile uncertain posts manually, never retry blindly. Synthetic mock transport and disposable DB tests wired into CI; actual SSH, scheduler, owner notifications and provider acceptance pending.
 
 Next priorities: CI verification, remaining mixed-media/Telegram/GBP adapters, actual OAuth renewal/alerts, communications monitoring, opportunity discovery, central dashboard and staging/release.
+
+V10.6T extends explicit private transfer with reviewed completed batch index (1–12 bundles), full local preflight, sequential delivery and stop on uncertainty. See [V106T_REVIEWED_MEDIA_TRANSFER.md](V106T_REVIEWED_MEDIA_TRANSFER.md). Existing single-bundle mode remains; individual approvals/imports mandatory.

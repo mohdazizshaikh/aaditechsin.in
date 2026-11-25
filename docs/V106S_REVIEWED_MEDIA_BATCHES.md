@@ -14,3 +14,7 @@ Exact current service titles, channel profile and byte limits, common unsupporte
 
 ## Tests
 126 synthetic service/channel input cases; real synthetic two-bundle template render plus prior single-image/fake-diffusion tests; digest mismatch, duplicate task, rollback, strict manifest, permissions and path rejection. New CI pending. Tests are not separate completed production features. No merge, hosting access or deployment.
+
+## Subsequent CI evidence
+
+Both V10.6S CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45560708189 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45560712922. Actual local model acceptance remains pending.

@@ -230,3 +230,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6S acceptance (pending)
 
 - [ ] Test approved revisions exported privately, 1–12 batch plan/render, changed digest refusal, incomplete index recovery, actual per-bundle inspection and exact hash registration, all profile sizes, real local model/disk/performance and private permissions. No auto-upload. See V106S_REVIEWED_MEDIA_BATCHES.md.
+
+## V10.6T acceptance (pending)
+
+- [ ] Test isolated SFTP with approved 1–12 bundle index, all-item preflight, pinned host key, interruption recovery, exact remote file verification and individual server-side imports. Never assume SFTP acknowledgement is publication or approval. See V106T_REVIEWED_MEDIA_TRANSFER.md.

@@ -1,4 +1,4 @@
-"""Explicit one-bundle SFTP delivery. No publishing, no credential discovery."""
+"""Explicit reviewed single or bounded batch SFTP delivery. No publishing or credential discovery."""
 import argparse
 import hashlib
 import json
@@ -11,13 +11,17 @@ import subprocess
 import sys
 import tempfile
 import secrets
+import importlib.util
+
+spec=importlib.util.spec_from_file_location('local_media',Path(__file__).with_name('local-media.py'))
+media=importlib.util.module_from_spec(spec);spec.loader.exec_module(media)
 
 ROOT=Path(__file__).resolve().parents[1]
 def private_path(path, directory=False):
-    path=Path(path).expanduser()
-    if path.is_symlink():
-        raise ValueError("Symlink rejected")
-    path=path.resolve(strict=True)
+    original=Path(path).expanduser().absolute()
+    path=original.resolve(strict=True)
+    if original!=path:
+        raise ValueError("Canonical private path required")
     if path==ROOT or ROOT in path.parents or path in ROOT.parents or "public_html" in path.parts:
         raise ValueError("Private path required")
     s=path.stat()
@@ -41,10 +45,7 @@ def bundle(directory, expected):
     raw=read_bound(directory/"manifest.json",4096)
     if not re.fullmatch("[a-f0-9]{64}",expected) or digest(raw)!=expected:
         raise ValueError("Manifest mismatch")
-    m=json.loads(raw)
-    keys={"version","task_id","revision","channel","renderer","width","height","image_sha256","video_sha256"}
-    if not isinstance(m,dict) or set(m)!=keys or m["version"]!=1 or any(type(m[k]) is not int or m[k]<1 for k in ("task_id","revision","width","height")):
-        raise ValueError("Invalid manifest")
+    m=media.validate_manifest(media.local.strict_json(raw))
     result=[]
     for name,key,ext,limit in (("creative.png","image_sha256","png",10*1024*1024),("creative.mp4","video_sha256","mp4",20*1024*1024)):
         data=read_bound(directory/name,limit)
@@ -85,22 +86,86 @@ def deliver(cfg, directory, expected, run=subprocess.run):
         run([exe,*args],input="\n".join(lines)+"\n",text=True,cwd=tmp,timeout=180,check=True,capture_output=True)
     return [name for name,_ in assets]
 
+def reviewed_batch(directory,expected,verify_one=media.verify):
+    directory=private_path(directory,True)
+    raw=read_bound(directory/"batch-index.json",16384)
+    if not isinstance(expected,str) or not re.fullmatch(r"[a-f0-9]{64}",expected) or digest(raw)!=expected:
+        raise ValueError("Reviewed index changed")
+    doc=media.local.strict_json(raw)
+    if not isinstance(doc,dict) or set(doc)!={"version","plan_sha256","renderer","bundles"} or type(doc["version"]) is not int or doc["version"]!=1 or doc["renderer"] not in ("template","local-diffusion") or not isinstance(doc["plan_sha256"],str) or not re.fullmatch(r"[a-f0-9]{64}",doc["plan_sha256"]) or not isinstance(doc["bundles"],list) or not 1<=len(doc["bundles"])<=12:
+        raise ValueError("Invalid completed index")
+    seen=set();names=set();rows=[]
+    for row in doc["bundles"]:
+        if not isinstance(row,dict) or set(row)!={"task_id","revision","directory","manifest_sha256"} or any(type(row[k]) is not int or row[k]<1 for k in ("task_id","revision")):
+            raise ValueError("Invalid bundle entry")
+        name=row["directory"];hash_=row["manifest_sha256"]
+        if not isinstance(name,str) or not re.fullmatch(r"task-[1-9][0-9]*-r[1-9][0-9]*-[a-z0-9_]{8}",name) or not name.startswith(f"task-{row['task_id']}-r{row['revision']}-") or not isinstance(hash_,str) or not re.fullmatch(r"[a-f0-9]{64}",hash_) or row["task_id"] in seen or name in names:
+            raise ValueError("Invalid or duplicate bundle scope")
+        seen.add(row["task_id"]);names.add(name)
+        target=private_path(directory/name,True)
+        raw_manifest=read_bound(target/"manifest.json",4096)
+        manifest=media.validate_manifest(media.local.strict_json(raw_manifest))
+        if digest(raw_manifest)!=hash_ or manifest["task_id"]!=row["task_id"] or manifest["revision"]!=row["revision"] or manifest["renderer"]!=doc["renderer"]:
+            raise ValueError("Bundle scope mismatch")
+        # Validate exact bytes and full codec integrity before any connection.
+        bundle(target,hash_)
+        if verify_one(target)!=hash_:
+            raise ValueError("Bundle verification mismatch")
+        rows.append((target,hash_))
+    return rows
+
+class BatchInterrupted(RuntimeError):
+    def __init__(self,acknowledged):
+        super().__init__("Batch interrupted; inspect remote inbox before retry")
+        self.acknowledged=acknowledged
+
+def deliver_batch(cfg,directory,expected,run=subprocess.run,verify_one=media.verify):
+    options(cfg)
+    rows=reviewed_batch(directory,expected,verify_one)
+    acknowledged=0
+    for target,hash_ in rows:
+        try:
+            # Existing one-bundle sender revalidates exact bytes and spools privately.
+            deliver(cfg,target,hash_,run)
+            acknowledged+=1
+        except Exception as exc:
+            raise BatchInterrupted(acknowledged) from exc
+    return acknowledged
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--config",type=Path,required=True)
-    p.add_argument("--directory",type=Path,required=True)
-    p.add_argument("--manifest-sha256",required=True)
+    scope=p.add_mutually_exclusive_group(required=True)
+    scope.add_argument("--directory",type=Path)
+    scope.add_argument("--batch-directory",type=Path)
+    p.add_argument("--manifest-sha256")
+    p.add_argument("--batch-index-sha256")
     p.add_argument("--send",action="store_true")
     a=p.parse_args()
     try:
-        cfg=json.loads(read_bound(a.config,8192))
-        if not a.send:
-            options(cfg);bundle(a.directory,a.manifest_sha256)
-            print("Local validation only; no connection made.")
+        cfg=media.local.strict_json(read_bound(a.config,8192))
+        if a.directory is not None:
+            if not a.manifest_sha256 or a.batch_index_sha256 is not None:
+                raise ValueError("Explicit manifest digest required")
+            if not a.send:
+                options(cfg);bundle(a.directory,a.manifest_sha256)
+                print("Local validation only; no connection made.")
+            else:
+                deliver(cfg,a.directory,a.manifest_sha256)
+                print("SFTP bundle acknowledged; server-side manifest import still required.")
         else:
-            deliver(cfg,a.directory,a.manifest_sha256)
-            print("SFTP batch acknowledged; server-side manifest import still required.")
+            if not a.batch_index_sha256 or a.manifest_sha256 is not None:
+                raise ValueError("Explicit reviewed index digest required")
+            if not a.send:
+                options(cfg);rows=reviewed_batch(a.batch_directory,a.batch_index_sha256)
+                print(f"Local validation only: {len(rows)} bundles; no connection made.")
+            else:
+                count=deliver_batch(cfg,a.batch_directory,a.batch_index_sha256)
+                print(f"SFTP acknowledged {count} bundles; individual server-side manifest imports still required.")
         return 0
+    except BatchInterrupted as exc:
+        print(f"BLOCKED: {exc.acknowledged} bundles acknowledged before interruption. Inspect remote files; no automatic retry.",file=sys.stderr)
+        return 1
     except Exception:
         print("BLOCKED: verify private files, pinned host key and authorized inbox. Inspect partial remote files before retry.",file=sys.stderr)
         return 1

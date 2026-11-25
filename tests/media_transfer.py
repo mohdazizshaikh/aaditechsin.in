@@ -41,3 +41,66 @@ with tempfile.TemporaryDirectory() as tmp:
         blocked(lambda:t.deliver(cfg,root,t.digest(raw),fake))
         check(len(calls)==1)
 print("Synthetic private SFTP and exact bundle rules: PASS")
+
+# Channel-by-renderer integrity matrix, with header-only fixture bytes.
+# Full media codec acceptance is exercised separately in local_media.py.
+cases=0
+with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)
+    png=b"\x89PNG\r\n\x1a\n"+b"test"
+    mp4=b"\x00\x00\x00\x20ftyp"+b"test"
+    def write(path,data):
+        path.write_bytes(data);path.chmod(0o600)
+    write(root/"creative.png",png);write(root/"creative.mp4",mp4)
+    for channel,(w,h) in t.media.PROFILES.items():
+        for renderer in ("template","local-diffusion"):
+            m=dict(version=1,task_id=1,revision=1,channel=channel,renderer=renderer,width=w,height=h,image_sha256=t.digest(png),video_sha256=t.digest(mp4))
+            raw=json.dumps(m).encode();write(root/"manifest.json",raw)
+            check(len(t.bundle(root,t.digest(raw)))==2);cases+=1
+            for mutation in ({"version":True},{"renderer":"unlisted"},{"channel":"unknown"},{"width":1},{"task_id":0},{"video_sha256":"invalid"}):
+                raw=json.dumps({**m,**mutation}).encode();write(root/"manifest.json",raw)
+                blocked(lambda:t.bundle(root,t.digest(raw)));cases+=1
+assert cases==126
+print(f"Media transfer contract: {cases} positive/negative profile cases PASS")
+
+with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)
+    def write(path,data):
+        path.write_bytes(data);path.chmod(0o600)
+    cfg=dict(enabled=True,host="staging.example.invalid",port=22,user="media",identity_file=str(root/"key"),known_hosts=str(root/"known"),remote_inbox="/private/inbox")
+    write(root/"key",b"mock");write(root/"known",b"mock")
+    rows=[]
+    for i in (1,2):
+        name=f"task-{i}-r1-abcdefgh";directory=root/name;directory.mkdir(mode=0o700)
+        png=b"\x89PNG\r\n\x1a\n"+bytes([i]);mp4=b"\x00\x00\x00\x20ftyp"+bytes([i])
+        write(directory/"creative.png",png);write(directory/"creative.mp4",mp4)
+        m=dict(version=1,task_id=i,revision=1,channel="threads",renderer="template",width=1080,height=1080,image_sha256=t.digest(png),video_sha256=t.digest(mp4))
+        raw=json.dumps(m).encode();write(directory/"manifest.json",raw)
+        rows.append(dict(task_id=i,revision=1,directory=name,manifest_sha256=t.digest(raw)))
+    doc=dict(version=1,plan_sha256="a"*64,renderer="template",bundles=rows)
+    def index(d):
+        raw=json.dumps(d).encode();write(root/"batch-index.json",raw);return t.digest(raw)
+    expected=index(doc)
+    def verify(path):return t.digest((path/"manifest.json").read_bytes())
+    check(len(t.reviewed_batch(root,expected,verify))==2)
+    blocked(lambda:t.reviewed_batch(root,"0"*64,verify))
+    for changed in ({"version":True},{"bundles":[]},{"bundles":rows*7},{"bundles":[rows[0],rows[0]]},{"renderer":"local-diffusion"},{"bundles":[{**rows[0],"directory":"../escape"}]},{"bundles":[{**rows[0],"task_id":2}]},{"bundles":[{**rows[0],"manifest_sha256":"0"*64}]}):
+        bad=index({**doc,**changed});blocked(lambda:t.reviewed_batch(root,bad,verify))
+    expected=index(doc)
+    calls=[]
+    def fake(args,**kw):calls.append(kw["input"])
+    with patch.object(t.shutil,"which",return_value="/usr/bin/sftp"):
+        check(t.deliver_batch(cfg,root,expected,fake,verify)==2 and len(calls)==2)
+        calls.clear()
+        def uncertain(args,**kw):
+            calls.append(kw["input"])
+            if len(calls)==2:raise OSError("Synthetic lost acknowledgement")
+        try:t.deliver_batch(cfg,root,expected,uncertain,verify)
+        except t.BatchInterrupted as exc:check(exc.acknowledged==1 and len(calls)==2)
+        else:raise AssertionError("Interrupted batch accepted")
+        calls.clear()
+        # Failure in the final local bundle must prevent every network call.
+        write(root/rows[1]["directory"]/"creative.mp4",b"tampered")
+        blocked(lambda:t.deliver_batch(cfg,root,expected,fake,verify))
+        check(not calls)
+print("Reviewed SFTP batch, preflight, and interrupted acknowledgement: PASS (mock network)")
