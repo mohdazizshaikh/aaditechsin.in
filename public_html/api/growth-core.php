@@ -46,21 +46,86 @@ function growthOwnerUpdate(array $u,array $cfg,string $header,?int $now=null): b
 function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $command=trim($command);
-    if(in_array($command,['/start','/help'],true))return "Aaditechs V9.6 owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate Telegram channel scheduling required.";
+    if(in_array($command,['/start','/help'],true))return "Aaditechs owner controls\n/today /health /leads /visitors /pages /services /sources /calls\n/opportunities /opportunity ID /qualify ID /dismiss ID /draftoutreach ID /outreach /discoveryruns /tenders\n/createcontent SERVICE CHANNEL OBJECTIVE /content /coverage /coveragegrid OBJECTIVE\n/creativeworker /retrycreative ID REV\n/media ID /approvemedia ID REV SHA256 /rejectmedia ID REV SHA256\n/uploads /upload ID /approveupload ID SHA256 VISIBILITY CHANNEL_ID /cancelupload ID\n/igreels /igreel ID /approveig ID SHA256 ACCOUNT_ID /cancelig ID\n/carousels /carousel ID /approvecarousel ID BUNDLE_SHA256 PROVIDER ACCOUNT_ID /cancelcarousel ID\n/metaimages /metaimage ID /approveimage ID JPEG_SHA256 PROVIDER ACCOUNT_ID /approvethreadsvideo ID MP4_SHA256 threads ACCOUNT_ID /cancelimage ID\n/xvideos /xvideo ID /approvexvideo ID SHA256 ACCOUNT_ID /cancelxvideo ID\n/livideos /livideo ID /approvelivideo ID SHA256 ORG_ID /cancellivideo ID\n/mediarecovery\n/netmedia /netasset ID /approvenetmedia ID SHA256 PROVIDER ACCOUNT_ID /cancelnetmedia ID\n/tgalbum ID /approvetgalbum ID BUNDLE_SHA256 CHANNEL_ID\n/tgmedia /tgasset ID /approvetgmedia ID SHA256 photo|video CHANNEL_ID /canceltgmedia ID\n/communications /gmailhealth /nativeusage /wainbound /twinbound /intelligence\n/commreviews /commreview CHANNEL DAY DUE_DAY /completecommreview CHANNEL DAY /cancelcommreview CHANNEL DAY\n/followups /followup ID YYYY-MM-DD /completefollowup ID /cancelfollowup ID\n/fbmedia /fbasset ID /approvefbmedia ID SHA256 photo|video PAGE_ID /cancelfbmedia ID\n/expert SERVICE assessment|planning|escalation /experts\n/seo /seotopics SERVICE /searchconsole /searchhistory /liveseo\n/connections /connectionalerts\n/publications /network /networktarget /networkschedule PROVIDER TASK REV ACCOUNT_ID UTC_TIME /networkcancel ID\n/meta /metatarget /metaschedule PROVIDER TASK REV ACCOUNT_ID UTC_TIME /metacancel ID\n/socialtarget /social /schedulepost TASK REV CHANNEL_ID UTC_TIME /cancelpost ID\n/errors /notifications /reporthistory /notifydaily on|off /notifyerrors on|off\n/approvals /task ID\n/approve ID REV /reject ID REV /regenerate ID REV\n/pause /resume\nApproval records review only; separate publication authorization required.";
     require_once __DIR__.'/reports-core.php';
     $report=reportCommand($db,$cfg,$command);
     if($report!==null)return $report;
+    require_once __DIR__.'/oauth-health-core.php';
+    $oauth=oauthCommand($db,$cfg,$command);
+    if($oauth!==null)return $oauth;
+    require_once __DIR__.'/publication-overview.php';
+    $overview=publicationOverview($db,$cfg,$command);
+    if($overview!==null)return $overview;
+    require_once __DIR__.'/network-core.php';
+    $network=networkCommand($db,$cfg,$command);
+    if($network!==null)return $network;
+    require_once __DIR__.'/meta-core.php';
+    $meta=metaCommand($db,$cfg,$command);
+    if($meta!==null)return $meta;
     require_once __DIR__.'/social-core.php';
     $social=socialCommand($db,$cfg,$command);
     if($social!==null)return $social;
+    require_once __DIR__.'/seo-core.php';
+    $seo=seoCommand($db,$cfg,$command);
+    if($seo!==null)return $seo;
+    require_once __DIR__.'/expert-core.php';
+    $expert=expertCommand($db,$cfg,$command);
+    if($expert!==null)return $expert;
+    require_once __DIR__.'/carousel-core.php';
+    $ca=caCommand($db,$cfg,$command);
+    if($ca!==null)return $ca;
+    require_once __DIR__.'/meta-image-core.php';
+    $mi=miCommand($db,$cfg,$command);
+    if($mi!==null)return $mi;
+    require_once __DIR__.'/x-video-core.php';
+    $xv=xvCommand($db,$cfg,$command);
+    if($xv!==null)return $xv;
+    require_once __DIR__.'/linkedin-video-core.php';
+    $lv=lvCommand($db,$cfg,$command);
+    if($lv!==null)return $lv;
+    require_once __DIR__.'/network-media-core.php';
+    $recovery=nmRecoveryReport($db,$cfg,$command);
+    if($recovery!==null)return $recovery;
+    $nm=nmCommand($db,$cfg,$command);
+    if($nm!==null)return $nm;
+    require_once __DIR__.'/telegram-media-core.php';
+    require_once __DIR__.'/telegram-album-core.php';
+    $album=taCommand($db,$cfg,$command);if($album!==null)return $album;
+    $tgmedia=tgMediaCommand($db,$cfg,$command);
+    if($tgmedia!==null)return $tgmedia;
+    require_once __DIR__.'/intelligence-core.php';
+    $intel=intelligenceCommand($db,$cfg,$command);
+    if($intel!==null)return $intel;
+    $follow=followCommand($db,$cfg,$command);
+    if($follow!==null)return $follow;
+    require_once __DIR__.'/communications-core.php';
+    require_once __DIR__.'/communication-review-core.php';
+    $review=commReviewCommand($db,$cfg,$command);if($review!==null)return $review;
+    $communications=communicationsCommand($db,$cfg,$command);
+    if($communications!==null)return $communications;
+    require_once __DIR__.'/facebook-media-core.php';
+    $fbmedia=fbMediaCommand($db,$cfg,$command);
+    if($fbmedia!==null)return $fbmedia;
+    require_once __DIR__.'/instagram-core.php';
+    $ig=igCommand($db,$cfg,$command);
+    if($ig!==null)return $ig;
+    require_once __DIR__.'/upload-core.php';
+    $upload=uploadCommand($db,$cfg,$command);
+    if($upload!==null)return $upload;
+    require_once __DIR__.'/media-core.php';
+    $media=mediaCommand($db,$cfg,$command);
+    if($media!==null)return $media;
+    require_once __DIR__.'/creative-transport-core.php';
+    $transport=creativeTransportCommand($db,$cfg,$command);
+    if($transport!==null)return $transport;
     require_once __DIR__.'/creative-core.php';
     $creative=creativeCommand($db,$cfg,$command);
     if($creative!==null)return $creative;
     if($command==='/discoveryruns'){
-        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||($cfg['discovery']['feeds_enabled']??false)!==true)return 'External discovery feeds disabled or unconfigured.';
+        if(($cfg['growth']['enabled']??false)!==true||($cfg['discovery']['enabled']??false)!==true||(($cfg['discovery']['feeds_enabled']??false)!==true&&($cfg['discovery']['local_batch_enabled']??false)!==true&&($cfg['discovery']['tender_poll_enabled']??false)!==true))return 'Discovery feeds and local batches disabled or unconfigured.';
         $lines=['Recent source runs (up to 10; not confirmed leads):'];
         foreach($db->query('SELECT source_id,status,imported_count,duplicate_count,skipped_count,error_code FROM growth_source_runs ORDER BY id DESC LIMIT 10')->fetchAll(PDO::FETCH_ASSOC) as $r)
-            $lines[]=$r['source_id'].' '.$r['status'].' | imported '.$r['imported_count'].' duplicate '.$r['duplicate_count'].' skipped '.$r['skipped_count'].($r['error_code']!==''?' | '.$r['error_code']:'');
+            $lines[]=$r['source_id'].' '.$r['status'].(str_starts_with($r['source_id'],'tender-feed-')?' | research tasks created '.$r['imported_count'].' preserved '.$r['duplicate_count']:' | imported '.$r['imported_count'].' duplicate '.$r['duplicate_count']).' skipped '.$r['skipped_count'].($r['error_code']!==''?' | '.$r['error_code']:'');
         return count($lines)===1?'No source run recorded.':implode("\n",$lines);
     }
     require_once __DIR__.'/discovery-core.php';
@@ -101,9 +166,14 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
             foreach($db->query("SELECT status,COUNT(*) total FROM growth_publications WHERE status IN ('queued','sending','failed','unknown') GROUP BY status")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='Publication inventory '.$r['status'].': '.$r['total'];
         }else $lines[]='Telegram business publishing disabled or unconfigured.';
         if(discoveryEnabled($cfg)&&($cfg['discovery']['feeds_enabled']??false)===true){
-            $q=$db->prepare('SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) imported,COALESCE(SUM(duplicate_count),0) duplicates FROM growth_source_runs WHERE finished_at>=? AND finished_at<?');
-            $q->execute($bounds);$s=$q->fetch(PDO::FETCH_ASSOC);
+            $q=$db->prepare('SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) imported,COALESCE(SUM(duplicate_count),0) duplicates FROM growth_source_runs WHERE finished_at>=? AND finished_at<? AND source_id NOT LIKE ?');
+            $q->execute(array_merge($bounds,['tender-feed-%']));$s=$q->fetch(PDO::FETCH_ASSOC);
             $lines[]='Source runs finished today: '.$s['runs'].' / imported '.$s['imported'].' / duplicates '.$s['duplicates'];
+        }
+        if(discoveryEnabled($cfg)&&($cfg['discovery']['tender_poll_enabled']??false)===true){
+            $q=$db->prepare("SELECT COUNT(*) runs,COALESCE(SUM(imported_count),0) created,COALESCE(SUM(duplicate_count),0) preserved FROM growth_source_runs WHERE finished_at>=? AND finished_at<? AND source_id LIKE 'tender-feed-%'");
+            $q->execute($bounds);$s=$q->fetch(PDO::FETCH_ASSOC);
+            $lines[]='Tender polls finished today: '.$s['runs'].' / research tasks created '.$s['created'].' / preserved '.$s['preserved'].' (not qualified leads)';
         }
         $lines[]='Actual calls, sales messages/email, reach, other social providers and full external errors: not connected.';
         $lines[]='Database query succeeded; not a full system health test.';
