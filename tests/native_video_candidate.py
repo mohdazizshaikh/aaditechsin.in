@@ -95,7 +95,7 @@ with tempfile.TemporaryDirectory() as tmp:
     def fake(args,**kw):
         assert "StrictHostKeyChecking=yes" in args and "IdentityAgent=none" in args
         assert kw["input"].startswith("cd /private/inbox\n") and kw["input"].count("chmod 600 ")==2
-        assert kw["input"].count("rename ")==2 and kw["input"].count("get ")==2
+        assert kw["input"].count("ln ")==2 and kw["input"].count("rm ")==2 and kw["input"].count("get ")==2
         for line in kw["input"].splitlines():
             if line.startswith("get "):
                 _,name,local=line.split();shutil.copyfile(Path(kw["cwd"])/name,Path(kw["cwd"])/local)
