@@ -87,7 +87,7 @@ return [
     ],
     'leads' => [
         'enabled' => false, // Enables real lead storage only with database + approved privacy notice.
-        'response_queue_enabled' => false, 'response_target_hours' => 24,
+        'response_queue_enabled' => false, 'intelligence_enabled' => false, 'response_target_hours' => 24,
     ],
     'portal' => [
         'enabled' => false, // Enable after HTTPS, admin hash, database and staging tests.
