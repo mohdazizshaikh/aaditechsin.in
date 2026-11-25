@@ -55,3 +55,15 @@ for slug in ["it-infrastructure","software-web-development","cloud-modern-it","s
     assert page.select_one('a[href="../?service='+slug+'#contact"]'),slug
 assert home.select_one('#contactFields[disabled]') and home.select_one('#contactForm[method=post]')
 print('Service-specific consultation links and no-JS privacy guard: PASS')
+
+# All 14 actual service pages contain useful scope questions even without JS.
+for slug in route_map.values():
+    page=BeautifulSoup((WEB/slug/'index.html').read_text(),'html.parser')
+    brief=page.select_one('.service-brief')
+    assert brief and len(brief.select('input[type=checkbox][disabled]'))==4,slug
+    assert len({x.get_text(' ',strip=True) for x in brief.select('.brief-choice span')})==4,slug
+    assert brief.select_one('.brief-actions[hidden]') and brief.select_one('.brief-result[hidden]'),slug
+    assert brief.select_one('a[href="../?service='+slug+'#contact"]'),slug
+    assert page.select_one('script[src="../assets/service-brief.js"][defer]'),slug
+    assert len(page.select('.av-related a'))==3,slug
+print('All 14 service proposal checklists, local brief controls and related routes: PASS')

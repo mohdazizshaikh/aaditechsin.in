@@ -179,3 +179,7 @@ Seven provider replacement credentials can be privately planned and identity-ver
 
 ## V10.7K — business-facing website completion (source only)
 Nine new dedicated service pages; catalog coverage 5/14 to 14/14, static homepage navigation, sitemap/analytics/live SEO coverage 16 public paths, first-load improvements and no-JS inquiry safety. Real performance measurement, content sign-off and deployment pending. See [V10.7K](docs/V107K_SERVICE_WEBSITE.md).
+
+
+## V10.7L — competitor-informed service conversion (source)
+Public editorial benchmark of 10 pages (7 page-text, 3 indexed excerpts), 14 service-specific proposal checklists (56 topics), 14 local discussion brief builders and related navigation. No fabricated claims, no automated sending or new collection. V10.7K final CI passed; V10.7L CI and hosted acceptance pending. See [V10.7L](docs/V107L_COMPETITOR_RESEARCH_AND_CONVERSION.md).

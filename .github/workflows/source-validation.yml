@@ -34,6 +34,7 @@ jobs:
           set -e
           .ci-venv/bin/python tests/security_static.py
           .ci-venv/bin/python tests/site_integrity.py
+          node tests/service_brief.js
           php tests/workflow_rules.php
           php tests/growth_rules.php
           php tests/discovery_rules.php
