@@ -8,3 +8,7 @@ New private communication-auto-review.php worker: --check validates flags/lookba
 
 ## Validation
 V10.7N initial and two final CI passed; cumulative CI status was still in progress at the initial verification. V10.7O source and disposable database tests authored: admin session/target, queue filtering, response record, stale replay and no contact disclosure; automatic review all four channels, positive missed evidence, closed preservation, idempotency and pause. HTTP negative path for unconfigured inquiry queue. New feature flags default OFF; no schema migration. New CI pending. Actual provider/SMTP/phone/WhatsApp integration, individual inbox response tracking, cron and owner acceptance remain pending. No live customer records accessed or modified. Overall project 5% not asserted absent a weighted baseline.
+
+
+## V10.7P — Google OAuth continuity (source)
+Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search Console read-only capture; no active credential file mutation, reviewed grant expiry/revoke and exact scope, per-provider lock and freshness skip. Both default OFF; V10.7O all CI passed. Actual consent, live Google capture and hosted cron pending. See [V10.7P](V107P_GOOGLE_OAUTH_CONTINUITY.md).

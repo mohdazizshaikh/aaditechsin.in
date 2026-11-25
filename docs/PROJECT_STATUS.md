@@ -297,7 +297,7 @@ V10.7M owner `/tenders` command and historical observation fixture classificatio
 ## V10.7N — scheduled tender ingestion (source)
 Authorized normalized HTTPS tender feed worker (1–5 sources, 25 notices/source), optional private bearer, reviewed service routing, cadence, atomic pending research task/ledger write and owner queue. V10.7M all CI passed. No actual provider connection or cron installed; final CI pending. See [V10.7N](V107N_SCHEDULED_TENDER_INGESTION.md).
 
-| V10.7N | Source committed; CI pending | Scheduled authorized normalized tender intake to owner research queue; actual provider/cron/staging pending |
+| V10.7N | [All final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45693944011) | Scheduled authorized normalized tender intake to owner research queue; actual provider/cron/staging pending |
 
 V10.7N follow-up distinguishes tender research-task counts from general discovery metrics and exposes tender-only source run reports. Final CI pending.
 
@@ -305,4 +305,10 @@ V10.7N follow-up distinguishes tender research-task counts from general discover
 ## V10.7O — inquiry response and automatic communication review (source)
 Private owner oldest-first website inquiry response queue, status-based internal response target, explicit response recording, aggregate-only owner reporting, automatic missed-channel internal review reminders across four channels. Both new flags default OFF. No actual message or cron installed. Source CI and live acceptance pending. See [V10.7O](V107O_COMMUNICATION_WORKFLOWS.md).
 
-| V10.7O | Source committed; CI pending | Website inquiry response workflow and automatic aggregate missed-contact reminders; actual live communications pending |
+| V10.7O | [All final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45694707002) | Website inquiry response workflow and automatic aggregate missed-contact reminders; actual live communications pending |
+
+
+## V10.7P — Google OAuth continuity (source)
+Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search Console read-only capture; no active credential file mutation, reviewed grant expiry/revoke and exact scope, per-provider lock and freshness skip. Both default OFF; V10.7O all CI passed. Actual consent, live Google capture and hosted cron pending. See [V10.7P](V107P_GOOGLE_OAUTH_CONTINUITY.md).
+
+| V10.7P | Source committed; CI pending | Scheduled ephemeral OAuth refresh for Gmail and Search Console; live consent and cron pending |

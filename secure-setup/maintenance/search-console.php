@@ -7,6 +7,7 @@ try{
     if(count($argv)!==2||!in_array($argv[1],['--check','--capture'],true))throw new RuntimeException('Explicit mode required');
     $cfg=opsConfig();$p=scConfig($cfg);if(!$p)throw new RuntimeException('Disabled');
     if($argv[1]==='--check'){echo "Local configuration valid; no network access.\n";exit;}
+    if(($cfg['seo']['search_console']['scheduled_capture_enabled']??false)===true)throw new RuntimeException('Use scheduled Google capture');
     $db=opsDb($cfg);$db->beginTransaction();creativeActive($db);$db->commit();
     $window=scWindow();$r=scCollect($p,$window,'gmailRenewRequest','scRequest');
     $db->beginTransaction();scCapture($db,$cfg,$window,$r);$db->commit();echo "Finalized search analytics aggregate recorded; no credentials or search terms stored.\n";
