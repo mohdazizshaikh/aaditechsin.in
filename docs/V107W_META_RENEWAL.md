@@ -1,0 +1,21 @@
+# V10.7W — Meta OAuth replacement candidate acquisition
+
+Baseline V10.7V 200308920d9027df0bca58966727c8bd1b9cad39. No new migration. Source only, no actual provider calls or activation.
+
+## Provider-specific flows
+- Threads: refresh a separately reviewed, still-valid long-lived token issued at least 24 hours ago, with documented provider expiry and current active generation. Call the fixed Threads refresh endpoint, bound expiry to the response and local review deadline; reject an unchanged token instead of pretending it is a replacement (manual renewal deadline review required in that case). Expired/revoked provider token requires independent consent.
+- Facebook and Instagram (Facebook Login): retrieve only the exact configured Page access token using an independently authorized, unexpired user token. Inspect user and replacement Page tokens through debug_token using the reviewed app identity, validity, expiry/data-access expiry and exact reviewed scopes; require exact Page ID and linked Instagram professional account. This retrieves a replacement Page credential, not indefinite user-token refresh or initial consent. A same-token response stops. Some Page token debug responses may not provide the exact fields/scope set required; fail closed and review manually rather than assuming permissions. Candidate identity probe is separate.
+- Threads refresh response does not attest scopes; owner must independently verify retained consent and capabilities. Meta debug/identity checks do not establish publication permission.
+
+Official Meta references: https://www.postman.com/meta/threads/request/34203612-7a45f35b-0646-4d4e-ace7-5b32ad56f327 ; https://www.postman.com/meta/facebook/request/tass6hw/get-specific-page-access-token ; https://www.postman.com/meta/instagram/http-request/23987686-a49d79fe-b63a-4461-abc8-83d420ba7599 ; https://developers.facebook.com/docs/graph-api/reference/debug_token/ .
+
+## Private operator workflow
+Enable existing growth/creative/social/provider/media gates, oauth_lifecycle.enabled, rotation_review_enabled, meta_candidate_enabled and individual meta_renewal provider enabled/authorized flags (all new flags default false). Configure independent fresh grant generation, review deadline <=90 days, exact target ID (Instagram uses PAGE:IG), private canonical 0700 candidate directory. Threads also needs long_lived_reviewed, active_generation, issued_utc and provider_expires_utc. Facebook/Instagram need user_access_token, user_expires_utc, user_id, app_id, app_secret and reviewed_scopes (Facebook pages_manage_posts/pages_read_engagement/pages_show_list; Instagram instagram_basic/instagram_content_publish/pages_read_engagement/pages_show_list; optional public_profile). Stop other workers, pause growth and freeze private config. Never store real secrets in Git/chat/logs.
+
+`php /PRIVATE/secure/maintenance/meta-renew.php --check threads`
+`php /PRIVATE/secure/maintenance/meta-renew.php --scheduled-run threads`
+
+Repeat for facebook/instagram. Local check performs no provider calls. Candidate due within seven days of local credential deadline (Threads also actual provider expiry). Owner-installed maintenance-window scheduling only; no cron installed. Advisory lock, per-request pause/grant/clock checks and final pause lock guard private creation. Fixed HTTPS/no redirects, bounded strict JSON. Meta documented query parameters may contain secrets on provider requests; disable URL/HTTP tracing and protect provider logs; no secret printed locally. Existing candidate file causes no exchange. Atomic non-overwriting 0600 candidate creation via private temporary file; retain exact V10.7J rotation format and separate reviewed HMAC plan/verification/activation. No automatic active configuration mutation, reauthorization or publishing. No DB transaction across HTTP; in-flight requests cannot be cancelled. Local file/DB operations not atomic together; inspect after errors.
+
+## Verification
+53 provider grant/response cases and three disposable scheduling scenarios authored; no live credentials or provider requests. V10.7W CI pending. Google Business/YouTube V10.7V and Meta V10.7W source candidate coverage 5/7; LinkedIn and X pending. Actual provider consent, activation, hosted cron and staging acceptance remain open.
