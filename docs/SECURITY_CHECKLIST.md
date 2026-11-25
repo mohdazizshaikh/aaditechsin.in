@@ -197,3 +197,7 @@
 ## V10.6S security (pending runtime)
 
 - [ ] Verify private canonical job/output paths, actual ACLs, exact catalog and digest, bounded batch, no transfer/publication, strict manifest, codec validation and cleanup on failure. Review actual imagery, model license and local egress. No native video acceptance asserted.
+
+## V10.6T security (pending runtime)
+
+- [ ] Verify independent index digest and individual server approvals, canonical private paths, host key/account/inbox authorization, full local codec checks, no connection by default, no automatic retry on uncertain delivery. Actual server import and permissions still required.
