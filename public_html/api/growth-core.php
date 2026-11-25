@@ -148,6 +148,7 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
         $rows=$q->fetchAll(PDO::FETCH_ASSOC);
         $lines=['Aaditechs V9.6 — '.$start->format('Y-m-d').' IST','Saved leads today: '.array_sum(array_column($rows,'total'))];
         foreach($rows as $r)$lines[]='Lead intake '.$r['source'].': '.$r['total'];
+        if(inquiryQueueEnabled($cfg))$lines[]=inquiryQueueCommand($db,$cfg,'/inquiryqueue');
         if($command==='/leads')return implode("\n",$lines)."\nSaved inquiries, not won projects or marketing-source attribution.";
         $paused=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
         if($paused===false)throw new RuntimeException('Control missing');
