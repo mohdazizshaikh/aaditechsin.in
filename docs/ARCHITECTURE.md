@@ -188,3 +188,7 @@ Optional pinned mode checks exact model inventory before claim and before/after 
 ## V10.6R schema parity gate
 
 Read-only fixed information_schema queries compare trusted reference table, column, index and FK metadata, bound to exact contract and independently recorded reference digest. Backup verification checks canonical file identity. No automatic restore or schema mutation. See V106R_SCHEMA_RESTORE_GATE.md.
+
+## V10.6S local media batches
+
+Canonical digest binds ordered validated job set; sequential private batch render and verification emits index only after success, removes new batch on caught failure. Existing individual review and manifest registration unchanged. Exact private bundle validation and codec checks; no native generative video. See V106S_REVIEWED_MEDIA_BATCHES.md.

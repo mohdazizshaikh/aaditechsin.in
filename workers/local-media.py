@@ -9,6 +9,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import stat
+import importlib.util
+
+spec=importlib.util.spec_from_file_location('local_creative',Path(__file__).with_name('local-creative.py'))
+local=importlib.util.module_from_spec(spec);spec.loader.exec_module(local)
 
 ROOT=Path(__file__).resolve().parents[1]
 PROFILES={"instagram":(1080,1920),"youtube":(1080,1920),"threads":(1080,1080),"telegram":(1080,1080),**dict.fromkeys(("facebook","linkedin","google-business","x","blog"),(1200,628))}
@@ -20,20 +25,30 @@ def read_json(path,limit=16384):
         raw=f.read(limit+1)
     if len(raw)>limit:
         raise ValueError("Oversized input")
-    return json.loads(raw)
+    return local.strict_json(raw)
 def validate(job):
     keys={"version","task_id","revision","channel","service_title","caption","visual_brief","video_brief","dimensions"}
-    if not isinstance(job,dict) or set(job)!=keys or job["version"]!=1 or any(type(job[k]) is not int or job[k]<1 for k in ("task_id","revision")):
+    if not isinstance(job,dict) or set(job)!=keys or type(job["version"]) is not int or job["version"]!=1 or any(type(job[k]) is not int or job[k]<1 for k in ("task_id","revision")):
         raise ValueError("Invalid job")
-    if job["channel"] not in PROFILES or job["dimensions"]!=list(PROFILES[job["channel"]]):
+    if not isinstance(job["channel"],str) or job["channel"] not in PROFILES or not isinstance(job["dimensions"],list) or any(type(n) is not int for n in job["dimensions"]) or job["dimensions"]!=list(PROFILES[job["channel"]]):
         raise ValueError("Profile mismatch")
     for key,limit in (("service_title",160),("caption",900),("visual_brief",400),("video_brief",400)):
         s=job[key]
         if not isinstance(s,str) or not s.strip() or len(s.encode())>limit or re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]",s):
             raise ValueError("Invalid text")
+    titles={s["title"] for s in read_json(ROOT/"public_html/assets/service-registry.json",65536)["services"]}
+    if job["service_title"] not in titles:
+        raise ValueError("Unknown service title")
+    if local.CLAIMS.search(" ".join(job[k] for k in ("caption","visual_brief","video_brief"))):
+        raise ValueError("Unsupported claim or contact detail")
+    if len(job["caption"].encode())>{"x":280,"threads":500}.get(job["channel"],900):
+        raise ValueError("Channel caption exceeds limit")
     return job
 def private_root(path):
-    path=path.expanduser().resolve()
+    original=path.expanduser().absolute()
+    path=original.resolve()
+    if original!=path:
+        raise ValueError("Canonical private path required")
     if path==ROOT or ROOT in path.parents or path in ROOT.parents or "public_html" in path.parts:
         raise ValueError("Choose a private directory outside repository and webroot")
     path.mkdir(mode=0o700,parents=True,exist_ok=True)
@@ -122,8 +137,34 @@ def render(job,root,font,renderer,model=None,generate=diffusion_image):
     except BaseException:
         shutil.rmtree(out)
         raise
+def private_bundle(directory):
+    directory=Path(directory).expanduser().absolute()
+    if directory.resolve(strict=True)!=directory or not directory.is_dir() or directory==ROOT or ROOT in directory.parents or directory in ROOT.parents or "public_html" in directory.parts:
+        raise ValueError("Private canonical bundle required")
+    if os.name=="posix" and directory.stat().st_mode&0o077:
+        raise ValueError("Private bundle permissions required")
+    for name,limit in (("manifest.json",4096),("creative.png",10*1024*1024),("creative.mp4",20*1024*1024)):
+        path=directory/name
+        info=path.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or not 0<info.st_size<=limit or (os.name=="posix" and info.st_mode&0o077):
+            raise ValueError("Private bounded regular bundle files required")
+    return directory
+
+def validate_manifest(manifest):
+    keys={"version","task_id","revision","channel","renderer","width","height","image_sha256","video_sha256"}
+    if not isinstance(manifest,dict) or set(manifest)!=keys or type(manifest["version"]) is not int or manifest["version"]!=1:
+        raise ValueError("Invalid manifest")
+    if any(type(manifest[k]) is not int or manifest[k]<1 for k in ("task_id","revision","width","height")):
+        raise ValueError("Invalid manifest identifiers")
+    if not isinstance(manifest["channel"],str) or (manifest["width"],manifest["height"])!=PROFILES.get(manifest["channel"]) or manifest["renderer"] not in ("template","local-diffusion"):
+        raise ValueError("Manifest profile or renderer mismatch")
+    if any(not isinstance(manifest[k],str) or not re.fullmatch(r"[a-f0-9]{64}",manifest[k]) for k in ("image_sha256","video_sha256")):
+        raise ValueError("Invalid manifest hashes")
+    return manifest
+
 def verify(directory):
-    manifest=read_json(directory/"manifest.json",4096)
+    directory=private_bundle(directory)
+    manifest=validate_manifest(read_json(directory/"manifest.json",4096))
     if manifest["image_sha256"]!=sha(directory/"creative.png") or manifest["video_sha256"]!=sha(directory/"creative.mp4"):
         raise ValueError("Asset hash mismatch")
     from PIL import Image
@@ -137,25 +178,69 @@ def verify(directory):
     video=directory/"creative.mp4"
     if video.stat().st_size>20*1024*1024:
         raise ValueError("MP4 too large")
-    probe=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_entries","stream=codec_type,codec_name,width,height:format=duration","-of","json",str(video)],timeout=30))
+    probe=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_entries","stream=codec_type,codec_name,width,height,pix_fmt:format=duration,format_name","-of","json",str(video)],timeout=30))
     streams=[s for s in probe["streams"] if s.get("codec_type")=="video"]
-    if len(streams)!=1 or streams[0].get("codec_name")!="h264" or (streams[0].get("width"),streams[0].get("height"))!=expected or not 3.5<=float(probe["format"]["duration"])<=4.5:
+    if len(probe["streams"])!=1 or len(streams)!=1 or streams[0].get("pix_fmt")!="yuv420p" or "mp4" not in probe["format"]["format_name"].split(",") or streams[0].get("codec_name")!="h264" or (streams[0].get("width"),streams[0].get("height"))!=expected or not 3.5<=float(probe["format"]["duration"])<=4.5:
         raise ValueError("MP4 profile mismatch")
     subprocess.run(["ffmpeg","-nostdin","-v","error","-xerror","-i",str(video),"-map","0:v:0","-f","null","-"],check=True,timeout=60,capture_output=True)
     return sha(directory/"manifest.json")
+def batch_plan(doc):
+    if not isinstance(doc,dict) or set(doc)!={"version","jobs"} or type(doc["version"]) is not int or doc["version"]!=1 or not isinstance(doc["jobs"],list) or not 1<=len(doc["jobs"])<=12:
+        raise ValueError("Batch must have 1–12 exported jobs")
+    seen=set()
+    for job in doc["jobs"]:
+        validate(job)
+        key=job["task_id"]
+        if key in seen:
+            raise ValueError("Only one revision per task in a batch")
+        seen.add(key)
+    canonical=json.dumps(doc,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode("utf-8")
+    return {"jobs":len(doc["jobs"]),"sha256":hashlib.sha256(b"aaditechs-media-batch-v1\x00"+canonical).hexdigest()}
+
+def render_batch(doc,expected,root,font,renderer,model=None,render_one=render,verify_one=verify):
+    plan=batch_plan(doc)
+    if not isinstance(expected,str) or not re.fullmatch(r"[a-f0-9]{64}",expected) or plan["sha256"]!=expected:
+        raise ValueError("Reviewed batch plan changed")
+    if renderer not in ("template","local-diffusion") or not font.is_file() or (renderer=="local-diffusion" and (model is None or not model.is_dir())):
+        raise ValueError("Trusted renderer, font and model required")
+    root=private_root(root)
+    stage=Path(tempfile.mkdtemp(prefix="media-batch-",dir=root))
+    try:
+        results=[]
+        for job in doc["jobs"]:
+            out=render_one(job,stage,font,renderer,model)
+            manifest_hash=verify_one(out)
+            results.append({"task_id":job["task_id"],"revision":job["revision"],"directory":out.name,"manifest_sha256":manifest_hash})
+        index=stage/"batch-index.json"
+        with index.open("x",encoding="utf-8") as f:
+            index.chmod(0o600)
+            json.dump({"version":1,"plan_sha256":expected,"renderer":renderer,"bundles":results},f,sort_keys=True,separators=(",",":"))
+        return stage
+    except BaseException:
+        shutil.rmtree(stage)
+        raise
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     sub=p.add_subparsers(dest="mode",required=True)
     r=sub.add_parser("render");r.add_argument("--job",type=Path,required=True);r.add_argument("--output",type=Path,required=True);r.add_argument("--font",type=Path,required=True);r.add_argument("--renderer",choices=["template","local-diffusion"],required=True);r.add_argument("--model",type=Path)
     v=sub.add_parser("verify");v.add_argument("--directory",type=Path,required=True)
+    p1=sub.add_parser("batch-plan");p1.add_argument("--jobs",type=Path,required=True)
+    p2=sub.add_parser("batch-render");p2.add_argument("--jobs",type=Path,required=True);p2.add_argument("--plan-sha256",required=True);p2.add_argument("--output",type=Path,required=True);p2.add_argument("--font",type=Path,required=True);p2.add_argument("--renderer",choices=["template","local-diffusion"],required=True);p2.add_argument("--model",type=Path)
     a=p.parse_args()
     try:
         if a.mode=="render":
             out=render(read_json(a.job),a.output,a.font,a.renderer,a.model)
             print(out)
             print("Manifest SHA256:",verify(out))
-        else:
+        elif a.mode=="verify":
             print("Manifest SHA256:",verify(a.directory))
+        elif a.mode=="batch-plan":
+            print(json.dumps(batch_plan(read_json(a.jobs,65536))))
+        else:
+            out=render_batch(read_json(a.jobs,65536),a.plan_sha256,a.output,a.font,a.renderer,a.model)
+            print(out)
+            print("Local verified bundles only; individual owner review required.")
         return 0
     except Exception:
         print("BLOCKED: invalid job, private storage, local model, renderer or asset verification.",file=sys.stderr)

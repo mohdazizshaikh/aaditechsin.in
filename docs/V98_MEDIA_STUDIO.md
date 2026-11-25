@@ -22,3 +22,5 @@ Instagram and YouTube: 1080x1920 vertical; Threads and Telegram: 1080x1080 squar
 ## Acceptance
 
 Synthetic CI exercises real template PNG/MP4 creation, a fake diffusion adapter, manifest validation and owner review. Real model inference, model-specific safety and licensing, Windows ACLs, local hardware/codec performance, asset transfer and review acceptance on staging remain pending. Native text-to-video, storyboard sequencing, automated authenticated binary transport, owner preview in Telegram and image/video social posting remain future work.
+
+V10.6S adds reviewed local batch rendering (1–12 jobs) and stricter local file/manifest/codec validation. See [V106S_REVIEWED_MEDIA_BATCHES.md](V106S_REVIEWED_MEDIA_BATCHES.md). Existing per-bundle review remains required.
