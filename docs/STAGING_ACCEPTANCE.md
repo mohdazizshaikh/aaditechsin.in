@@ -332,3 +332,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final CI synthetic dump and media tar restoration, all 49 table counts/fingerprints and all 17 media zone/reference comparisons. CI is not hosted restore.
 - [ ] Obtain independently recorded source database/media archive digests on frozen, isolated hosting; capture metadata/count/content/media references before restoring to an independent target.
 - [ ] Compare actual restored target against source references, ensure no missing/quarantined referenced assets and complete application acceptance; record measured recovery time and any drift. Do not enable production or use a source database as its own hosted reference.
+
+
+## V10.7S native video review bridge (pending live acceptance)
+- [ ] Verify final source CI, actual local model provenance/rights, approved text export, human review and exact reviewed decision/packet SHA-256.
+- [ ] Verify separate default-OFF flag, current approved source binding, read-only plan, atomic pending system-task apply, stale plan refusal and duplicate preservation on isolated staging.
+- [ ] Confirm no registered media manifests or queued publication, no private asset or customer exposure. Native binary import and real GPU/provider acceptance remain separate; generic review task approval is not media approval.
