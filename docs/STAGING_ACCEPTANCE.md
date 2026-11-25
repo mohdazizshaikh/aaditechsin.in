@@ -278,3 +278,7 @@ Private bounded read-only content fingerprint comparison across 49 tables; keyed
 
 ## V10.7E — private media restore parity (source only)
 Full bounded active/quarantine asset verification and keyed parity across 15 reference sources, missing-reference readiness gate, no raw asset names exported, three staging flag visibility updates. 51 manifest matrix cases authored. Prior V10.7D CI passed; actual restoration and new CI pending. See [V10.7E](V107E_MEDIA_RESTORE_PARITY.md).
+
+
+## V10.7F — staging configuration and schema preflight (source only)
+113 explicit flag states, 76 child flag dependency checks, strict all-off isolated staging baseline, all 49 contract tables/required columns and 437 matrix cases authored. Prior V10.7E CI passed; new CI and actual hosted acceptance pending. See [V10.7F](V107F_STAGING_PREFLIGHT.md).
