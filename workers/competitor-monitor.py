@@ -34,7 +34,8 @@ def read_private(path,cap=LIMIT):
         if not stat.S_ISREG(a.st_mode) or stat.S_IMODE(a.st_mode)!=0o600 or a.st_nlink!=1 or not 0<a.st_size<=cap:raise ValueError("Private regular file")
         data=f.read(cap+1);b=os.fstat(f.fileno())
         if len(data)!=a.st_size or (a.st_size,a.st_mtime_ns,a.st_ctime_ns)!=(b.st_size,b.st_mtime_ns,b.st_ctime_ns):raise ValueError("File drift")
-    if os.lstat(path).st_ino!=a.st_ino:raise ValueError("Path drift")
+    z=os.lstat(path)
+    if (z.st_dev,z.st_ino,z.st_size,z.st_mtime_ns,z.st_ctime_ns)!=(a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns):raise ValueError("Path drift")
     return data
 def write_once(path,obj):
     raw=c.canonical(obj)+b"\n"
@@ -53,7 +54,7 @@ def policy(doc,today):
     capture_plan=c.plan(scope,today)
     return scope,capture_plan
 def approve(doc,key,today):
-    if not isinstance(key,bytes) or len(key)!=32:raise ValueError("Private HMAC key")
+    if not isinstance(key,bytes) or len(key)!=32 or key==bytes(32):raise ValueError("Private HMAC key")
     policy(doc,today)
     return hmac.new(key,c.canonical(doc),hashlib.sha256).hexdigest()
 def validate_packet(packet,expected_day,scope):
@@ -87,7 +88,10 @@ def inventory(root,doc,key,today):
     if len(names)>HISTORY*2+1:raise ValueError("History cap")
     days={}
     for p in names:
-        if p.name=="lock":continue
+        if p.name=="lock":
+            st=p.lstat()
+            if not stat.S_ISREG(st.st_mode) or stat.S_IMODE(st.st_mode)!=0o600 or st.st_nlink!=1:raise ValueError("Unsafe lock")
+            continue
         if not p.name.endswith((".attempt.json",".capture.json")):raise ValueError("Unknown journal entry")
         value,kind,_=p.name.split(".")
         d=day(value)
@@ -108,6 +112,7 @@ def run(doc,key,expected,root,clock=c.utc_day,capture=c.capture):
     if not c.hash_ok(expected) or not hmac.compare_digest(expected,tag):raise ValueError("Reviewed policy mismatch")
     root=private_root(root)
     journal=root/tag
+    if any(p.name!=tag for p in root.iterdir()):raise ValueError("Prior policy requires private archival before change")
     try:journal.mkdir(mode=0o700)
     except FileExistsError:pass
     private_root(journal)
@@ -131,7 +136,7 @@ def run(doc,key,expected,root,clock=c.utc_day,capture=c.capture):
         return {"status":"captured","capture_sha256":c.digest(c.canonical(packet)),"pages":sum(len(s["observations"]) for s in packet["subjects"]),"change_review":report,"publication_authorized":False}
     finally:os.close(fd)
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument("mode",choices=("plan","run","compare"));p.add_argument("--expected");p.add_argument("--root",type=Path);p.add_argument("--previous",type=Path);p.add_argument("--current",type=Path);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument("mode",choices=("plan","run","compare"));p.add_argument("--expected");p.add_argument("--root",type=Path);a=p.parse_args()
     try:
         doc=e.decode(sys.stdin.buffer.read(LIMIT+1))
         key=bytes.fromhex(os.environ.get("AADITECHS_COMPETITOR_MONITOR_KEY_HEX",""))
