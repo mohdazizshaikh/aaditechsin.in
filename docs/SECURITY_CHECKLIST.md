@@ -263,3 +263,7 @@ Seven reviewed decode calls reject repeated decoded members; existing scope/auth
 Offline fixed CogVideoX candidate adapter, reviewed 1–12 job/model/font/seed plan, 14-service/9-channel coverage, bounded private motion rendering and review-only index, no transfer or publication. 126 plan cases and synthetic moving-frame codec tests authored. Prior V10.7H CI passed; actual GPU/model, new CI and hosted acceptance pending. See [V10.7I](V107I_NATIVE_VIDEO_CANDIDATES.md).
 
 V10.7I follow-up adds exact read-only candidate re-verification, complete index/bundle and per-job binding, asset integrity and explicit editorial disposition report with publication_authorized=false. No server import or actual review. Final-head CI pending.
+
+
+## V10.7J — reviewed OAuth rotation and native-video CI correction (source only)
+Seven provider replacement credentials can be privately planned and identity-verified without activation. 84 provider cases authored; separate default-OFF flag, HMAC binding, pause/config gates and fail-stop. Corrects V10.7I font fixture without relaxing production checks. New CI pending; actual provider renewal, GPU inference and hosted acceptance pending. See [V10.7J](V107J_OAUTH_ROTATION_REVIEW.md).
