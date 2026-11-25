@@ -84,6 +84,7 @@ jobs:
           python3 -m compileall -q workers tests
           php tests/social_renew_rules.php
           php tests/meta_renew_rules.php
+          php tests/network_renew_rules.php
           php tests/linkedin_video_rules.php
           php tests/x_video_rules.php
           php tests/carousel_rules.php
@@ -180,6 +181,7 @@ jobs:
           php tests/native_import_rules.php --database
           php tests/social_renew_rules.php --database
           php tests/meta_renew_rules.php --database
+          php tests/network_renew_rules.php --database
           php tests/competitor_review_rules.php --database
           php tests/runtime_retention_rules.php --database
           php tests/intelligence_rules.php --database
