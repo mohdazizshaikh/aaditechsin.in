@@ -89,8 +89,8 @@ function socialRenewRun(PDO $db,callable $config,string $provider,callable $exch
         if(strtotime($item['expires_utc'])<=$last+600)throw new RuntimeException('Candidate window elapsed');
         // Hold the pause row through the local file creation; no HTTP under a transaction.
         $db->beginTransaction();oauthBatchPaused($db);
-        $final=$config();
-        if(($final['database']??null)!==$database||socialRenewGrant($final,$provider,$last)!==$g)throw new RuntimeException('Grant changed');
+        $finalTime=$clock();$final=$config();
+        if(!is_int($finalTime)||$finalTime<$last||strtotime($item['expires_utc'])<=$finalTime+600||($final['database']??null)!==$database||socialRenewGrant($final,$provider,$finalTime)!==$g||socialRenewDirectory($g['directory'],dirname(__DIR__,2).'/public_html')!==$dir)throw new RuntimeException('Grant changed');
         socialRenewStore($path,$item);$db->commit();
         return ['status'=>'candidate_created','provider'=>$provider,'expires_utc'=>$item['expires_utc'],'activation_authorized'=>false];
     }catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}
