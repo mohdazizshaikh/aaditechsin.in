@@ -355,7 +355,7 @@ Adds all-seven-provider explicit HMAC activation with exact static private confi
 
 
 ## V10.8A — authorized competitor editorial capture (source)
-V10.7X cumulative CI passed. Adds reviewed exact HTTPS service-page capture across own site and 1–5 peers, public IPv4/TLS pinning, reviewed robots policy preflight, bounded HTML structural metadata and digest, all-unknown editorial template, exact reviewed handoff to existing 84-cell comparison/task pipeline. 84 cell, 140 URL, 56 review drift and robots/DNS fixture checks authored. No live collection, stored raw content, automatic claims, publishing or hosting; final CI pending. See [V10.8A](V108A_COMPETITOR_CAPTURE.md).
+V10.7X cumulative CI passed. Adds reviewed exact HTTPS service-page capture across own site and 1–5 peers, public IPv4/TLS pinning, reviewed robots policy preflight, bounded HTML structural metadata and digest, all-unknown editorial template, exact reviewed handoff to existing 84-cell comparison/task pipeline. 84 cell, 140 URL, 56 review drift and robots/DNS fixture checks authored. No live collection, stored raw content, automatic claims, publishing or hosting; [final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45717614512). See [V10.8A](V108A_COMPETITOR_CAPTURE.md).
 
 
 ## V10.8B — bounded competitor monitoring and historical change review (source)
@@ -364,3 +364,7 @@ V10.7Y cumulative CI passed. Adds exact HMAC reviewed, expiring monitoring polic
 
 ## V10.8C — offline competitor content analysis and reviewed recommendations (source)
 V10.7Z cumulative CI passed. Adds exact digest-bound local HTML analysis, bounded six-signal lexical suggestions, optional offline trusted NLI classifier, no raw excerpt output, independent editorial recommendation and scoped task bridge. 168 cue, 84 confirmed gap and 84 missing-peer cases authored. No actual model, live collection, automatic claims, tasks or publishing; CI pending. See [V10.8C](V108C_COMPETITOR_ANALYSIS.md).
+
+
+## V10.8D — tender opportunity ranking, amendment and deadline intelligence (source)
+V10.8A cumulative CI passed. Adds transparent 14-service opportunity priority, separately audited amendment/cancellation review tasks, original evidence preservation, owner deadline and change queues, scheduled poll integration with config/database/pause boundaries. 168 ranking cases and disposable DB amendment/dedup/owner queue tests authored. No actual authorized feed, live notices, automatic bid/outreach or hosting; CI pending. See [V10.8D](V108D_TENDER_INTELLIGENCE.md).
