@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "notes": "General assessment guidance, not verified engineering specifications. Human review required.",
+  "services": {
+    "infrastructure": {
+      "intake": "Assess endpoints, locations, current topology, bandwidth and redundancy needs.",
+      "planning": "Document the existing network and cabling, capacity, power, cooling and change windows.",
+      "escalation": "Require an engineer to validate topology and installation plans."
+    },
+    "software-web": {
+      "intake": "Identify business workflows, users, access roles, integrations and content ownership.",
+      "planning": "Define requirements, acceptance tests, hosting and maintenance responsibilities.",
+      "escalation": "Review privacy, security and implementation scope before quoting."
+    },
+    "it-amc": {
+      "intake": "Count devices, sites, support hours, incident patterns and current inventory.",
+      "planning": "Agree escalation, exclusions, response targets and preventive maintenance.",
+      "escalation": "Confirm contract terms with the service team."
+    },
+    "cloud": {
+      "intake": "Inventory workloads, data sensitivity, dependencies and recovery objectives.",
+      "planning": "Compare deployment options, migration stages, costs and rollback plans.",
+      "escalation": "Engineer validates configuration, access and compliance."
+    },
+    "security": {
+      "intake": "Establish asset scope, authorization, current controls and incident symptoms.",
+      "planning": "Prioritize defensive assessment, least privilege, updates and backups.",
+      "escalation": "Escalate active incidents to an authorized security specialist. Do not attempt intrusion or bypass."
+    },
+    "data-backup": {
+      "intake": "Identify protected data, retention, acceptable data loss and downtime.",
+      "planning": "Plan isolated backups and tested restores with access restrictions.",
+      "escalation": "Validate recovery objectives and test restoration before relying on backups."
+    },
+    "it-procurement": {
+      "intake": "Identify workloads, quantities, compatibility, budget range and lifecycle.",
+      "planning": "Compare requirements, warranty, support and total cost of ownership.",
+      "escalation": "Verify availability and supplier quotations separately."
+    },
+    "smart-office": {
+      "intake": "Identify room use, access needs, privacy requirements and existing systems.",
+      "planning": "Assess network coverage, power, interoperability and consent for monitoring.",
+      "escalation": "Arrange authorized site assessment and privacy review."
+    },
+    "special-projects": {
+      "intake": "Clarify project goals, sites, users, temporary or permanent scope and dates.",
+      "planning": "Identify dependencies, support ownership and acceptance criteria.",
+      "escalation": "Obtain engineer review and a scoped proposal."
+    },
+    "video-conferencing": {
+      "intake": "Identify room size, seating, conferencing platform, acoustics and display needs.",
+      "planning": "Assess microphone coverage, camera framing, connectivity and accessibility.",
+      "escalation": "Arrange specialist site survey before equipment selection."
+    },
+    "auditorium-av": {
+      "intake": "Identify capacity, layout, event type, acoustics and existing equipment.",
+      "planning": "Assess sightlines, audio coverage, control, rigging and power requirements.",
+      "escalation": "Specialists must validate structural, electrical and acoustic design."
+    },
+    "professional-sound": {
+      "intake": "Identify venue, audience, program material, acoustics and sound coverage.",
+      "planning": "Assess existing equipment, signal flow, power and operating constraints.",
+      "escalation": "Qualified specialists verify SPL, electrical load and safe installation."
+    },
+    "av-maintenance": {
+      "intake": "Inventory equipment, age, symptoms, usage and support requirements.",
+      "planning": "Plan authorized inspection, preventive care and service scheduling.",
+      "escalation": "Refer electrical, rigging and hardware repairs to qualified technicians."
+    },
+    "data-recovery": {
+      "intake": "Identify storage type, symptoms, recent events and data importance without filenames.",
+      "planning": "Stop using failing media where practical. Avoid writing, formatting, repair utilities or opening a drive.",
+      "escalation": "Arrange specialist assessment. Recovery feasibility and cost cannot be guaranteed."
+    }
+  }
+}
