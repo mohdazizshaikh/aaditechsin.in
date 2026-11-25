@@ -72,6 +72,7 @@ jobs:
           php tests/meta_image_rules.php
           php tests/media_storage_rules.php
           php tests/oauth_health_rules.php
+          php tests/oauth_rotation_rules.php
           php tests/linkedin_video_rules.php
           php tests/x_video_rules.php
           php tests/carousel_rules.php

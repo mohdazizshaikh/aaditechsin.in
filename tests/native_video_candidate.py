@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import shutil
 from PIL import Image,ImageDraw
 root=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location("native",root/"workers/native-video-candidate.py")
@@ -30,6 +31,9 @@ blocked(lambda:m.model_index({**index,"_class_name":"OtherPipeline"}))
 font=Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
 with tempfile.TemporaryDirectory() as tmp:
     p=Path(tmp);model=p/"model";model.mkdir();(model/"transformer").mkdir()
+    # A packaged font may be hardlinked by the runner. Use a private regular
+    # fixture copy rather than weakening the production single-link gate.
+    trusted_font=p/"fixture.ttf";shutil.copyfile(font,trusted_font);trusted_font.chmod(0o600);font=trusted_font
     (model/"model_index.json").write_text(json.dumps(index))
     weights=model/"transformer/model.safetensors";weights.write_bytes(b"synthetic not real weights")
     h=m.model_inventory(model);assert m.exact_hash(h)
