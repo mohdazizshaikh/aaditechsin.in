@@ -61,6 +61,7 @@ function preflightFlagPaths():array{
         'intelligence_dashboard.csv_enabled',
         'intelligence_dashboard.enabled',
         'leads.enabled',
+        'leads.response_queue_enabled',
         'mail.enabled',
         'media.enabled',
         'media_upload.enabled',
@@ -123,6 +124,7 @@ function preflightFlagPaths():array{
 function preflightDependencies():array{
     return [
         'leads.enabled'=>['database.enabled'],
+        'leads.response_queue_enabled'=>['leads.enabled','portal.enabled','database.enabled'],
         'portal.enabled'=>['database.enabled'],
         'portal.admin_totp_enabled'=>['portal.enabled'],
         'analytics.enabled'=>['database.enabled'],
