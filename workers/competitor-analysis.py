@@ -91,6 +91,19 @@ def analyze(packet,scope,root,today,score=None):
             suggestions[signal]={"state":"review_suggested" if matches else "unknown","matches":matches}
         results.append({"host":host,"service_id":service,"source_url":r["source_url"],"body_sha256":r["body_sha256"],"units_scanned":len(chunks),"suggestions":suggestions})
     return {"version":1,"scope":"private-unreviewed-editorial-analysis","capture_sha256":scope["capture_sha256"],"selection_sha256":c.digest(c.canonical(scope)),"method":"lexical-local-nli" if score is not None else "lexical-only","pages":results,"publication_authorized":False}
+def recommendations(packet,scope,decisions,today):
+    selected={k for k,_ in selection(packet,scope,today)}
+    evidence=c.review(packet,scope["capture_sha256"],decisions,today)
+    comparison=e.compare(evidence,today);items=[]
+    for cell in comparison["comparisons"]:
+        service=cell["service_id"]
+        if cell["outcome"]!="editorial_review_candidate" or (e.OWN,service) not in selected:continue
+        peers=[p for p in cell["peer_states"] if p["state"]=="present" and (p["host"],service) in selected]
+        if not peers:continue
+        items.append({"service_id":service,"signal":cell["signal"],"reviewed_peer_count":len(peers),"review_action":cell["review_action"],"own_source_url":cell["own_source_url"],"peer_sources":[p["source_url"] for p in peers]})
+    items.sort(key=lambda row:(-row["reviewed_peer_count"],row["service_id"],row["signal"]))
+    return {"evidence_sha256":comparison["input_sha256"],"recommendations":items,"task_scope":{"version":1,"scope":"competitor-editorial-review","evidence_sha256":comparison["input_sha256"],"review_day_utc":today.isoformat(),"items":[{"service_id":r["service_id"],"signal":r["signal"]} for r in items]},"publication_authorized":False}
+
 def local_nli(path):
     # Owner-installed, trusted, local model only. No custom model code or pickle loading.
     p=Path(path)
@@ -110,12 +123,15 @@ def local_nli(path):
     return score
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--capture",type=Path,required=True);p.add_argument("--source-root",type=Path,required=True);p.add_argument("--model",type=Path)
+    p.add_argument("--capture",type=Path,required=True);p.add_argument("--source-root",type=Path,required=True);p.add_argument("--model",type=Path);p.add_argument("--decisions",type=Path)
     a=p.parse_args()
     try:
         scope=e.decode(sys.stdin.buffer.read(e.LIMIT+1));packet=e.decode(m.read_private(a.capture))
         today=c.utc_day();selection(packet,scope,today)
         result=analyze(packet,scope,a.source_root,today,local_nli(a.model) if a.model else None)
+        if a.decisions:
+            decisions=e.decode(m.read_private(a.decisions))
+            result["reviewed_recommendations"]=recommendations(packet,scope,decisions,today)
         if c.utc_day()!=today:raise ValueError("Review day changed")
         print(json.dumps(result,sort_keys=True,separators=(",",":")))
     except Exception:p.exit(1,"BLOCKED: exact capture, private source, local model or analysis validation failed.\n")
