@@ -100,3 +100,21 @@ d["subjects"].append({"host": "extra.example", "observations": [row("extra.examp
 blocked(lambda: m.compare(d, today))
 assert m.decode(json.dumps(doc()).encode()) == doc()
 print("Private competitor evidence: 504 service/signal decision cases and scope checks PASS")
+
+# Full 84-cell proposal and single-cell selection isolation.
+d = doc()
+for r in d["subjects"][0]["observations"]:
+    r["signals"] = dict.fromkeys(m.SIGNALS, "absent")
+for r in d["subjects"][1]["observations"]:
+    r["signals"] = dict.fromkeys(m.SIGNALS, "present")
+scope = m.task_scope(d, today)
+assert len(scope["items"]) == 84 and scope["evidence_sha256"] == m.compare(d,today)["input_sha256"]
+assert len({(x["service_id"],x["signal"]) for x in scope["items"]}) == 84
+assert m.task_scope(doc(),today)["items"] == []
+for i, service in enumerate(ids):
+    for signal in m.SIGNALS:
+        single = doc()
+        single["subjects"][0]["observations"][i]["signals"][signal] = "absent"
+        single["subjects"][1]["observations"][i]["signals"][signal] = "present"
+        assert m.task_scope(single,today)["items"] == [{"service_id":service,"signal":signal}]
+print("Editorial proposal: 84 isolated cells, full scope and empty scope PASS")

@@ -15,3 +15,7 @@ Six editorial signals across all 14 service categories: scope, process, limitati
 
 ## Tests and remaining work
 504 synthetic service/signal decision cases (14 x 6 x 6), 84-cell coverage checks, deterministic ordering, private scope/host/date/URL/duplicate rejection, one-to-five peer bounds, missing observation handling and CLI JSON validation added to offline CI. No actual competitors reviewed. New CI pending. Remaining: actual owner-selected evidence, permitted source collection, evidence freshness process, verified editorial review, authorized provider acceptance, isolated hosting and backup/restore. This is a source-level capability, not completion of actual competitor research.
+
+
+## V10.7B — reviewed editorial task batches (source only)
+Private default-OFF competitor-to-SEO review handoff, 1–84 selected cells, exact reviewed plan, stale digest rejection, atomic audited pending-review task creation and existing-task preservation. 84 export + 168 scope cases and synthetic 84-task database test authored. No live competitor data, external publishing or production changes. See [V10.7B](V107B_COMPETITOR_REVIEW_TASKS.md).

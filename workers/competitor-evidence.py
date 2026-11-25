@@ -185,12 +185,25 @@ def compare(doc, today=None):
         "limitations": "Operator observations only; not verified network provenance, provider quality, rankings, traffic, demand, market share or permission to copy.",
     }
 
+def task_scope(doc, today=None):
+    """Propose only eligible cells; operator must review and may remove items."""
+    result = compare(doc, today)
+    return {
+        "version": 1, "scope": "competitor-editorial-review",
+        "evidence_sha256": result["input_sha256"], "review_day_utc": result["as_of_utc"],
+        "items": [{"service_id": x["service_id"], "signal": x["signal"]}
+                  for x in result["comparisons"] if x["outcome"] == "editorial_review_candidate"],
+    }
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--compare-reviewed", action="store_true", required=True)
-    p.parse_args()
+    modes = p.add_mutually_exclusive_group(required=True)
+    modes.add_argument("--compare-reviewed", action="store_true")
+    modes.add_argument("--propose-task-scope", action="store_true")
+    args = p.parse_args()
     try:
-        result = compare(decode(sys.stdin.buffer.read(LIMIT + 1)))
+        source = decode(sys.stdin.buffer.read(LIMIT + 1))
+        result = task_scope(source) if args.propose_task_scope else compare(source)
         print(json.dumps(result, ensure_ascii=True, indent=2))
     except (ValueError, TypeError, KeyError, OSError, RecursionError):
         p.exit(1, "BLOCKED: private evidence scope, registry, date or URL validation failed.\n")
