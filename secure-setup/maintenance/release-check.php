@@ -14,7 +14,7 @@ try{
         $actual=array_map('basename',glob($dir.'/*.sql')?:[]);$expected=$contract['migrations'];sort($actual);sort($expected);
         if($actual!==$expected||count($expected)!==count(array_unique($expected)))throw new RuntimeException('Migration inventory mismatch');
         releaseSourceIntegrity($root,$contract);
-        echo 'PASS: 38 schema/fixture/migration file Git blob hashes match. No signature authenticity asserted.' ."\n";
+        echo 'PASS: '.count($contract['source_git_blob_sha1']).' schema/fixture/migration file Git blob hashes match. No signature authenticity asserted.' ."\n";
         echo 'PASS: '.count($expected)." ordered migration files accounted for.\n";
         echo 'SOURCE ONLY: no database or hosting acceptance.'."\n";exit;
     }
