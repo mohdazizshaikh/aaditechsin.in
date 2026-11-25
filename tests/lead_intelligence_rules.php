@@ -38,6 +38,7 @@ try{
         foreach(array_keys(leadIntelReasons()) as $reason){
             $r=leadIntelReminder($db,$cfg,$lead,'qualified',$updated,$day,$reason,'yes',$now);
             liCheck($r['status']==='created','Reminder created');
+            liCheck(str_contains(growthCommand($db,'/regenerate '.$r['task_id'].' 1',$cfg),'private lead review portal'),'Reserved task protected');
             liCheck(leadIntelReminder($db,$cfg,$lead,'qualified',$updated,$day,$reason,'yes',$now)['status']==='existing_open','No duplicate open');
             liCheck(leadIntelClose($db,$cfg,$r['task_id'],1,'reviewed','yes'),'Review disposition');
             liCheck(!leadIntelClose($db,$cfg,$r['task_id'],1,'reviewed','yes'),'Disposition replay');
