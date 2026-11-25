@@ -37,7 +37,7 @@
   const navLinks=$('#navLinks');
   if(navLinks){navLinks.innerHTML='<a class="active" href="#home">Home</a><a href="#services">Services</a><a href="#data-recovery">Data Recovery</a><a href="#audio-visual">Audio Visual</a><a href="#interactive-tools">Smart Tools</a><a href="#company">About</a><a href="#contact">Contact</a>';navLinks.addEventListener('click',event=>{if(!event.target.closest('a'))return;navLinks.classList.remove('open');const toggle=$('#menuToggle');if(toggle){toggle.setAttribute('aria-expanded','false');toggle.textContent='☰'}})}
   const serviceSelect=$('#service');
-  if(serviceSelect){serviceSelect.addEventListener('change',()=>{$('#deviceField').hidden=serviceSelect.value!=='Data Recovery'})}
+  if(serviceSelect){const chosen=new URLSearchParams(location.search).get('service');const selected=services.find(s=>s.path===chosen+'/');if(selected){serviceSelect.value=selected.title;$('#deviceField').hidden=selected.title!=='Data Recovery'}serviceSelect.addEventListener('change',()=>{$('#deviceField').hidden=serviceSelect.value!=='Data Recovery'})}
   const companyFooter=$('.footer-grid>div:first-child');
   if(companyFooter){const div=document.createElement('div');div.className='contact-footer';div.innerHTML='<a href="tel:+919773693440">☎ +91 97736 93440</a><a href="mailto:info@aaditechs.in">✉ info@aaditechs.in</a><small>Andheri East, Mumbai 400059, India</small>';companyFooter.append(div)}
 

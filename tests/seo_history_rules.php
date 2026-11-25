@@ -31,6 +31,15 @@ shCheck($matrix===126,'126 page contract cases');
 foreach([null,'bad',[null],[1],[['keys'=>'bad']],[['keys'=>[$w['start']],'clicks'=>1,'impressions'=>0,'position'=>1]]] as $rows)
     shBlocked(static fn()=>scParse(['responseAggregationType'=>'byProperty','rows'=>$rows],$w));
 echo "Detailed SEO contract: $matrix/126 PASS\n";
+$full=$detailed;$full['version']=3;$full['pages']=16;$full['counts']['html_ok']=16;
+$full['page_details']=array_map(static fn($p)=>['path'=>$p,'status'=>'html_ok','findings'=>[]],liveSeoFullPaths());
+shCheck(liveSeoValidate($full,$now)['counts']['html_ok']===16,'All services');
+foreach(liveSeoFullPaths() as $i=>$path){
+    $bad=$full;$bad['page_details'][$i]['path']='/portal/';shBlocked(static fn()=>liveSeoValidate($bad,$now));
+    $good=$full;$good['page_details'][$i]['findings']=['missing_title'];$good['counts']['missing_title']=1;shCheck(liveSeoValidate($good,$now)['counts']['missing_title']===1,'Full scope detail');
+}
+$bad=$full;$bad['pages']=7;shBlocked(static fn()=>liveSeoValidate($bad,$now));
+echo "Expanded 16-page SEO contract: PASS\n";
 if(($argv[1]??'')!=='--database'){echo "SEO observation validation: PASS\n";exit;}
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1'||getenv('CI_DB_PASSWORD')!=='ci_only_not_real_password')exit(2);
 $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aaditechs_ci;charset=utf8mb4','aaditechs_ci',getenv('CI_DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false]);
@@ -49,6 +58,9 @@ try{
     liveSeoCapture($db,$cfg,$new,$now->modify('+1 second'));
     $stored=$db->query('SELECT counts_json FROM growth_live_seo_snapshot WHERE id=1')->fetchColumn();
     shCheck(!str_contains($stored,'page_details')&&json_decode($stored,true)['html_ok']===7,'Aggregate only storage');
+    $full['captured_utc']=$now->modify('+2 seconds')->format('Y-m-d\TH:i:s\Z');
+    liveSeoCapture($db,$cfg,$full,$now->modify('+2 seconds'));
+    shCheck(str_contains(liveSeoSummary($db,$cfg,$now->modify('+2 seconds')),'16/16 HTML pages'),'Expanded aggregate persisted');
     growthCommand($db,'/pause',$cfg);shBlocked(static fn()=>liveSeoCapture($db,$cfg,$report,$now));
     $db->rollBack();echo "Synthetic SEO history and observation import: PASS\n";
 }catch(Throwable $e){if($db->inTransaction())$db->rollBack();fwrite(STDERR,'SEO history test failed: '.$e->getMessage()."\n");exit(1);}

@@ -175,3 +175,7 @@ Offline fixed CogVideoX candidate adapter, reviewed 1–12 job/model/font/seed p
 
 ## V10.7J — reviewed OAuth rotation and native-video CI correction (source only)
 Seven provider replacement credentials can be privately planned and identity-verified without activation. 84 provider cases authored; separate default-OFF flag, HMAC binding, pause/config gates and fail-stop. Corrects V10.7I font fixture without relaxing production checks. New CI pending; actual provider renewal, GPU inference and hosted acceptance pending. See [V10.7J](docs/V107J_OAUTH_ROTATION_REVIEW.md).
+
+
+## V10.7K — business-facing website completion (source only)
+Nine new dedicated service pages; catalog coverage 5/14 to 14/14, static homepage navigation, sitemap/analytics/live SEO coverage 16 public paths, first-load improvements and no-JS inquiry safety. Real performance measurement, content sign-off and deployment pending. See [V10.7K](docs/V107K_SERVICE_WEBSITE.md).

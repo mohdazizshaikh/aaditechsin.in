@@ -67,6 +67,7 @@
     const el=e.target instanceof Element?e.target:null;if(!el)return;
     const a=el.closest('a[href]');
     if(a){const href=(a.getAttribute('href')||'').toLowerCase();if(href.startsWith('tel:'))send('call_click');else if(href.startsWith('mailto:'))send('email_click')}
+    const direct=el.closest('a[data-service-route]');if(direct){const id=pages[direct.dataset.serviceRoute];if(id)send('service_interest',id)}
     const button=el.closest('button[data-service]');
     if(button){const id=services[Number(button.dataset.service)];if(id)send('service_interest',id)}
     if(el.closest('.chat-launch[aria-expanded="true"]'))send('chat_open');

@@ -58,3 +58,9 @@ for target in m.PATHS:
         cases += 1
 assert cases == 56
 print("Page-specific SEO diagnostic matrix: 56/56 PASS")
+
+full=m.crawl(fixture,lambda:None,all_services=True)
+assert full["version"]==3 and full["pages"]==16 and full["counts"]["html_ok"]==14
+assert [x["path"] for x in full["page_details"]]==list(m.FULL_PATHS)
+assert len(set(m.FULL_PATHS))==16
+print("Expanded 16-page live SEO scope: PASS (fixture only)")
