@@ -339,8 +339,12 @@ New default-OFF scheduled refresh-token acquisition for Google Business and YouT
 
 
 ## V10.7W — Meta OAuth replacement candidates (source)
-Adds independent default-OFF Threads long-lived refresh and exact Facebook/Instagram Page credential retrieval from authorized user grants, app/scope/expiry and target identity checks, per-request pause and grant gates, private non-overwriting V10.7J-compatible candidates. 53 provider cases and disposable scheduling tests authored; final CI pending. Five of seven provider candidate adapters now implemented at source level. No active credential rotation, actual provider calls, installed cron or hosting; LinkedIn/X and actual consent remain open. See [V10.7W](V107W_META_RENEWAL.md).
+Adds independent default-OFF Threads long-lived refresh and exact Facebook/Instagram Page credential retrieval from authorized user grants, app/scope/expiry and target identity checks, per-request pause and grant gates, private non-overwriting V10.7J-compatible candidates. 53 provider cases and disposable scheduling tests authored; [final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45715822221). Five of seven provider candidate adapters now implemented at source level. No active credential rotation, actual provider calls, installed cron or hosting; LinkedIn/X and actual consent remain open. See [V10.7W](V107W_META_RENEWAL.md).
 
 
 ## V10.7X — LinkedIn and X OAuth renewal candidates (source)
 Adds independently enabled confidential-client refresh, exact reviewed scopes and expiry, provider identity and per-request pause/grant checks, durable pre-exchange fail-stop marker, private unverified rotated response and separately reviewed rotation candidate. 46 provider cases and disposable DB uncertainty/revoke/no-retry tests authored. All seven provider candidate adapters now source implemented; no automatic active credential rotation, actual provider consent, provider requests, hosted cron or production acceptance. V10.7V/W CI still queued at last check; V10.7X CI pending. See [V10.7X](V107X_NETWORK_RENEWAL.md).
+
+
+## V10.7Y — unified reviewed OAuth lifecycle orchestration (source)
+V10.7W cumulative CI passed. Added all-seven-provider private status inventory, candidate/journal/unsafe-file detection, exact HMAC batch plans, due-only dispatch and per-provider and batch drift/pause/stop gates. 127 reviewed subsets and disposable DB batch tests authored; final CI pending. No active credential mutation, installed cron or live provider access. Controlled activation/reconciliation and hosted acceptance remain open. See [V10.7Y](V107Y_OAUTH_ORCHESTRATOR.md).
