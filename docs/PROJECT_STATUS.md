@@ -319,4 +319,8 @@ V10.7P both PR-triggered CI runs passed. V10.7Q guards every individual Google r
 
 
 ## V10.7R — disposable database and media restore rehearsal (source tests)
-V10.7Q [CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45697990011). Expanded actual synthetic MariaDB dump/restore with a private generated media archive, 49 table row counts and keyed content fingerprints, 15 reference sources, two media zones and negative same-count/missing-media drift checks. V10.7R CI pending. No hosted restore or production acceptance. See [V10.7R](V107R_RESTORE_REHEARSAL.md).
+V10.7Q [CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45697990011). Expanded actual synthetic MariaDB dump/restore with a private generated media archive, 49 table row counts and keyed content fingerprints, 15 reference sources, two media zones and negative same-count/missing-media drift checks. V10.7R [CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45699431744). No hosted restore or production acceptance. See [V10.7R](V107R_RESTORE_REHEARSAL.md).
+
+
+## V10.7S — native video editorial review handoff (source)
+V10.7R verified CI recovery rehearsal passed. Native candidate handoff now exports exact verified editorial packet; separate default-OFF server plan/apply validates current approved job and creates up to 12 pending owner review tasks without media registration, upload or publication. 126 scope cases and 12-item disposable DB test authored, plus Python/PHP interoperability on synthetic clip. Final CI pending; real inference, native binary import, actual hosting and provider acceptance remain pending. See [V10.7S](V107S_NATIVE_REVIEW_BRIDGE.md).
