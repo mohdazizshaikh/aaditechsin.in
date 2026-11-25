@@ -368,3 +368,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify CI, LinkedIn programmatic-refresh eligibility and confidential-client authorization, exact scopes/target, refresh expiry and private storage.
 - [ ] Verify paused maintenance, attempt marker before exchange, no retry after uncertain response, separate private unverified refresh response, per-request identity and expiry checks and exact rotation candidate.
 - [ ] Independently reconcile any rotated refresh token, review and separately authorize active credential rotation; verify no automatic activation or publication, no token logging and protected journal retention. Hosted cron and live provider acceptance remain open.
+
+
+## V10.7Y unified OAuth orchestration (pending live acceptance)
+- [ ] Verify final CI and independent grant authorization for exact provider scope; private status must not expose secrets, IDs or paths.
+- [ ] Verify offline reviewed HMAC plan, paused maintenance, provider order, due-only dispatch, remaining scope drift refusal and fail-stop behavior on busy/uncertain result.
+- [ ] Reconcile candidates and refresh journals privately, separately authorize active credential replacement, and verify actual provider permissions. No automated activation or publication.
