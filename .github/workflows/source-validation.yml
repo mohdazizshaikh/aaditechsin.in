@@ -26,7 +26,9 @@ jobs:
       - name: Install isolated Python test dependency
         run: |
           python3 -m venv .ci-venv
-          .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3
+          .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 Pillow==11.3.0
+      - name: Install local synthetic media dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg fonts-dejavu-core
       - name: Security, links and workflow tests
         run: |
           set -e
@@ -37,11 +39,48 @@ jobs:
           php tests/discovery_rules.php
           php tests/discovery_feed.php
           php tests/creative_rules.php
+          php tests/creative_batch_matrix.php
           php tests/social_rules.php
+          php tests/meta_rules.php
+          php tests/network_rules.php
+          php tests/upload_rules.php
+          php tests/instagram_rules.php
+          php tests/facebook_media_rules.php
+          php tests/telegram_media_rules.php
+          php tests/communications_rules.php
+          php tests/credential_retention_rules.php
+          php tests/communications_bridge_rules.php
+          php tests/release_gate_rules.php
+          php tests/reconciliation_rules.php
+          php tests/native_usage_rules.php
+          php tests/albums_inbound_rules.php
+          php tests/twilio_retention_rules.php
+          php tests/mixed_review_rules.php
+          php tests/search_console_rules.php
+          php tests/seo_history_rules.php
+          php tests/runtime_retention_rules.php
+          python3 tests/local_runtime_check.py
+          python3 tests/live_seo_crawl.py
+          python3 tests/backup_verify.py
+          php tests/intelligence_rules.php
+          php tests/dashboard_rules.php
+          php tests/network_media_rules.php
+          php tests/meta_image_rules.php
+          php tests/media_storage_rules.php
+          php tests/oauth_health_rules.php
+          php tests/linkedin_video_rules.php
+          php tests/x_video_rules.php
+          php tests/carousel_rules.php
           php tests/report_rules.php
+          python3 tests/media_transfer.py
           python3 tests/local_creative.py
+          python3 tests/local_expert.py
+          .ci-venv/bin/python tests/seo_audit.py
+          python3 tests/competitor_evidence.py
+          .ci-venv/bin/python tests/local_media.py
           .ci-venv/bin/python tests/http_smoke.py
           php secure-setup/maintenance/preflight.php --source-only
+          php secure-setup/maintenance/release-check.php --source-only
       - name: Scope statement
         run: echo 'Source checks only; no Hostinger deployment, MySQL, SMTP, Google API or production permission test.'
 
@@ -77,7 +116,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: pdo_mysql
+          extensions: pdo_mysql, gd
           coverage: none
       - name: Verify PDO MySQL is available
         run: php -m | grep -iq pdo_mysql
@@ -85,14 +124,45 @@ jobs:
         run: |
           python3 -m venv .ci-venv
           .ci-venv/bin/python -m pip install --disable-pip-version-check beautifulsoup4==4.12.3 PyMySQL==1.1.1 requests==2.32.3
+      - name: Install disposable MariaDB dump client
+        run: sudo apt-get update -qq && sudo apt-get install -y mariadb-client
       - name: Synthetic MySQL + HTTP full workflow
         run: |
+          .ci-venv/bin/python tests/migration_replay.py
           .ci-venv/bin/python tests/integration_mysql_http.py
           php tests/growth_database.php
           php tests/discovery_rules.php --database
           php tests/discovery_feed.php --database
+          php tests/creative_batch_matrix.php --database
           php tests/creative_rules.php --database
           php tests/social_rules.php --database
+          php tests/meta_rules.php --database
+          php tests/network_rules.php --database
+          php tests/upload_rules.php --database
+          php tests/instagram_rules.php --database
+          php tests/facebook_media_rules.php --database
+          php tests/telegram_media_rules.php --database
+          php tests/communications_rules.php --database
+          php tests/credential_retention_rules.php --database
+          php tests/communications_bridge_rules.php --database
+          php tests/release_gate_rules.php --database
+          php tests/reconciliation_rules.php --database
+          php tests/native_usage_rules.php --database
+          php tests/albums_inbound_rules.php --database
+          php tests/twilio_retention_rules.php --database
+          php tests/mixed_review_rules.php --database
+          php tests/search_console_rules.php --database
+          php tests/seo_history_rules.php --database
+          php tests/runtime_retention_rules.php --database
+          php tests/intelligence_rules.php --database
+          php tests/dashboard_rules.php --database
+          php tests/network_media_rules.php --database
+          php tests/meta_image_rules.php --database
+          php tests/media_storage_rules.php --database
+          php tests/oauth_health_rules.php --database
+          php tests/linkedin_video_rules.php --database
+          php tests/x_video_rules.php --database
+          php tests/carousel_rules.php --database
           php tests/report_rules.php --database
       - name: Scope statement
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'

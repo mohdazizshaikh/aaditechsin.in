@@ -1,10 +1,14 @@
-# Aaditechs — Website & Partner Operations Hub (V8)
+# Aaditechs — Website, Partner Operations & Growth Platform
 
 **Source repository** for Aaditechs' modern website, Audio Visual (AV) solutions, guided assessment chatbot, consent-based Lead Engine, and a private owner/partner work-order portal.
 
 Production: `https://aaditechs.in/` — **not deployed by this source commit**. Previous hosted *static* concept preview: `https://aaditechs-modern-concept-2026.tiledparrot.chatgpt.site` — may still show an earlier V6 until explicitly updated. No CRM data, credentials or production customer records are included in Git.
 
-## What's implemented
+## Growth development status (24 November 2026)
+
+Main V9.6 source verified; V9.7–V10.6W development is stacked and not deployed. See [current project tracker](docs/PROJECT_STATUS.md), [SEO guide](docs/V100_SEO.md), [Meta text publishing](docs/V101_META.md), [Other social networks](docs/V102_NETWORKS.md), [Private media uploads](docs/V102A_MEDIA_UPLOAD.md), [Instagram Reels](docs/V102B_INSTAGRAM.md), [Facebook media](docs/V102C_FACEBOOK_MEDIA.md), [LinkedIn/X images](docs/V102D_NETWORK_MEDIA.md), [Meta images](docs/V102E_META_IMAGES.md), [Private media inventory](docs/V102F_MEDIA_STORAGE.md), [OAuth lifecycle](docs/V102G_OAUTH_HEALTH.md), [Media recovery](docs/V102H_MEDIA_RECOVERY.md), [LinkedIn video batch](docs/V102H1_VIDEO_BATCH.md), [X/Threads video batch](docs/V102H2_VIDEO_BATCH.md), [Carousel and private inbox batch](docs/V102H3_CAROUSEL_TRANSFER.md), [staging gates](docs/STAGING_ACCEPTANCE.md) and [GitHub issue #2](https://github.com/mohdazizshaikh/aaditechsin.in/issues/2). Public guide, private model workflows and integrations are independently gated OFF. Source implementation is not production acceptance.
+
+## Existing website and operations
 
 - Original Aaditechs logo retained; Data Recovery, IT Infrastructure, Software, Support, Cloud, Security and Procurement retained.
 - **Audio Visual division:** Video Conferencing, Auditorium AV, Professional Sound & PA, AV Installation/Maintenance with homepage category filter.
@@ -65,3 +69,73 @@ python tests/browser_smoke.py  # requires Python playwright + local Chromium; us
 ```
 
 See [docs/GAP_AUDIT_V8.md](docs/GAP_AUDIT_V8.md) and [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/SECURITY_CHECKLIST.md](docs/SECURITY_CHECKLIST.md). Keep new work scoped; do not reintroduce Zenith Soles / Robotics Lab, invent customer reviews, or change the original brand logo without owner approval.
+
+V10.2I/J source batch: [private SFTP transfer and integration health](docs/V102IJ_TRANSFER_HEALTH.md). CI pending; no live acceptance.
+
+V10.2K/V10.3 source batch: [Telegram media and communications aggregates](docs/V102K_V103_COMMUNICATIONS.md). CI pending; no live acceptance.
+
+V10.3A/V10.4 source batch: [Gmail metadata, authorized discovery batch and opportunity reminders](docs/V103A_V104_INTELLIGENCE.md). CI pending; no live acceptance.
+
+V10.5 source batch: [private owner intelligence dashboard](docs/V105_OWNER_DASHBOARD.md). CI pending; no live acceptance.
+
+V10.5A/V10.6A source batch: [advanced aggregate reporting and release readiness](docs/V105A_V106A_RELEASE_READINESS.md). CI pending; no live acceptance.
+
+V10.6B source batch: [Gmail renewal candidates and communications retention](docs/V106B_CREDENTIAL_RETENTION.md). CI pending; no live acceptance.
+
+V10.6C source batch: [signed communication bridges and consolidated release gates](docs/V106C_COMMUNICATIONS_RELEASE.md). CI pending; no live acceptance.
+
+V10.6D source batch: [publication review, backup verification and credential pre-activation checks](docs/V106D_RECONCILIATION_BACKUP.md). CI pending; no live acceptance.
+
+V10.6E source batch: [native provider usage and synthetic restore rehearsal](docs/V106E_NATIVE_USAGE_RESTORE.md). CI pending; no live acceptance.
+
+V10.6F source batch: [Telegram albums and authenticated WhatsApp inbound events](docs/V106F_ALBUMS_INBOUND.md). CI pending; no live acceptance.
+
+V10.6G source batch: [Twilio inbound callbacks and controlled WhatsApp retention](docs/V106G_INBOUND_RETENTION.md). CI pending; no live acceptance.
+
+V10.6H source batch: [mixed Meta carousels and internal communication reviews](docs/V106H_MIXED_REVIEWS.md). CI pending; no live acceptance.
+
+V10.6I source batch: [Search Console finalized search metrics and ephemeral OAuth refresh](docs/V106I_SEARCH_CONSOLE.md). CI pending; no live acceptance.
+
+V10.6J source batch: [historical Search Console and bounded public SEO observation](docs/V106J_SEO_HISTORY_CRAWL.md). CI pending; no live acceptance.
+
+V10.6K source batch: [local AI runtime readiness, SEO history retention and GBP media read checks](docs/V106K_RUNTIME_RETENTION.md). CI pending; no live acceptance.
+
+V10.6L source batch: [pause-safe discovery, cadence and reviewed recovery](docs/V106L_DISCOVERY_AUTOMATION.md). CI pending; no live acceptance.
+
+V10.6M source batch: [bulk creative coverage, replay-preserving Twilio retention and release validation](docs/V106M_BULK_COVERAGE_RELEASE.md). CI pending; no live acceptance.
+
+V10.6N: [bounded creative batch and draft integrity](docs/V106N_BOUNDED_CREATIVE_REVIEW.md). New CI pending; no live acceptance.
+
+V10.6O: [discovery scheduler readiness and evidence integrity](docs/V106O_DISCOVERY_SCHEDULER_INTEGRITY.md). New CI pending; no live scheduling or acceptance.
+
+V10.6P: [owner coverage intelligence](docs/V106P_OWNER_COVERAGE_INTELLIGENCE.md). New CI pending; no live acceptance.
+
+V10.6Q: [bounded pinned local AI worker](docs/V106Q_PINNED_LOCAL_WORKER.md). New CI pending; no live inference.
+
+V10.6R: [read-only schema and backup release gates](docs/V106R_SCHEMA_RESTORE_GATE.md). New CI pending; no actual hosted restore.
+
+V10.6S: [reviewed local media batches](docs/V106S_REVIEWED_MEDIA_BATCHES.md). New CI pending; no live rendering or publication acceptance.
+
+V10.6T: [reviewed private media transfer](docs/V106T_REVIEWED_MEDIA_TRANSFER.md). CI pending; no live transfer.
+
+V10.6U: [reviewed server-side media import](docs/V106U_REVIEWED_SERVER_IMPORT.md). New batch flag OFF; CI pending.
+
+V10.6V: [private media reference audit and retention planning](docs/V106V_MEDIA_INTEGRITY_AUDIT.md). New CI pending; no live file operations.
+
+V10.6W: [reviewed OAuth health batch](docs/V106W_OAUTH_HEALTH_BATCH.md). New batch flag OFF; CI pending.
+
+
+## V10.6X — reviewed opportunity follow-up batches (source only)
+Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](docs/V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.
+
+
+## V10.6Y — reviewed communications and retention integrity (source only)
+New default-OFF private 1–50 aggregate review batch across email, WhatsApp, SMS and calls; exact-state plan/apply, per-item audit, local rollback and full-state retention digest. 108 scope and 24 channel scenarios authored, plus retention drift tests. Prior V10.6X CI passed. New CI and actual hosting/consent/retention acceptance pending. See [V10.6Y](docs/V106Y_COMMUNICATION_REVIEW_BATCH.md).
+
+
+## V10.6Z — private page-level SEO diagnostics (source only)
+Optional detailed seven-page observation v2 with strict path/status/finding consistency, aggregate-only persistence, v1 compatibility, atomic Search Console snapshot/history/audit and live SEO audit rollback. 56 crawler + 126 report validation scenarios authored. Prior V10.6Y CI passed; new CI and actual crawl/provider/staging acceptance pending. See [V10.6Z](docs/V106Z_PAGE_SEO_DIAGNOSTICS.md).
+
+
+## V10.7A — competitor editorial evidence (source only)
+Offline private operator-supplied own/peer comparison across 14 services and six editorial signals (84 cells), 1–5 peers, explicit unknown evidence, source references and review-only gap suggestions, 504 synthetic decision cases. No scraping, actual competitor claims, rankings, publishing or database changes. Prior V10.6Z CI passed; new CI and real evidence acceptance pending. See [V10.7A](docs/V107A_COMPETITOR_EVIDENCE.md).
