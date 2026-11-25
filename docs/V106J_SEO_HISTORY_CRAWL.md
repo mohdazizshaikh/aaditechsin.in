@@ -17,3 +17,7 @@ Review aggregate JSON privately, then import via php secure/maintenance/live-seo
 ## Verification
 
 Offline mocked crawl/robots and PHP report rules, disposable MariaDB history dedup/revision/generation/coverage and private import/duplicate/pause tests wired into CI. Historical migration replay, synthetic dump/restore and fresh metadata parity include both tables. CI pending at writing. Real Search Console consent, actual public crawl, approved history retention, GBP media/API approval, automatic credential activation, replay-safe Twilio retention, authorized opportunity feeds, local AI runtime/native video, actual Hostinger backup restoration and staging release remain pending. Cumulative draft #34 is prior V10.6H snapshot; latest incremental review and CI required before release.
+
+
+## V10.6Z — private page-level SEO diagnostics (source only)
+Optional detailed seven-page observation v2 with strict path/status/finding consistency, aggregate-only persistence, v1 compatibility, atomic Search Console snapshot/history/audit and live SEO audit rollback. 56 crawler + 126 report validation scenarios authored. Prior V10.6Y CI passed; new CI and actual crawl/provider/staging acceptance pending. See [V10.6Z](V106Z_PAGE_SEO_DIAGNOSTICS.md).

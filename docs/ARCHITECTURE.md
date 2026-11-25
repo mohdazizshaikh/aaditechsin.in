@@ -216,3 +216,7 @@ Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, r
 
 ## V10.6Y — reviewed communications and retention integrity (source only)
 New default-OFF private 1–50 aggregate review batch across email, WhatsApp, SMS and calls; exact-state plan/apply, per-item audit, local rollback and full-state retention digest. 108 scope and 24 channel scenarios authored, plus retention drift tests. Prior V10.6X CI passed. New CI and actual hosting/consent/retention acceptance pending. See [V10.6Y](V106Y_COMMUNICATION_REVIEW_BATCH.md).
+
+
+## V10.6Z — private page-level SEO diagnostics (source only)
+Optional detailed seven-page observation v2 with strict path/status/finding consistency, aggregate-only persistence, v1 compatibility, atomic Search Console snapshot/history/audit and live SEO audit rollback. 56 crawler + 126 report validation scenarios authored. Prior V10.6Y CI passed; new CI and actual crawl/provider/staging acceptance pending. See [V10.6Z](V106Z_PAGE_SEO_DIAGNOSTICS.md).
