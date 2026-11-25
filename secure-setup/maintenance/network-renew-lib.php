@@ -90,7 +90,10 @@ function networkRenewRun(PDO $db,callable $config,string $provider,callable $exc
         $next=$boundary();$parsed=networkRenewResponse($g,$response,$start);$item=$parsed['item'];
         if(metaRenewDate($item['expires_utc'])<=$last+600)throw new RuntimeException('Candidate expired');
         $prepared=oauthRotationPrepare($next,json_encode(['version'=>1,'items'=>[$item]],JSON_THROW_ON_ERROR),random_bytes(32),$last);
-        $boundary();if($probe($provider,$prepared['private'][0]['target'],$boundary)!==true)throw new RuntimeException('Identity refused');
+        $tokenBoundary=static function()use($boundary,$item,&$last):void{
+            $boundary();if(metaRenewDate($item['expires_utc'])<=$last+600)throw new RuntimeException('Candidate expired');
+        };
+        $tokenBoundary();if($probe($provider,$prepared['private'][0]['target'],$tokenBoundary)!==true)throw new RuntimeException('Identity refused');
         $db->beginTransaction();oauthBatchPaused($db);$fresh();
         if(metaRenewDate($item['expires_utc'])<=$last+600)throw new RuntimeException('Candidate expired');
         socialRenewStore($candidate,$item);$db->commit();
