@@ -386,3 +386,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify cumulative CI, explicit authorization and current terms/robots policy for every exact reviewed hostname and path.
 - [ ] Verify public DNS/TLS pinning, reviewed robots preflight, bounded HTML capture, no raw content or personal data retention, no redirects, and fail-stop on drift/restrictions.
 - [ ] Independently review actual page content, keep unknown evidence unknown, verify exact capture digest and template handoff, then separately review eligible task scope. No ranking, copying, outreach or publication.
+
+
+## V10.8B competitor monitoring (pending live acceptance)
+- [ ] Verify CI, repeated collection authorization, exact scoped policy HMAC, expiry, minimum cadence, private directory, stopped/uncertain attempts and exclusive capture history.
+- [ ] Verify historical digest/structural changes without automatically inferring service, quality or commercial claims; independently review semantic evidence.
+- [ ] Verify protected journal retention and manual reconciliation before policy rollover; no automatic publishing or outreach. Hosted scheduler remains uninstalled.
