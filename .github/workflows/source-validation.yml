@@ -1,7 +1,7 @@
 name: Aaditechs source validation (no deployment)
 on:
   push:
-    branches: [main]
+    branches: [main, 'development/**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -52,6 +52,7 @@ jobs:
           php tests/communications_bridge_rules.php
           php tests/release_gate_rules.php
           php tests/preflight_rules.php
+          php tests/strict_json_rules.php
           python3 tests/deployment_integrity.py
           php tests/reconciliation_rules.php
           php tests/native_usage_rules.php

@@ -253,3 +253,7 @@ Full bounded active/quarantine asset verification and keyed parity across 15 ref
 
 ## V10.7G — exact deployment integrity (source only)
 Commit-derived bounded SHA-256 inventory of all tracked public files/private maintenance scripts, private staged-copy parity, missing/drift/extra/unsafe checks, preflight config path and permission gate, 102 synthetic file cases. Prior V10.7F CI passed; new CI and actual hosting pending. See [V10.7G](V107G_DEPLOYMENT_INTEGRITY.md).
+
+
+## V10.7H — strict JSON boundaries (source only)
+Seven reviewed decode calls reject repeated decoded members; existing scope/authorization controls retained. 200 matrix cases and six integrated scope tests authored; development push CI trigger added. V10.7G PR/CI unconfirmed at initial check; new CI and actual hosting pending. See [V10.7H](V107H_STRICT_JSON_BOUNDARIES.md).

@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__,2).'/public_html/api/strict-json.php';
 require_once dirname(__DIR__,2).'/public_html/api/communication-review-core.php';
 function commReviewBatchScope(array $cfg,string $raw,?DateTimeImmutable $now=null):array{
     if(!commReviewEnabled($cfg)||($cfg['communications']['review_batch_enabled']??false)!==true)throw new RuntimeException('Batch disabled');
     if(strlen($raw)>16384)throw new InvalidArgumentException('Scope too large');
-    $obj=json_decode($raw,false,8,JSON_THROW_ON_ERROR);
+    $obj=strictJsonDecode($raw,false,8);
     if(!$obj instanceof stdClass)throw new InvalidArgumentException('Object required');
     $v=get_object_vars($obj);$action=$v['action']??null;
     if(!in_array($action,['set','complete','cancel'],true))throw new InvalidArgumentException('Invalid action');

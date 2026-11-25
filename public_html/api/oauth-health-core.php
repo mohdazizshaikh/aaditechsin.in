@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/strict-json.php';
 require_once __DIR__.'/oauth-policy.php';
 require_once __DIR__.'/meta-core.php';
 require_once __DIR__.'/network-core.php';
@@ -77,7 +78,7 @@ function oauthBatchEnabled(array $cfg):bool{
 }
 function oauthBatchScope(string $raw):array{
     if(strlen($raw)>4096)throw new InvalidArgumentException('Oversized scope');
-    $d=json_decode($raw,true,8,JSON_THROW_ON_ERROR);
+    $d=strictJsonDecode($raw,true,8);
     if(!is_array($d)||count($d)!==2||($d['version']??null)!==1||!is_array($d['providers']??null)||!array_is_list($d['providers'])||count($d['providers'])<1||count($d['providers'])>7)throw new InvalidArgumentException('Invalid scope');
     $seen=[];foreach($d['providers'] as $p){
         if(!is_string($p)||!in_array($p,oauthProviders(),true)||isset($seen[$p]))throw new InvalidArgumentException('Invalid or duplicate provider');

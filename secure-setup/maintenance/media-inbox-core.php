@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__,2).'/public_html/api/strict-json.php';
 require_once __DIR__.'/upload-assets.php';
 function inboxReadPair(string $inbox,string $root,array $row):array{
     if($inbox===$root||str_starts_with($inbox,$root.'/')||str_starts_with($root,$inbox.'/'))throw new RuntimeException('Separate inbox required');
@@ -21,7 +22,7 @@ function inboxBatchEnabled(array $cfg):bool{
 }
 function inboxBatchRequest(string $raw):array{
     if(strlen($raw)>16384)throw new InvalidArgumentException('Batch too large');
-    $doc=json_decode($raw,true,16,JSON_THROW_ON_ERROR);
+    $doc=strictJsonDecode($raw,true,16);
     if(!is_array($doc)||count($doc)!==2||($doc['version']??null)!==1||!is_array($doc['items']??null)||!array_is_list($doc['items'])||count($doc['items'])<1||count($doc['items'])>12)throw new InvalidArgumentException('Invalid batch');
     $seen=[];$out=[];
     foreach($doc['items'] as $r){

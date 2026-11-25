@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__,2).'/public_html/api/strict-json.php';
 require_once dirname(__DIR__,2).'/public_html/api/seo-core.php';
 require_once dirname(__DIR__,2).'/public_html/api/creative-core.php';
 function competitorReviewSignals():array{
@@ -15,7 +16,7 @@ function competitorReviewSignals():array{
 function competitorReviewScope(array $cfg,string $raw,?DateTimeImmutable $now=null):array{
     if(!seoEnabled($cfg)||($cfg['seo']['competitor_review_batch_enabled']??false)!==true)throw new RuntimeException('Disabled');
     if(strlen($raw)>16384)throw new InvalidArgumentException('Scope cap');
-    $o=json_decode($raw,false,8,JSON_THROW_ON_ERROR);
+    $o=strictJsonDecode($raw,false,8);
     if(!$o instanceof stdClass)throw new InvalidArgumentException('Scope object');
     $v=get_object_vars($o);$keys=array_keys($v);sort($keys);
     if($keys!==['evidence_sha256','items','review_day_utc','scope','version']||$v['version']!==1||$v['scope']!=='competitor-editorial-review'||!is_string($v['evidence_sha256'])||!preg_match('/^[a-f0-9]{64}$/D',$v['evidence_sha256'])||!is_string($v['review_day_utc'])||!is_array($v['items'])||count($v['items'])<1||count($v['items'])>84)throw new InvalidArgumentException('Invalid scope');

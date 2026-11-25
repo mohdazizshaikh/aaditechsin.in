@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/strict-json.php';
 require_once __DIR__.'/creative-core.php';
 function mediaEnabled(array $cfg):bool {
     return creativeEnabled($cfg)&&($cfg['media']['enabled']??false)===true;
@@ -22,7 +23,7 @@ function mediaExport(PDO $db,int $id,int $rev):array {
 }
 function mediaRegister(PDO $db,string $raw):array {
     if(strlen($raw)>4096)throw new InvalidArgumentException('Manifest too large');
-    $m=json_decode($raw,true,16,JSON_THROW_ON_ERROR);
+    $m=strictJsonDecode($raw,true,16);
     $keys=['version','task_id','revision','channel','renderer','width','height','image_sha256','video_sha256'];
     if(!is_array($m)||count($m)!==count($keys)||array_diff(array_keys($m),$keys)||($m['version']??null)!==1)throw new InvalidArgumentException('Invalid manifest');
     foreach(['task_id','revision','width','height'] as $k)if(!is_int($m[$k])||$m[$k]<1)throw new InvalidArgumentException('Invalid number');

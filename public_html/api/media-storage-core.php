@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/strict-json.php';
 require_once __DIR__.'/meta-image-core.php';
 function storageEnabled(array $cfg):bool {
     return mediaEnabled($cfg)&&($cfg['media_upload']['enabled']??false)===true&&($cfg['media_upload']['inventory_enabled']??false)===true;
@@ -125,7 +126,7 @@ function storageReferenceAudit(PDO $db,string $root,int $perSource=20,int $byteB
 }
 function storagePlanRequest(string $raw):array{
     if(strlen($raw)>8192)throw new InvalidArgumentException('Plan input too large');
-    $d=json_decode($raw,true,16,JSON_THROW_ON_ERROR);
+    $d=strictJsonDecode($raw,true,16);
     if(!is_array($d)||count($d)!==2||($d['version']??null)!==1||!is_array($d['names']??null)||!array_is_list($d['names'])||count($d['names'])<1||count($d['names'])>50)throw new InvalidArgumentException('Invalid plan');
     $seen=[];foreach($d['names'] as $name){
         if(!is_string($name)||!storageName($name)||isset($seen[$name]))throw new InvalidArgumentException('Invalid or duplicate asset');
