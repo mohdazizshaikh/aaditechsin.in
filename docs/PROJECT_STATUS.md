@@ -331,7 +331,7 @@ V10.7S final CI passed. Added distinct native-video renderer migration (37 migra
 
 
 ## V10.7U — reviewed native video private transfer (source)
-V10.7T final CI passed. Native candidate transfer now supports reviewed destination and exact packet binding, full preflight and private spool, non-overwriting SFTP hardlink delivery, SHA-256 readback and stop-on-uncertainty for up to 12 pairs. Tests cover real synthetic clip mock delivery, 24 tamper positions, interruption and shared assets; [V10.7U CI failed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45714923677) at native transfer Python syntax (disposable DB passed). Corrected in V10.7V; verification pending. Real SFTP hardlink compatibility, hosted import, GPU inference, staging/restore and provider acceptance remain pending. See [V10.7U](V107U_NATIVE_TRANSFER.md).
+V10.7T final CI passed. Native candidate transfer now supports reviewed destination and exact packet binding, full preflight and private spool, non-overwriting SFTP hardlink delivery, SHA-256 readback and stop-on-uncertainty for up to 12 pairs. Tests cover real synthetic clip mock delivery, 24 tamper positions, interruption and shared assets; [V10.7U CI failed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45714923677) at native transfer Python syntax (disposable DB passed). Corrected and verified in [V10.7V](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45715372967). Real SFTP hardlink compatibility, hosted import, GPU inference, staging/restore and provider acceptance remain pending. See [V10.7U](V107U_NATIVE_TRANSFER.md).
 
 
 ## V10.7V — Google social OAuth replacement candidates (source)
@@ -347,7 +347,7 @@ Adds independently enabled confidential-client refresh, exact reviewed scopes an
 
 
 ## V10.7Y — unified reviewed OAuth lifecycle orchestration (source)
-V10.7W cumulative CI passed. Added all-seven-provider private status inventory, candidate/journal/unsafe-file detection, exact HMAC batch plans, due-only dispatch and per-provider and batch drift/pause/stop gates. 127 reviewed subsets and disposable DB batch tests authored; final CI pending. No active credential mutation, installed cron or live provider access. Controlled activation/reconciliation and hosted acceptance remain open. See [V10.7Y](V107Y_OAUTH_ORCHESTRATOR.md).
+V10.7W cumulative CI passed. Added all-seven-provider private status inventory, candidate/journal/unsafe-file detection, exact HMAC batch plans, due-only dispatch and per-provider and batch drift/pause/stop gates. 127 reviewed subsets and disposable DB batch tests authored; [final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45716513740). No active credential mutation, installed cron or live provider access. Controlled activation/reconciliation and hosted acceptance remain open. See [V10.7Y](V107Y_OAUTH_ORCHESTRATOR.md).
 
 
 ## V10.7Z — reviewed staging OAuth activation (source)
@@ -356,3 +356,7 @@ Adds all-seven-provider explicit HMAC activation with exact static private confi
 
 ## V10.8A — authorized competitor editorial capture (source)
 V10.7X cumulative CI passed. Adds reviewed exact HTTPS service-page capture across own site and 1–5 peers, public IPv4/TLS pinning, reviewed robots policy preflight, bounded HTML structural metadata and digest, all-unknown editorial template, exact reviewed handoff to existing 84-cell comparison/task pipeline. 84 cell, 140 URL, 56 review drift and robots/DNS fixture checks authored. No live collection, stored raw content, automatic claims, publishing or hosting; final CI pending. See [V10.8A](V108A_COMPETITOR_CAPTURE.md).
+
+
+## V10.8B — bounded competitor monitoring and historical change review (source)
+V10.7Y cumulative CI passed. Adds exact HMAC reviewed, expiring monitoring policy, 1–30 day cadence, private fail-stop capture history, maximum 84-page comparison, exact byte digest and structural deltas; 168 historical page/change cases and cadence/expiry/interruption fixtures authored. No real collection, installed cron, semantic competitor claims, publication or hosted acceptance. CI pending. See [V10.8B](V108B_COMPETITOR_MONITOR.md).
