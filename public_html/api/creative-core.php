@@ -30,7 +30,7 @@ function creativeExport(PDO $db,int $id):array {
     $q->execute([$id]);$r=$q->fetch(PDO::FETCH_ASSOC);
     if(!$r)throw new RuntimeException('No pending generation request');
     $service=growthCatalog()[$r['service_id']]??null;
-    if(!$service)throw new RuntimeException('Unknown catalog service');
+    if(!$service||!in_array($r['channel'],creativeChannels(),true)||!in_array($r['objective'],creativeObjectives(),true))throw new RuntimeException('Invalid catalog request');
     // Public catalog only. No leads, prospect evidence, contacts, old drafts or secrets.
     return ['version'=>1,'task_id'=>(int)$r['id'],'revision'=>(int)$r['revision'],'service'=>$service,'channel'=>$r['channel'],'objective'=>$r['objective']];
 }
@@ -40,7 +40,7 @@ function creativeValidate(array $result):array {
     foreach(['task_id','revision'] as $k)if(!is_int($result[$k])||$result[$k]<1)throw new InvalidArgumentException('Invalid IDs');
     foreach(['model'=>100,'caption'=>900,'visual_brief'=>400,'video_brief'=>400,'review_notes'=>160] as $key=>$limit){
         $v=$result[$key];
-        if(!is_string($v)||trim($v)===''||strlen($v)>$limit||preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/',$v))throw new InvalidArgumentException('Invalid creative field');
+        if(!is_string($v)||preg_match('//u',$v)!==1||trim($v)===''||strlen($v)>$limit||preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/',$v))throw new InvalidArgumentException('Invalid creative field');
         $result[$key]=trim($v);
     }
     // Review aid, not truth verification. Block common unsupported claims/contacts.
@@ -52,19 +52,25 @@ function creativeValidate(array $result):array {
 function creativeImport(PDO $db,array $result):bool {
     creativeActive($db);
     $v=creativeValidate($result);$id=$v['task_id'];$rev=$v['revision'];
-    $q=$db->prepare("SELECT t.status,t.revision,c.channel FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id WHERE t.id=? FOR UPDATE");
+    $q=$db->prepare("SELECT t.status,t.revision,t.service_id,c.channel,c.objective FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id WHERE t.id=? FOR UPDATE");
     $q->execute([$id]);$r=$q->fetch(PDO::FETCH_ASSOC);
     if(!$r||$r['status']!=='regeneration_requested'||(int)$r['revision']!==$rev)return false;
+    if(!isset(growthCatalog()[$r['service_id']])||!in_array($r['channel'],creativeChannels(),true)||!in_array($r['objective'],creativeObjectives(),true))throw new RuntimeException('Invalid catalog request');
     $limit=match($r['channel']){'x'=>280,'threads'=>500,default=>900};
     // Conservative byte caps, not provider-side character validation.
     if(strlen($v['caption'])>$limit)throw new InvalidArgumentException('Channel draft too long');
     $draft="Caption:\n".$v['caption']."\nVisual brief:\n".$v['visual_brief']."\nVideo brief:\n".$v['video_brief']."\nReview: ".$v['review_notes'];
-    if(!growthReplace($db,$id,$rev,$draft))return false;
-    $db->prepare('INSERT INTO growth_creative_results(task_id,revision,model_label,caption,visual_brief,video_brief,review_notes) VALUES(?,?,?,?,?,?,?)')->execute([$id,$rev,$v['model'],$v['caption'],$v['visual_brief'],$v['video_brief'],$v['review_notes']]);
-    growthAudit($db,$id,$rev,'creative_imported','private_cli');
-    return true;
+    $db->exec('SAVEPOINT creative_result_import');
+    try{
+        if(!growthReplace($db,$id,$rev,$draft)){$db->exec('RELEASE SAVEPOINT creative_result_import');return false;}
+        $db->prepare('INSERT INTO growth_creative_results(task_id,revision,model_label,caption,visual_brief,video_brief,review_notes) VALUES(?,?,?,?,?,?,?)')->execute([$id,$rev,$v['model'],$v['caption'],$v['visual_brief'],$v['video_brief'],$v['review_notes']]);
+        growthAudit($db,$id,$rev,'creative_imported','private_cli');
+        $db->exec('RELEASE SAVEPOINT creative_result_import');
+        return true;
+    }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT creative_result_import');$db->exec('RELEASE SAVEPOINT creative_result_import');throw $e;}
 }
 function creativeCommand(PDO $db,array $cfg,string $command):?string {
+    if(preg_match('/^\/coveragegrid(?: |$)/D',$command)){require_once __DIR__.'/creative-batch-core.php';return creativeBatchSummary($db,$cfg,substr($command,14));}
     if(!preg_match('/^\/(?:createcontent|content|coverage)(?: |$)/D',$command))return null;
     if(!creativeEnabled($cfg))return 'Creative engine disabled or unconfigured.';
     if($command==='/content'){
