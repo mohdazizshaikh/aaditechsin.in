@@ -97,6 +97,7 @@ jobs:
           .ci-venv/bin/python tests/seo_audit.py
           python3 tests/competitor_evidence.py
           python3 tests/competitor_capture.py
+          python3 tests/competitor_monitor.py
           .ci-venv/bin/python tests/local_media.py
           .ci-venv/bin/python tests/native_video_candidate.py
           .ci-venv/bin/python tests/native_video_transfer.py
