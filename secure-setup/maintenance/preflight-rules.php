@@ -246,3 +246,10 @@ function preflightSchemaFailures(array $expected,array $actual):array{
     }
     return $missing;
 }
+
+function preflightPrivateConfig(string $public,string $private,string $config):bool{
+    $w=realpath($public);$s=realpath($private);$c=realpath($config);
+    if($w===false||$s===false||$c===false||$s!==$private||$c!==$config||dirname($c)!==$s||is_link($private)||is_link($config)||!is_dir($s)||!is_file($c))return false;
+    if($s===$w||str_starts_with($s,$w.'/')||str_starts_with($w,$s.'/'))return false;
+    $st=lstat($c);return $st!==false&&$st['nlink']===1&&($st['mode']&0077)===0&&(fileperms($s)&0077)===0;
+}

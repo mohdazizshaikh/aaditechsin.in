@@ -249,3 +249,7 @@ Full bounded active/quarantine asset verification and keyed parity across 15 ref
 
 ## V10.7F — staging configuration and schema preflight (source only)
 113 explicit flag states, 76 child flag dependency checks, strict all-off isolated staging baseline, all 49 contract tables/required columns and 437 matrix cases authored. Prior V10.7E CI passed; new CI and actual hosted acceptance pending. See [V10.7F](V107F_STAGING_PREFLIGHT.md).
+
+
+## V10.7G — exact deployment integrity (source only)
+Commit-derived bounded SHA-256 inventory of all tracked public files/private maintenance scripts, private staged-copy parity, missing/drift/extra/unsafe checks, preflight config path and permission gate, 102 synthetic file cases. Prior V10.7F CI passed; new CI and actual hosting pending. See [V10.7G](V107G_DEPLOYMENT_INTEGRITY.md).

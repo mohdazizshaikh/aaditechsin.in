@@ -47,3 +47,15 @@ foreach($tables as $table=>$cols){
     $x=$actual;unset($x[$table][$cols[0]]);pfCheck(preflightSchemaFailures($tables,$x)===[$table.'.'.$cols[0]],'Missing column');++$cases;
 }
 echo 'Preflight: '.count($flags)." explicit flags; $cases flag/schema matrix cases PASS\n";
+
+$tmp=sys_get_temp_dir().'/aaditechs-preflight-'.bin2hex(random_bytes(8));mkdir($tmp,0700);
+mkdir($tmp.'/public_html',0700);mkdir($tmp.'/secure',0700);
+$p=$tmp.'/secure/aaditechs-config.php';file_put_contents($p,'<?php return [];');chmod($p,0600);
+try{
+    pfCheck(preflightPrivateConfig($tmp.'/public_html',$tmp.'/secure',$p),'Private file accepted');
+    chmod($p,0644);clearstatcache();pfCheck(!preflightPrivateConfig($tmp.'/public_html',$tmp.'/secure',$p),'Public permission rejected');chmod($p,0600);
+    $alias=$tmp.'/secure/alias';symlink($p,$alias);pfCheck(!preflightPrivateConfig($tmp.'/public_html',$tmp.'/secure',$alias),'Symlink rejected');unlink($alias);
+    link($p,$alias);clearstatcache();pfCheck(!preflightPrivateConfig($tmp.'/public_html',$tmp.'/secure',$p),'Hardlink rejected');unlink($alias);
+    chmod($tmp.'/secure',0755);clearstatcache();pfCheck(!preflightPrivateConfig($tmp.'/public_html',$tmp.'/secure',$p),'Public directory rejected');chmod($tmp.'/secure',0700);
+}finally{unlink($p);rmdir($tmp.'/secure');rmdir($tmp.'/public_html');rmdir($tmp);}
+echo "Private preflight config path and permissions: PASS\n";

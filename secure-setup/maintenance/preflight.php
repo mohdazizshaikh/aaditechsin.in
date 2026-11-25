@@ -108,8 +108,13 @@ if ($configReal === false || !is_file($configReal)) {
 if ($publicReal !== false) {
     outcome('Private config outside public_html', $configReal !== $publicReal && !str_starts_with($configReal, rtrim($publicReal, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR));
 }
+// Do not execute an unsafe or aliased private PHP config.
+if(!preflightPrivateConfig($public,$private,$configPath)){
+    outcome('Canonical private config, restricted permissions and no hardlinks',false);exit(1);
+}
+outcome('Canonical private config, restricted permissions and no hardlinks',true);
 // Trusted owner-maintained PHP config, never user-submitted content.
-$config = require $configReal;
+try{$config=require $configReal;}catch(Throwable $e){outcome('Private config load',false);exit(1);}
 if (!is_array($config)) {
     outcome('Private config returns an array', false);
     exit(1);
