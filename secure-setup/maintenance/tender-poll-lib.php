@@ -76,7 +76,10 @@ function tenderPollRun(PDO $db,callable $config,string $source,callable $fetch,?
     if($id===null){$result['status']='not_due';return $result;}
     try{
         // A read-only request, once admitted. Recheck policy and pause before importing.
-        $fresh();$raw=$fetch($src);
+        $db->beginTransaction();creativeActive($db);$fresh();
+        $q=$db->prepare("SELECT status FROM growth_source_runs WHERE id=? AND source_id=? FOR UPDATE");$q->execute([$id,$src['id']]);
+        if($q->fetchColumn()!=='running')throw new RuntimeException('source_run_resolved');$db->commit();
+        $raw=$fetch($src);
         if(!is_string($raw))throw new InvalidArgumentException('Feed response');
         $db->beginTransaction();creativeActive($db);$cfg=$fresh();
         $q=$db->prepare("SELECT status FROM growth_source_runs WHERE id=? AND source_id=? FOR UPDATE");$q->execute([$id,$src['id']]);
