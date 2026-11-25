@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__,2).'/public_html/api/strict-json.php';
 require_once __DIR__.'/reconciliation-lib.php';
 function releaseBlobHash(string $raw):string{return sha1('blob '.strlen($raw)."\0".$raw);}
 function releaseSourceIntegrity(string $root,array $contract):void{
@@ -74,7 +75,7 @@ function releaseMetadataBytes(array $reference):string{
 }
 function releaseMetadataCompare(array $current,string $raw,string $digest):array{
     if(strlen($raw)>1048576||!preg_match('/^[a-f0-9]{64}$/D',$digest)||!hash_equals($digest,hash('sha256',$raw)))throw new RuntimeException('Reference integrity mismatch');
-    $ref=json_decode($raw,true,32,JSON_THROW_ON_ERROR);
+    $ref=strictJsonDecode($raw,true,32);
     if(!is_array($ref)||array_keys($ref)!==['version','contract_sha256','metadata']||$ref['version']!==1||$ref['contract_sha256']!==$current['contract_sha256']||!is_array($ref['metadata'])||array_keys($ref['metadata'])!==array_keys(releaseMetadataQueries()))throw new RuntimeException('Reference contract mismatch');
     $out=[];
     foreach(releaseMetadataQueries() as $kind=>$unused){
@@ -125,7 +126,7 @@ function releaseCountBytes(array $manifest):string{
 }
 function releaseCompareCounts(array $current,string $raw,string $digest):array{
     if(strlen($raw)>65536||!releaseCountDigest($digest)||!hash_equals($digest,hash('sha256',$raw)))throw new RuntimeException('Count reference integrity');
-    $r=json_decode($raw,true,8,JSON_THROW_ON_ERROR);
+    $r=strictJsonDecode($raw,true,8);
     if(!is_array($r)||array_keys($r)!==['version','scope','contract_sha256','metadata_sha256','backup_sha256','counts']||$r['version']!==1||$r['scope']!=='restore-row-counts'||!is_array($r['counts']))throw new RuntimeException('Count reference shape');
     if(releaseCountBytes($r)!==$raw)throw new RuntimeException('Noncanonical count reference');
     foreach(['contract_sha256','metadata_sha256','backup_sha256'] as $k)

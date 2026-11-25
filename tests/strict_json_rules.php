@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
-require dirname(__DIR__).'/public_html/api/strict-json.php';
-require dirname(__DIR__).'/public_html/api/oauth-health-core.php';
-require dirname(__DIR__).'/public_html/api/media-storage-core.php';
-require dirname(__DIR__).'/secure-setup/maintenance/competitor-review-lib.php';
-require dirname(__DIR__).'/secure-setup/maintenance/followup-batch-lib.php';
-require dirname(__DIR__).'/secure-setup/maintenance/communication-review-batch-lib.php';
-require dirname(__DIR__).'/secure-setup/maintenance/media-inbox-core.php';
+require_once dirname(__DIR__).'/public_html/api/strict-json.php';
+require_once dirname(__DIR__).'/public_html/api/oauth-health-core.php';
+require_once dirname(__DIR__).'/public_html/api/media-storage-core.php';
+require_once dirname(__DIR__).'/secure-setup/maintenance/competitor-review-lib.php';
+require_once dirname(__DIR__).'/secure-setup/maintenance/followup-batch-lib.php';
+require_once dirname(__DIR__).'/secure-setup/maintenance/communication-review-batch-lib.php';
+require_once dirname(__DIR__).'/secure-setup/maintenance/media-inbox-core.php';
 function sjCheck(bool $ok,string $label):void{if(!$ok)throw new LogicException($label);}
 function sjBlocked(callable $fn):void{try{$fn();}catch(InvalidArgumentException|JsonException $e){return;}throw new LogicException('Expected rejection');}
 $cases=0;
@@ -50,3 +50,10 @@ foreach($scopes as [$raw,$fn]){
     sjBlocked(static fn()=>$fn(str_replace('"version":1','"\u0076ersion":0,"version":1',$raw)));
 }
 echo "Strict JSON: 200 matrix cases and six integrated scope regressions PASS\n";
+
+require_once dirname(__DIR__).'/secure-setup/maintenance/release-gate-lib.php';
+$meta=['version'=>1,'contract_sha256'=>str_repeat('a',64),'metadata'=>['tables'=>[],'columns'=>[],'indexes'=>[],'foreign_keys'=>[]]];
+$raw=releaseMetadataBytes($meta);
+$bad=str_replace('"version":1','"version":0,"\u0076ersion":1',$raw);
+sjBlocked(static fn()=>releaseMetadataCompare($meta,$bad,hash('sha256',$bad)));
+echo "Strict schema-reference duplicate rejection PASS\n";

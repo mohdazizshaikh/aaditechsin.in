@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__,2).'/public_html/api/strict-json.php';
 require_once __DIR__.'/discovery-feed-lib.php';
 require_once dirname(__DIR__,2).'/public_html/api/creative-core.php';
 function discoveryBatchSource(array $cfg,string $id):array{
@@ -11,7 +12,7 @@ function discoveryBatch(PDO $db,array $cfg,string $id,string $raw):array{
     if(!$db->inTransaction())throw new LogicException('Transaction required');
     $src=discoveryBatchSource($cfg,$id);creativeActive($db);
     if(strlen($raw)>262144)throw new InvalidArgumentException('Batch size');
-    $doc=json_decode($raw,true,32,JSON_THROW_ON_ERROR);
+    $doc=strictJsonDecode($raw,true,32);
     if(!is_array($doc)||count($doc)!==2||!array_key_exists('version',$doc)||!array_key_exists('items',$doc))throw new InvalidArgumentException('Exact feed contract');
     $parsed=feedItems($raw,$src);
     if($parsed['skipped']!==0||!$parsed['records'])throw new InvalidArgumentException('Every record must pass source and service validation');

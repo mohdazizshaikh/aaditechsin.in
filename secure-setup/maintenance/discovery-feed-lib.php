@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__,2).'/public_html/api/strict-json.php';
 // Private CLI library. No endpoint accepts arbitrary fetch URLs.
 require_once dirname(__DIR__,2).'/public_html/api/discovery-core.php';
 require_once dirname(__DIR__,2).'/public_html/api/creative-core.php';
@@ -51,7 +52,7 @@ function feedFetch(array $src):string {
 }
 function feedItems(string $body,array $src):array {
     if(strlen($body)>262144)throw new InvalidArgumentException('feed_size');
-    $doc=json_decode($body,true,32,JSON_THROW_ON_ERROR);
+    $doc=strictJsonDecode($body,true,32);
     if(!is_array($doc)||count($doc)!==2||($doc['version']??null)!==1||!is_array($doc['items']??null)||!array_is_list($doc['items'])||count($doc['items'])>25)throw new InvalidArgumentException('feed_contract');
     $records=[];$skipped=0;
     foreach($doc['items'] as $item){
