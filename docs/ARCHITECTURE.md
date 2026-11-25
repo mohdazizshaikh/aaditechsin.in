@@ -184,3 +184,7 @@ Existing owner read-only snapshot adds catalog-complete opportunities, four-obje
 ## V10.6Q pinned local worker
 
 Optional pinned mode checks exact model inventory before claim and before/after inference. Bounded sequential polling stops at empty/failure/uncertainty. Exact checked-in catalog and strict JSON protect inputs/outputs. No new network destination or publication capability. See V106Q_PINNED_LOCAL_WORKER.md.
+
+## V10.6R schema parity gate
+
+Read-only fixed information_schema queries compare trusted reference table, column, index and FK metadata, bound to exact contract and independently recorded reference digest. Backup verification checks canonical file identity. No automatic restore or schema mutation. See V106R_SCHEMA_RESTORE_GATE.md.

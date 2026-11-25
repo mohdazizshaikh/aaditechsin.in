@@ -227,3 +227,5 @@ V10.6O: no migration. Discovery scheduler flag OFF. Only after source authorizat
 V10.6P: no migration or new flags. Existing private dashboard and CSV authorization apply. Creative coverage requires existing creative batch flag; web breakdown requires consented analytics. Confirm complete catalog, missing-vs-zero, private headers and aggregate CSV on isolated staging before enabling. See docs/V106P_OWNER_COVERAGE_INTELLIGENCE.md.
 
 V10.6Q: no migration/new flag. Existing private creative transport gate remains. For multi-job invocation provide independently verified local model digest and --limit 1–20. Check actual offline runtime, protected token, TLS, stop behavior and non-overlap before scheduling. See docs/V106Q_PINNED_LOCAL_WORKER.md.
+
+V10.6R: no migration or new flag. With workers stopped and growth paused, capture schema metadata from independently trusted isolated fresh release, record SHA256, compare against isolated restored target using --compare-schema. Use private reference and canonical gzip paths. See docs/V106R_SCHEMA_RESTORE_GATE.md; metadata parity is not data completeness or production acceptance.

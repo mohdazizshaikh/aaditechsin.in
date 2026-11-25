@@ -3,7 +3,8 @@ declare(strict_types=1);
 if(PHP_SAPI!=='cli'){http_response_code(404);exit;}
 require_once __DIR__.'/release-gate-lib.php';
 try{
-    if(count($argv)!==2||!in_array($argv[1],['--source-only','--check-db'],true))throw new RuntimeException('Explicit mode required');
+    $mode=$argv[1]??'';
+    if(!in_array($mode,['--source-only','--check-db','--capture-schema','--compare-schema'],true)||count($argv)!==($mode==='--compare-schema'?3:2))throw new RuntimeException('Explicit mode required');
     $contract=json_decode((string)file_get_contents(__DIR__.'/release-contract.json'),true,32,JSON_THROW_ON_ERROR);
     if(($contract['version']??null)!==1||!is_array($contract['tables']??null)||!is_array($contract['migrations']??null))throw new RuntimeException('Contract invalid');
     $root=dirname(__DIR__,2);
@@ -18,6 +19,22 @@ try{
     }
     require $root.'/public_html/api/operations.php';
     $cfg=opsConfig();$db=opsDb($cfg);
+    if(in_array($mode,['--capture-schema','--compare-schema'],true)){
+        // Run only with workers stopped and growth paused; no data or metadata writes.
+        $pause=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
+        if($pause===false||(int)$pause!==1||!releaseWorkerClear(releaseWorkerState($db)))throw new RuntimeException('Release state not clear');
+        $metadata=releaseMetadata($db,$contract);
+        if($mode==='--capture-schema'){
+            // Redirect only into a private operator-controlled file on a trusted reference instance.
+            echo releaseMetadataBytes($metadata);exit;
+        }
+        $raw=stream_get_contents(STDIN,1048577);
+        if(!is_string($raw))throw new RuntimeException('Reference unavailable');
+        $result=releaseMetadataCompare($metadata,$raw,$argv[2]);
+        foreach($result as $kind=>$ok)echo $kind.': '.($ok?'MATCH':'DRIFT')."\n";
+        if(in_array(false,$result,true))exit(1);
+        echo "READ ONLY: metadata parity observed; no restore completeness, grants, worker-stop or production acceptance asserted.\n";exit;
+    }
     $q=$db->query('SELECT TABLE_NAME,COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()');
     $actual=[];foreach($q->fetchAll(PDO::FETCH_ASSOC) as $r)$actual[$r['TABLE_NAME']][$r['COLUMN_NAME']]=true;
     $missing=0;
