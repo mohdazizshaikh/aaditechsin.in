@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/tender-review-lib.php';
+require_once __DIR__.'/tender-intelligence-lib.php';
 require_once __DIR__.'/discovery-feed-lib.php';
 
 // The provider supplies normalized, permitted observations, never task selections.
@@ -61,11 +62,11 @@ function tenderPollStatus(PDO $db,array $cfg):array{
 function tenderPollRun(PDO $db,callable $config,string $source,callable $fetch,?callable $clock=null):array{
     if($db->inTransaction())throw new LogicException('Unexpected transaction');
     $clock=$clock??static fn()=>new DateTimeImmutable('now');
-    $initial=tenderPollConfig($config());$src=$initial['sources'][$source]??null;
+    $initialCfg=$config();$initial=tenderPollConfig($initialCfg);$database=$initialCfg['database']??null;$intel=tenderIntelEnabled($initialCfg);$src=$initial['sources'][$source]??null;
     if(!$src)throw new InvalidArgumentException('Source not configured');
-    $fresh=static function()use($config,$source,$src,$initial):array{
+    $fresh=static function()use($config,$source,$src,$initial,$database,$intel):array{
         $cfg=$config();$p=tenderPollConfig($cfg);
-        if($p['minutes']!==$initial['minutes']||($p['sources'][$source]??null)!==$src)throw new RuntimeException('source_config_changed');
+        if(($cfg['database']??null)!==$database||tenderIntelEnabled($cfg)!==$intel||$p['minutes']!==$initial['minutes']||($p['sources'][$source]??null)!==$src)throw new RuntimeException('source_config_changed');
         return $cfg;
     };
     $result=['status'=>'blocked','created'=>0,'preserved'=>0,'skipped'=>0,'error'=>'','bid_authorized'=>false];
@@ -75,7 +76,7 @@ function tenderPollRun(PDO $db,callable $config,string $source,callable $fetch,?
     if($id===null){$result['status']='not_due';return $result;}
     try{
         // A read-only request, once admitted. Recheck policy and pause before importing.
-        $raw=$fetch($src);
+        $fresh();$raw=$fetch($src);
         if(!is_string($raw))throw new InvalidArgumentException('Feed response');
         $db->beginTransaction();creativeActive($db);$cfg=$fresh();
         $q=$db->prepare("SELECT status FROM growth_source_runs WHERE id=? AND source_id=? FOR UPDATE");$q->execute([$id,$src['id']]);
@@ -87,11 +88,13 @@ function tenderPollRun(PDO $db,callable $config,string $source,callable $fetch,?
             $a=tenderReviewApply($db,$cfg,$p['selected'],$plan['digest'],$now);
             $created=$a['created'];$preserved=$a['preserved'];
         }
-        $skip=$p['notices']-$created-$preserved;
+        $changes=['created'=>0,'preserved'=>0,'unverified_originals'=>0];
+        if($intel&&$p['notices']>0){$plan=tenderIntelPlan($db,$cfg,$raw,true,$now);$changes=tenderIntelApply($db,$cfg,$raw,$plan['digest'],$now);}
+        $fresh();$skip=$p['notices']-$created-$preserved;
         $q=$db->prepare("UPDATE growth_source_runs SET status='completed',imported_count=?,duplicate_count=?,skipped_count=?,finished_at=UTC_TIMESTAMP() WHERE id=? AND status='running'");
         $q->execute([$created,$preserved,$skip,$id]);if($q->rowCount()!==1)throw new RuntimeException('source_run_resolved');
         $db->commit();
-        return ['status'=>'completed','created'=>$created,'preserved'=>$preserved,'skipped'=>$skip,'classification'=>$p['counts'],'error'=>'','bid_authorized'=>false];
+        return ['status'=>'completed','created'=>$created,'preserved'=>$preserved,'skipped'=>$skip,'classification'=>$p['counts'],'amendment_reviews_created'=>$changes['created'],'amendment_reviews_preserved'=>$changes['preserved'],'unverified_originals'=>$changes['unverified_originals'],'error'=>'','bid_authorized'=>false];
     }catch(Throwable $e){
         if($db->inTransaction())$db->rollBack();
         $error=$e->getMessage()==='Growth paused'?'growth_paused':(in_array($e->getMessage(),['source_config_changed','source_run_resolved','dns_failed','unsafe_destination','transport_failed','http_status','content_type'],true)?$e->getMessage():'tender_feed_failed');
