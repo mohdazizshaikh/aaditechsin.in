@@ -197,6 +197,8 @@ function growthCommand(PDO $db,string $command,array $cfg=[]): string {
     }
     if(preg_match('/^\/(approve|reject|regenerate) ([1-9][0-9]{0,14}) ([1-9][0-9]{0,8})$/D',$command,$m)){
         $id=(int)$m[2];$rev=(int)$m[3];$action=$m[1];
+        $q=$db->prepare("SELECT title FROM growth_tasks WHERE id=? FOR UPDATE");$q->execute([$id]);$title=$q->fetchColumn();
+        if(is_string($title)&&str_starts_with($title,'Lead follow-up: '))return 'Use the private lead review portal for reminder disposition.';
         $status=['approve'=>'approved','reject'=>'rejected','regenerate'=>'regeneration_requested'][$action];
         $q=$db->prepare("UPDATE growth_tasks SET status=?,revision=revision+? WHERE id=? AND revision=? AND status='pending_review'");
         $q->execute([$status,$action==='regenerate'?1:0,$id,$rev]);

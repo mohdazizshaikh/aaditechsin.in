@@ -404,3 +404,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify cumulative CI and authorized normalized issuer/provider observations, current tender terms and actual deadline/eligibility; scores are review priority only.
 - [ ] Verify original audited task remains unchanged, amendment/cancellation dedup, stale/empty/unconfirmed exclusions, config/database/pause gates and separate counts.
 - [ ] Verify owner-only recorded deadline and amendment queues, truncation and stale labels; no automatic bidding/outreach. Actual feed and cron remain unconnected.
+
+
+## V10.8E lead qualification and internal follow-ups (pending acceptance)
+- [ ] Verify corrected cumulative CI, actual service mapping and owner-only HTTPS/session/CSRF; partner/anonymous denied.
+- [ ] Verify explicit qualification, stale form, duplicate/history preservation, paused creation refusal and private reminder disposition.
+- [ ] Verify inactive inquiries excluded from active counts, bounded reports, no customer data in owner notifications and no automatic contact. Actual hosted delivery and staging remain pending.

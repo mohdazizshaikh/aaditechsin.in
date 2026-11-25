@@ -53,6 +53,7 @@ jobs:
           php tests/telegram_media_rules.php
           php tests/communications_rules.php
           php tests/inquiry_queue_rules.php
+          php tests/lead_intelligence_rules.php
           php tests/communication_auto_review.php
           php tests/credential_retention_rules.php
           php tests/communications_bridge_rules.php
@@ -99,7 +100,7 @@ jobs:
           python3 tests/competitor_evidence.py
           python3 tests/competitor_capture.py
           python3 tests/competitor_monitor.py
-          python3 tests/competitor_analysis.py
+          .ci-venv/bin/python tests/competitor_analysis.py
           .ci-venv/bin/python tests/local_media.py
           .ci-venv/bin/python tests/native_video_candidate.py
           .ci-venv/bin/python tests/native_video_transfer.py
@@ -172,6 +173,7 @@ jobs:
           php tests/telegram_media_rules.php --database
           php tests/communications_rules.php --database
           php tests/inquiry_queue_rules.php --database
+          php tests/lead_intelligence_rules.php --database
           php tests/communication_auto_review.php --database
           php tests/credential_retention_rules.php --database
           php tests/communications_bridge_rules.php --database
