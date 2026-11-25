@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://aaditechs.in/</loc></url>
+  <url><loc>https://aaditechs.in/it-infrastructure/</loc></url>
+  <url><loc>https://aaditechs.in/software-web-development/</loc></url>
+  <url><loc>https://aaditechs.in/it-amc/</loc></url>
+  <url><loc>https://aaditechs.in/cloud-modern-it/</loc></url>
+  <url><loc>https://aaditechs.in/security-compliance/</loc></url>
+  <url><loc>https://aaditechs.in/data-management-backup/</loc></url>
+  <url><loc>https://aaditechs.in/it-asset-procurement/</loc></url>
+  <url><loc>https://aaditechs.in/smart-office-solutions/</loc></url>
+  <url><loc>https://aaditechs.in/it-special-projects/</loc></url>
   <url><loc>https://aaditechs.in/video-conferencing-solutions/</loc></url>
   <url><loc>https://aaditechs.in/auditorium-av-solutions/</loc></url>
   <url><loc>https://aaditechs.in/professional-sound-systems/</loc></url>
-  <url><loc>https://aaditechs.in/av-project-planner/</loc></url>
+  <url><loc>https://aaditechs.in/av-installation-maintenance/</loc></url>
   <url><loc>https://aaditechs.in/data-recovery/</loc></url>
-  <url><loc>https://aaditechs.in/it-amc/</loc></url>
+  <url><loc>https://aaditechs.in/av-project-planner/</loc></url>
 </urlset>

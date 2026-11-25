@@ -4,7 +4,8 @@ require_once __DIR__.'/growth-core.php';
 function analyticsPages(): array {
     return ['home'=>'','data-recovery'=>'data-recovery','it-amc'=>'it-amc',
         'video-conferencing-solutions'=>'video-conferencing','auditorium-av-solutions'=>'auditorium-av',
-        'professional-sound-systems'=>'professional-sound','av-project-planner'=>'av-maintenance'];
+        'professional-sound-systems'=>'professional-sound','av-project-planner'=>'av-maintenance',
+        'it-infrastructure'=>'infrastructure','software-web-development'=>'software-web','cloud-modern-it'=>'cloud','security-compliance'=>'security','data-management-backup'=>'data-backup','it-asset-procurement'=>'it-procurement','smart-office-solutions'=>'smart-office','it-special-projects'=>'special-projects','av-installation-maintenance'=>'av-maintenance'];
 }
 function analyticsDay(): string {return (new DateTimeImmutable('now',new DateTimeZone('Asia/Kolkata')))->format('Y-m-d');}
 function analyticsEnabled(array $cfg): bool {
