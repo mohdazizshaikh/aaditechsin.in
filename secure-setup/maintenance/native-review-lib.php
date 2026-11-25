@@ -53,6 +53,9 @@ function nativeReviewPlan(PDO $db,array $cfg,string $raw,string $digest,?DateTim
     $plan=['packet_sha256'=>$digest,'rows'=>$rows,'create_count'=>count(array_filter($rows,static fn($r)=>$r['existing']===null)),'publication_authorized'=>false];
     $plan['plan_sha256']=hash('sha256',nativeReviewCanonical($plan));return $plan;
 }
+function nativeReviewDraft(array $r,string $digest):string{
+    return "Internal editorial review only. Source task ".$r['source_task_id']." revision ".$r['source_revision'].".\nPrivate review SHA-256: ".$r['review_sha256']."\nPoster SHA-256: ".$r['poster_sha256']."\nNative video SHA-256: ".$r['candidate_sha256']."\nModel inventory SHA-256: ".$r['model_sha256']."\nHandoff packet SHA-256: ".$digest."\nIndependently inspect actual private bytes, model provenance, rights, brand, accuracy, and privacy. Metadata only; no verified inference, media registration, upload or publication authorized.";
+}
 function nativeReviewApply(PDO $db,array $cfg,string $raw,string $digest,string $planDigest,?DateTimeImmutable $now=null):array{
     if(!$db->inTransaction()||!nativeReviewHash($planDigest))throw new InvalidArgumentException('Reviewed plan required');
     $db->exec('SAVEPOINT native_review_bridge');
@@ -62,7 +65,7 @@ function nativeReviewApply(PDO $db,array $cfg,string $raw,string $digest,string 
         $ids=[];
         foreach($plan['rows'] as $r){
             if($r['existing']!==null)continue;
-            $draft="Internal editorial review only. Source task ".$r['source_task_id']." revision ".$r['source_revision'].".\nPrivate review SHA-256: ".$r['review_sha256']."\nPoster SHA-256: ".$r['poster_sha256']."\nNative video SHA-256: ".$r['candidate_sha256']."\nModel inventory SHA-256: ".$r['model_sha256']."\nHandoff packet SHA-256: ".$digest."\nIndependently inspect actual private bytes, model provenance, rights, brand, accuracy, and privacy. Metadata only; no verified inference, media registration, upload or publication authorized.";
+            $draft=nativeReviewDraft($r,$digest);
             $id=growthCreate($db,['service_id'=>$r['service_id'],'task_type'=>'system','title'=>$r['title'],'draft'=>$draft]);
             growthAudit($db,$id,1,'native_video_review_created','private_cli');$ids[]=$id;
         }
