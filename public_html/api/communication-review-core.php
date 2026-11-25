@@ -23,14 +23,33 @@ function commReviewCommand(PDO $db,array $cfg,string $cmd):?string{
         try{creativeActive($db);}catch(RuntimeException $e){return 'Growth paused.';}
         $q=$db->prepare('SELECT id,missed_count FROM growth_communication_daily WHERE channel=? AND day_utc=? FOR UPDATE');$q->execute([$m[1],$m[2]]);$r=$q->fetch(PDO::FETCH_ASSOC);
         if(!$r||(int)$r['missed_count']<1)return 'Imported missed-count evidence required.';
-        $db->prepare("INSERT INTO growth_communication_reviews(aggregate_id,due_on,status) VALUES(?,?,'open') ON DUPLICATE KEY UPDATE due_on=VALUES(due_on),status='open'")->execute([$r['id'],$m[3]]);
-        growthAudit($db,null,null,'communication_review_set','owner');return 'Internal aggregate review set. No outreach sent.';
+        commReviewAtomic($db,static function()use($db,$r,$m):void{
+            $db->prepare("INSERT INTO growth_communication_reviews(aggregate_id,due_on,status) VALUES(?,?,'open') ON DUPLICATE KEY UPDATE due_on=VALUES(due_on),status='open'")->execute([$r['id'],$m[3]]);
+            growthAudit($db,null,null,'communication_review_set','owner');
+        });return 'Internal aggregate review set. No outreach sent.';
     }
     if(preg_match('/^\/(completecommreview|cancelcommreview) (email|whatsapp|sms|calls) (\d{4}-\d{2}-\d{2})$/D',$cmd,$m)){
         $state=$m[1]==='completecommreview'?'completed':'cancelled';
-        $q=$db->prepare("UPDATE growth_communication_reviews r JOIN growth_communication_daily a ON a.id=r.aggregate_id SET r.status=? WHERE a.channel=? AND a.day_utc=? AND r.status='open'");$q->execute([$state,$m[2],$m[3]]);
-        if($q->rowCount()!==1)return 'No open review.';
-        growthAudit($db,null,null,'communication_review_'.$state,'owner');return 'Internal review '.$state.'. No outreach sent.';
+        commReviewControl($db,true);
+        $closed=commReviewAtomic($db,static function()use($db,$state,$m):bool{
+            $q=$db->prepare("UPDATE growth_communication_reviews r JOIN growth_communication_daily a ON a.id=r.aggregate_id SET r.status=? WHERE a.channel=? AND a.day_utc=? AND r.status='open'");$q->execute([$state,$m[2],$m[3]]);
+            if($q->rowCount()!==1)return false;
+            growthAudit($db,null,null,'communication_review_'.$state,'owner');return true;
+        });
+        return $closed?'Internal review '.$state.'. No outreach sent.':'No open review.';
     }
     return 'Use /commreviews /commreview CHANNEL DAY DUE_DAY /completecommreview CHANNEL DAY /cancelcommreview CHANNEL DAY.';
+}
+
+function commReviewControl(PDO $db,bool $lock=false):bool{
+    if(!$db->inTransaction())throw new LogicException('Transaction required');
+    $p=$db->query('SELECT paused FROM growth_control WHERE id=1'.($lock?' FOR UPDATE':''))->fetchColumn();
+    if($p===false||!in_array((string)$p,['0','1'],true))throw new RuntimeException('Control unavailable');
+    return (bool)$p;
+}
+function commReviewAtomic(PDO $db,callable $fn):mixed{
+    if(!$db->inTransaction())throw new LogicException('Transaction required');
+    $db->exec('SAVEPOINT communication_review_action');
+    try{$r=$fn();$db->exec('RELEASE SAVEPOINT communication_review_action');return $r;}
+    catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT communication_review_action');$db->exec('RELEASE SAVEPOINT communication_review_action');throw $e;}
 }

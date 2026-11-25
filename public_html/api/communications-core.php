@@ -18,8 +18,12 @@ function communicationsImport(PDO $db,array $cfg,array $row,?DateTimeImmutable $
     creativeActive($db);$r=communicationsValidate($row,$now);
     $q=$db->prepare('SELECT received_count,answered_count,missed_count FROM growth_communication_daily WHERE channel=? AND day_utc=? FOR UPDATE');$q->execute([$r['channel'],$r['day_utc']]);$old=$q->fetch(PDO::FETCH_ASSOC);
     if($old){if([(int)$old['received_count'],(int)$old['answered_count'],(int)$old['missed_count']]!==[$r['received'],$r['answered'],$r['missed']])throw new RuntimeException('Conflicting existing summary; no overwrite');return false;}
-    $db->prepare('INSERT INTO growth_communication_daily(channel,day_utc,received_count,answered_count,missed_count) VALUES(?,?,?,?,?)')->execute([$r['channel'],$r['day_utc'],$r['received'],$r['answered'],$r['missed']]);
-    growthAudit($db,null,null,'communications_import','private_cli');return true;
+    $db->exec('SAVEPOINT communications_single_import');
+    try{
+        $db->prepare('INSERT INTO growth_communication_daily(channel,day_utc,received_count,answered_count,missed_count) VALUES(?,?,?,?,?)')->execute([$r['channel'],$r['day_utc'],$r['received'],$r['answered'],$r['missed']]);
+        growthAudit($db,null,null,'communications_import','private_cli');
+        $db->exec('RELEASE SAVEPOINT communications_single_import');return true;
+    }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT communications_single_import');$db->exec('RELEASE SAVEPOINT communications_single_import');throw $e;}
 }
 function communicationsSummary(PDO $db,?DateTimeImmutable $now=null):string{
     $utc=new DateTimeZone('UTC');$day=($now??new DateTimeImmutable('now',$utc))->setTimezone($utc)->modify('-1 day')->format('Y-m-d');

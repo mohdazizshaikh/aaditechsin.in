@@ -212,3 +212,7 @@ Strict lifecycle metadata and reviewed digest-bound ordered provider scope. Exis
 
 ## V10.6X — reviewed opportunity follow-up batches (source only)
 Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.
+
+
+## V10.6Y — reviewed communications and retention integrity (source only)
+New default-OFF private 1–50 aggregate review batch across email, WhatsApp, SMS and calls; exact-state plan/apply, per-item audit, local rollback and full-state retention digest. 108 scope and 24 channel scenarios authored, plus retention drift tests. Prior V10.6X CI passed. New CI and actual hosting/consent/retention acceptance pending. See [V10.6Y](V106Y_COMMUNICATION_REVIEW_BATCH.md).
