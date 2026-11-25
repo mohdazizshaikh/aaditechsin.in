@@ -331,7 +331,7 @@ V10.7S final CI passed. Added distinct native-video renderer migration (37 migra
 
 
 ## V10.7U — reviewed native video private transfer (source)
-V10.7T final CI passed. Native candidate transfer now supports reviewed destination and exact packet binding, full preflight and private spool, non-overwriting SFTP hardlink delivery, SHA-256 readback and stop-on-uncertainty for up to 12 pairs. Tests cover real synthetic clip mock delivery, 24 tamper positions, interruption and shared assets; final CI pending. Real SFTP hardlink compatibility, hosted import, GPU inference, staging/restore and provider acceptance remain pending. See [V10.7U](V107U_NATIVE_TRANSFER.md).
+V10.7T final CI passed. Native candidate transfer now supports reviewed destination and exact packet binding, full preflight and private spool, non-overwriting SFTP hardlink delivery, SHA-256 readback and stop-on-uncertainty for up to 12 pairs. Tests cover real synthetic clip mock delivery, 24 tamper positions, interruption and shared assets; [V10.7U CI failed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45714923677) at native transfer Python syntax (disposable DB passed). Corrected in V10.7V; verification pending. Real SFTP hardlink compatibility, hosted import, GPU inference, staging/restore and provider acceptance remain pending. See [V10.7U](V107U_NATIVE_TRANSFER.md).
 
 
 ## V10.7V — Google social OAuth replacement candidates (source)
