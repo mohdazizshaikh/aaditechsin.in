@@ -5,14 +5,34 @@ function storageEnabled(array $cfg):bool {
     return mediaEnabled($cfg)&&($cfg['media_upload']['enabled']??false)===true&&($cfg['media_upload']['inventory_enabled']??false)===true;
 }
 function storageName(string $name):bool{return preg_match('/^[a-f0-9]{64}\.(?:png|jpg|mp4)$/D',$name)===1;}
+// Fixed reference sources shared by retention protection and read-only audit.
+function storageReferenceSources():array{
+    return [
+        'manifest-image'=>['png','growth_media_manifests','image_hash',''],
+        'manifest-video'=>['mp4','growth_media_manifests','video_hash',''],
+        'telegram-photo'=>['png','growth_telegram_media','asset_hash',"asset_kind='photo'"],
+        'telegram-video'=>['mp4','growth_telegram_media','asset_hash',"asset_kind='video'"],
+        'facebook-photo'=>['png','growth_facebook_media','asset_hash',"asset_kind='photo'"],
+        'facebook-video'=>['mp4','growth_facebook_media','asset_hash',"asset_kind='video'"],
+        'network-image'=>['png','growth_network_media','asset_hash',''],
+        'carousel-image'=>['jpg','growth_carousel_items','asset_hash',"asset_kind='image'"],
+        'carousel-video'=>['mp4','growth_carousel_items','asset_hash',"asset_kind='video'"],
+        'meta-image'=>['jpg','growth_meta_images','asset_hash',"asset_kind='image'"],
+        'meta-video'=>['mp4','growth_meta_images','asset_hash',"asset_kind='video'"],
+        'youtube-video'=>['mp4','growth_media_uploads','video_hash',''],
+        'linkedin-video'=>['mp4','growth_linkedin_video','video_hash',''],
+        'x-video'=>['mp4','growth_x_video','video_hash',''],
+        'instagram-video'=>['mp4','growth_instagram_uploads','video_hash','']
+    ];
+}
 function storageReferences(PDO $db,string $name):int {
     if(!storageName($name))throw new InvalidArgumentException('Invalid asset name');
-    [$hash,$ext]=explode('.',$name);$queries=match($ext){
-        'png'=>['SELECT COUNT(*) FROM growth_telegram_media WHERE asset_hash=? AND asset_kind=\'photo\'','SELECT COUNT(*) FROM growth_media_manifests WHERE image_hash=?','SELECT COUNT(*) FROM growth_facebook_media WHERE asset_hash=? AND asset_kind=\'photo\'','SELECT COUNT(*) FROM growth_network_media WHERE asset_hash=?'],
-        'jpg'=>['SELECT COUNT(*) FROM growth_carousel_items WHERE asset_hash=? AND asset_kind=\'image\'','SELECT COUNT(*) FROM growth_meta_images WHERE asset_hash=? AND asset_kind=\'image\''],
-        'mp4'=>['SELECT COUNT(*) FROM growth_carousel_items WHERE asset_hash=? AND asset_kind=\'video\'','SELECT COUNT(*) FROM growth_telegram_media WHERE asset_hash=? AND asset_kind=\'video\'','SELECT COUNT(*) FROM growth_media_manifests WHERE video_hash=?','SELECT COUNT(*) FROM growth_media_uploads WHERE video_hash=?','SELECT COUNT(*) FROM growth_linkedin_video WHERE video_hash=?','SELECT COUNT(*) FROM growth_x_video WHERE video_hash=?','SELECT COUNT(*) FROM growth_meta_images WHERE asset_hash=? AND asset_kind=\'video\'','SELECT COUNT(*) FROM growth_instagram_uploads WHERE video_hash=?','SELECT COUNT(*) FROM growth_facebook_media WHERE asset_hash=? AND asset_kind=\'video\'']
-    };
-    $n=0;foreach($queries as $sql){$q=$db->prepare($sql);$q->execute([$hash]);$n+=(int)$q->fetchColumn();}return $n;
+    [$hash,$ext]=explode('.',$name);$n=0;
+    foreach(storageReferenceSources() as [$format,$table,$column,$filter]){
+        if($format!==$ext)continue;
+        $q=$db->prepare("SELECT COUNT(*) FROM $table WHERE $column=?".($filter!==''?" AND $filter":''));$q->execute([$hash]);$n+=(int)$q->fetchColumn();
+    }
+    return $n;
 }
 function storageFile(string $root,string $name):array {
     if(!storageName($name))throw new InvalidArgumentException('Invalid asset name');
@@ -71,4 +91,61 @@ function storageMove(PDO $db,array $cfg,string $name,bool $restore=false,?int $n
     // Same-filesystem atomic move, no deletion. DB/filesystem not a single transaction.
     if(!rename($s['path'],$to.'/'.$name))throw new RuntimeException('Move failed');
     $db->prepare('INSERT INTO growth_media_storage_events(asset_name,action,byte_count) VALUES(?,?,?)')->execute([$name,$restore?'restored':'quarantined',$s['size']]);
+}
+
+/** No mutation. Missing manifest bytes may legitimately await transfer. */
+function storageAuditState(string $root,string $name,int &$remaining):string{
+    if(!storageName($name))return 'invalid_reference';
+    $path=$root.'/'.$name;clearstatcache(true,$path);
+    if(!file_exists($path)&&!is_link($path))return 'missing';
+    try{$info=storageFile($root,$name);}catch(RuntimeException $e){return 'unsafe';}
+    if($info['size']>$remaining)return 'not_checked_budget';
+    $remaining-=$info['size'];
+    try{storageBytes($root,$name);return 'verified';}catch(RuntimeException $e){return 'invalid_bytes';}
+}
+function storageReferenceAudit(PDO $db,string $root,int $perSource=20,int $byteBudget=134217728):array{
+    if($perSource<1||$perSource>50||$byteBudget<1||$byteBudget>134217728)throw new InvalidArgumentException('Invalid audit bounds');
+    $remaining=$byteBudget;$cache=[];$sources=[];
+    foreach(storageReferenceSources() as $label=>[$ext,$table,$column,$filter]){
+        $where=$filter!==''?" WHERE $filter":'';
+        // Fixed source/column names only; cap returned distinct references.
+        $q=$db->query("SELECT DISTINCT $column FROM $table$where ORDER BY $column LIMIT ".($perSource+1));
+        $values=$q->fetchAll(PDO::FETCH_COLUMN);
+        $truncated=count($values)>$perSource;$values=array_slice($values,0,$perSource);
+        $counts=array_fill_keys(['verified','missing','unsafe','invalid_bytes','invalid_reference','not_checked_budget'],0);
+        foreach($values as $hash){
+            $name=is_string($hash)?$hash.'.'.$ext:'';
+            if(!storageName($name)){$counts['invalid_reference']++;continue;}
+            if(!isset($cache[$name]))$cache[$name]=storageAuditState($root,$name,$remaining);
+            $counts[$cache[$name]]++;
+        }
+        $sources[$label]=['distinct_sample'=>count($values),'truncated'=>$truncated,'counts'=>$counts];
+    }
+    return ['scope'=>'bounded distinct-reference sample, not full inventory or publication readiness','per_source_limit'=>$perSource,'unique_valid_names_sampled'=>count($cache),'bytes_budget_consumed'=>$byteBudget-$remaining,'sources'=>$sources];
+}
+function storagePlanRequest(string $raw):array{
+    if(strlen($raw)>8192)throw new InvalidArgumentException('Plan input too large');
+    $d=json_decode($raw,true,16,JSON_THROW_ON_ERROR);
+    if(!is_array($d)||count($d)!==2||($d['version']??null)!==1||!is_array($d['names']??null)||!array_is_list($d['names'])||count($d['names'])<1||count($d['names'])>50)throw new InvalidArgumentException('Invalid plan');
+    $seen=[];foreach($d['names'] as $name){
+        if(!is_string($name)||!storageName($name)||isset($seen[$name]))throw new InvalidArgumentException('Invalid or duplicate asset');
+        $seen[$name]=true;
+    }
+    return $d['names'];
+}
+function storageQuarantinePlan(PDO $db,array $cfg,string $raw,?int $now=null):array{
+    if(!$db->inTransaction()||!storageEnabled($cfg)||($cfg['media_upload']['retention_enabled']??false)!==true)throw new RuntimeException('Maintenance disabled');
+    $paused=$db->query('SELECT paused FROM growth_control WHERE id=1 FOR UPDATE')->fetchColumn();
+    if($paused===false||(int)$paused!==1)throw new RuntimeException('Pause required');
+    $root=miRoot($cfg);$q=$root.'/.quarantine';$now=$now??time();
+    if((file_exists($q)||is_link($q))&&(is_link($q)||!is_dir($q)||realpath($q)!==$q||(fileperms($q)&0077)!==0))throw new RuntimeException('Unsafe quarantine');
+    $rows=[];$remaining=134217728;
+    foreach(storagePlanRequest($raw) as $name){
+        $s=storageFile($root,$name);
+        if($s['mtime']>$now-30*86400||storageReferences($db,$name)!==0||file_exists($q.'/'.$name)||is_link($q.'/'.$name)||$s['size']>$remaining)throw new RuntimeException('Protected asset, destination or budget');
+        storageBytes($root,$name);$remaining-=$s['size'];
+        $rows[]=['name'=>$name,'bytes'=>$s['size'],'mtime_utc'=>gmdate('Y-m-d H:i:s',$s['mtime'])];
+    }
+    // Deliberately planning only: existing explicit single-file quarantine still required.
+    return ['count'=>count($rows),'bytes'=>134217728-$remaining,'sha256'=>hash('sha256',json_encode(['media-quarantine-plan-v1',$root,$rows],JSON_THROW_ON_ERROR)),'items'=>$rows];
 }

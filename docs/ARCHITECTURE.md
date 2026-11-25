@@ -200,3 +200,7 @@ Exact completed index binds ordered local bundle manifests. All-bundle validatio
 ## V10.6U server-side media import
 
 Independent opt-in bounded import plan binds exact approved manifests, hashes, sizes and roots under growth control lock; apply rechecks all input before writes, audit savepoint and content-addressed file reuse. Filesystem not transactional; source retained. See V106U_REVIEWED_SERVER_IMPORT.md.
+
+## V10.6V media reference integrity
+
+Shared 15 fixed source projections protect retention and provide bounded reference-first storage audit with deduplicated integrity checks and byte budget. Read-only quarantine scope planning verifies protected references, age and destinations. Existing single-file move unchanged. See V106V_MEDIA_INTEGRITY_AUDIT.md.
