@@ -226,3 +226,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6R acceptance (pending)
 
 - [ ] Capture reference from trusted fresh isolated instance, verify hash independently, compare restored staging metadata (table/column/index/FK), investigate drift, verify business data counts/integrity and actual restore under owner authorization. No production changes. See V106R_SCHEMA_RESTORE_GATE.md.
+
+## V10.6S acceptance (pending)
+
+- [ ] Test approved revisions exported privately, 1–12 batch plan/render, changed digest refusal, incomplete index recovery, actual per-bundle inspection and exact hash registration, all profile sizes, real local model/disk/performance and private permissions. No auto-upload. See V106S_REVIEWED_MEDIA_BATCHES.md.

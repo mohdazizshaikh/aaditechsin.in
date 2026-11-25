@@ -229,3 +229,5 @@ V10.6P: no migration or new flags. Existing private dashboard and CSV authorizat
 V10.6Q: no migration/new flag. Existing private creative transport gate remains. For multi-job invocation provide independently verified local model digest and --limit 1–20. Check actual offline runtime, protected token, TLS, stop behavior and non-overlap before scheduling. See docs/V106Q_PINNED_LOCAL_WORKER.md.
 
 V10.6R: no migration or new flag. With workers stopped and growth paused, capture schema metadata from independently trusted isolated fresh release, record SHA256, compare against isolated restored target using --compare-schema. Use private reference and canonical gzip paths. See docs/V106R_SCHEMA_RESTORE_GATE.md; metadata parity is not data completeness or production acceptance.
+
+V10.6S: no migration/new flags. Explicit local batch-plan then batch-render for 1–12 exported approved text jobs. Keep private, verify individual manifests and actual imagery, review current revision before server registration; no automatic transfer or publish. See docs/V106S_REVIEWED_MEDIA_BATCHES.md.

@@ -15,3 +15,7 @@ Private gzip verifier additionally refuses intermediate symlink aliases and hard
 
 ## Tests and limitations
 49 independent table-level synthetic column-drift cases and three other metadata categories, valid round trip, digest tamper and contract rejection, private gzip alias/hardlink/limit/empty tests. Tests are not independent production tasks. New CI pending. No actual Hostinger credentials, backup, restore, DDL, merge or deployment used. P0 actual isolated hosting and owner-approved restoration remain open; P1 native AI video, GBP media, OAuth lifecycle, provider and retention acceptance remain pending.
+
+## Subsequent CI evidence
+
+V10.6R incremental CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45560435935. Cumulative run https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45560440719 was in progress at V10.6S initial inspection. Actual hosted restore remains pending.
