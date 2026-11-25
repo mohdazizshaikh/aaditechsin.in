@@ -239,3 +239,7 @@ V10.6U: no migration. New inbox_batch_enabled OFF; authorize isolated staging fi
 V10.6V: no migration/new flag. Private --reference-audit is bounded and read-only; --quarantine-plan requires approved retention, paused growth and 1–50 explicit names. No bulk move or deletion. See docs/V106V_MEDIA_INTEGRITY_AUDIT.md.
 
 V10.6W: no migration. New oauth_lifecycle.batch_health_enabled OFF. Explicit private --batch-plan and --batch-check reviewed digest for authorized providers only with workers stopped and growth paused. No renewal or revocation. See docs/V106W_OAUTH_HEALTH_BATCH.md.
+
+
+## V10.6X — reviewed opportunity follow-up batches (source only)
+Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](docs/V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.

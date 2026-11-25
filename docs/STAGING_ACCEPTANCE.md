@@ -246,3 +246,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6W acceptance (pending)
 
 - [ ] Verify actual authorized provider identity probes with reviewed scope, changed configuration rejection, expiry/revocation gates, pause and failure recovery, sanitized evidence. Renewal and provider permissions separate. See V106W_OAUTH_HEALTH_BATCH.md.
+
+
+## V10.6X — reviewed opportunity follow-up batches (source only)
+Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.

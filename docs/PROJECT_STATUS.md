@@ -2,7 +2,7 @@
 
 **Historical V8 baseline:** V8.5 code and disposable-MariaDB tests verified on 23 November 2026; see current GitHub `main` for the exact latest commit. Previous V7 SHA `ea67fa26c558d01640139ac5eecd00c5c2a45623`. Previous V6 GitHub baseline SHA `43bba82c0d75fb842c1e928eec5d9aa85ab7dbf0`. This file describes source completeness, **not production uptime**. Read the repository and confirm the actual Git HEAD before coding or deploying.
 
-## Current development baseline — 24 November 2026
+## Current development baseline — 25 November 2026
 
 Production is unchanged. Main remains V9.6 at verified commit 7582be3c9beafa7335c1ced9bc9c6369b4360daf (CI 45380755788). V9.7 onward are stacked unmerged development PRs. Verify current Git HEAD and CI before proceeding; this is a dated evidence snapshot, not a live status feed.
 
@@ -52,7 +52,8 @@ Production is unchanged. Main remains V9.6 at verified commit 7582be3c9beafa7335
 | V10.6T | [PR #54](https://github.com/mohdazizshaikh/aaditechsin.in/pull/54), [CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568204750), [draft #55 CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568209111) | Exact completed index, all-bundle preflight, bounded SFTP delivery, stop-on-uncertainty, 126 profile integrity cases; actual SFTP/import and provider acceptance pending |
 | V10.6U | [PR #56](https://github.com/mohdazizshaikh/aaditechsin.in/pull/56), [CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568784213), [draft #57 CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568789959) | Independent OFF gate, 1–12 approved bundles, read-only plan, digest and repeat preflight, audited apply, 84 scope cases; actual hosting import pending |
 | V10.6V | [PR #58](https://github.com/mohdazizshaikh/aaditechsin.in/pull/58), [incremental CI](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45569155055), [draft #59 cumulative CI](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45569161982) | 15 reference projections, bounded reverse audit, read-only 1–50 asset quarantine plan, 100 request cases; actual retention and hosting acceptance pending |
-| V10.6W | Reviewed OAuth health batch branch; CI pending | Strict lifecycle policy, independently gated 1–7 provider health plan and check, 77 policy cases; actual consent/refresh/revocation pending |
+| V10.6W | [PR #60 CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45569454303), [draft #61 CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45569458258) | Strict lifecycle policy, independently gated 1–7 provider health plan and check, 77 policy cases; actual consent/refresh/revocation pending |
+| V10.6X | Reviewed reminder batch branch; CI pending | 1–50 exact-state reminder batch, atomic audited apply, 73 scope + 84 per-service cases; actual hosting and owner acceptance pending |
 
 Priority backlog: P0 source CI and authorization; P1 verify private media staging and YouTube upload, Instagram direct Reel runtime acceptance, Facebook media runtime, Threads/X/LinkedIn video runtime, Instagram and Threads carousel runtime, mixed video carousels, live pinned SFTP delivery and import acceptance, bearer endpoint acceptance, private preview/retention runtime, referenced asset retention policy, actual OAuth consent, automatic refresh/revocation, live daily alert delivery and provider acceptance; P1 authorized Gmail metadata runtime, native WhatsApp/Twilio reporting runtime, consented WhatsApp inbound runtime and retention, native SMS/telephony callback runtime, replay-safe retention and follow-up adapters and authorized aggregate bridge runtime, consent/retention and GBP media (API approval required); P1 authorized discovery feed runtime; P1 owner dashboard staging acceptance and actionable lead intelligence; final isolated staging and production release gate. Do not mark full social integration complete until media, OAuth, live receipts and reconciliation accepted.
 
@@ -201,3 +202,7 @@ Start from this repo's latest HEAD; read `README.md`, `README_DEPLOYMENT.md`, `d
 - V9.5 text-only Telegram business channel scheduling, exact approved revision/destination, private worker, receipt/error states and unknown no-retry. Synthetic CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45380253444. Other social adapters not implemented.
 - V9.6 owner daily snapshots and completed-hour error digests, independent notification preferences, private owner bot destination, period deduplication, provider receipts and report history. No live bot delivery or cron. Final CI needs verification.
 - See docs/V95_V96_OPERATIONS.md for full activation order and remaining gaps. All new external feature flags default OFF. No production changes.
+
+
+## V10.6X — reviewed opportunity follow-up batches (source only)
+Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.

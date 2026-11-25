@@ -208,3 +208,7 @@ Shared 15 fixed source projections protect retention and provide bounded referen
 ## V10.6W OAuth health batching
 
 Strict lifecycle metadata and reviewed digest-bound ordered provider scope. Existing read-only identity probes with per-probe pause checks and independent evidence transactions; stop on failure. No credential activation or provider mutation. See V106W_OAUTH_HEALTH_BATCH.md.
+
+
+## V10.6X — reviewed opportunity follow-up batches (source only)
+Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.
