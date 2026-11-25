@@ -16,7 +16,7 @@ function scRequest(array $p,string $token,string $resource,?array $body=null):ar
         $opts=[CURLOPT_FOLLOWLOCATION=>false,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_PROXY=>'',CURLOPT_CONNECTTIMEOUT=>5,CURLOPT_TIMEOUT=>20,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$token,'Accept: application/json','Content-Type: application/json'],CURLOPT_WRITEFUNCTION=>static function($ch,string $chunk)use(&$raw):int{if(strlen($raw)+strlen($chunk)>32768)return 0;$raw.=$chunk;return strlen($chunk);}];
         if($resource==='query'){$opts[CURLOPT_POST]=true;$opts[CURLOPT_POSTFIELDS]=json_encode($body,JSON_THROW_ON_ERROR);}else $opts[CURLOPT_HTTPGET]=true;
         if(!curl_setopt_array($ch,$opts)||curl_exec($ch)!==true||curl_getinfo($ch,CURLINFO_RESPONSE_CODE)!==200)throw new RuntimeException('Read unavailable');
-        $r=json_decode($raw,true,16,JSON_THROW_ON_ERROR);if(!is_array($r))throw new RuntimeException('Invalid response');return $r;
+        $r=strictJsonDecode($raw,true,16);if(!is_array($r))throw new RuntimeException('Invalid response');return $r;
     }finally{curl_close($ch);}
 }
 function scCollect(array $p,array $window,callable $exchange,callable $read):array{

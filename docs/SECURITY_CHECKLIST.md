@@ -283,3 +283,7 @@ Authorized normalized HTTPS tender feed worker (1–5 sources, 25 notices/source
 
 ## V10.7O — inquiry response and automatic communication review (source)
 Private owner oldest-first website inquiry response queue, status-based internal response target, explicit response recording, aggregate-only owner reporting, automatic missed-channel internal review reminders across four channels. Both new flags default OFF. No actual message or cron installed. Source CI and live acceptance pending. See [V10.7O](V107O_COMMUNICATION_WORKFLOWS.md).
+
+
+## V10.7P — Google OAuth continuity (source)
+Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search Console read-only capture; no active credential file mutation, reviewed grant expiry/revoke and exact scope, per-provider lock and freshness skip. Both default OFF; V10.7O all CI passed. Actual consent, live Google capture and hosted cron pending. See [V10.7P](V107P_GOOGLE_OAUTH_CONTINUITY.md).
