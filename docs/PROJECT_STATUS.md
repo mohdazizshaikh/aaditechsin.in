@@ -300,3 +300,9 @@ Authorized normalized HTTPS tender feed worker (1–5 sources, 25 notices/source
 | V10.7N | Source committed; CI pending | Scheduled authorized normalized tender intake to owner research queue; actual provider/cron/staging pending |
 
 V10.7N follow-up distinguishes tender research-task counts from general discovery metrics and exposes tender-only source run reports. Final CI pending.
+
+
+## V10.7O — inquiry response and automatic communication review (source)
+Private owner oldest-first website inquiry response queue, status-based internal response target, explicit response recording, aggregate-only owner reporting, automatic missed-channel internal review reminders across four channels. Both new flags default OFF. No actual message or cron installed. Source CI and live acceptance pending. See [V10.7O](V107O_COMMUNICATION_WORKFLOWS.md).
+
+| V10.7O | Source committed; CI pending | Website inquiry response workflow and automatic aggregate missed-contact reminders; actual live communications pending |

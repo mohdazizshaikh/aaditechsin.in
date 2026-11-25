@@ -51,6 +51,8 @@ jobs:
           php tests/facebook_media_rules.php
           php tests/telegram_media_rules.php
           php tests/communications_rules.php
+          php tests/inquiry_queue_rules.php
+          php tests/communication_auto_review.php
           php tests/credential_retention_rules.php
           php tests/communications_bridge_rules.php
           php tests/release_gate_rules.php
@@ -154,6 +156,8 @@ jobs:
           php tests/facebook_media_rules.php --database
           php tests/telegram_media_rules.php --database
           php tests/communications_rules.php --database
+          php tests/inquiry_queue_rules.php --database
+          php tests/communication_auto_review.php --database
           php tests/credential_retention_rules.php --database
           php tests/communications_bridge_rules.php --database
           php tests/release_gate_rules.php --database

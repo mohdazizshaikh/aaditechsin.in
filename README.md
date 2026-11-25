@@ -191,3 +191,7 @@ Eight dated public observations (six listed candidates, one unconfirmed, one arc
 
 ## V10.7N — scheduled tender ingestion (source)
 Authorized normalized HTTPS tender feed worker (1–5 sources, 25 notices/source), optional private bearer, reviewed service routing, cadence, atomic pending research task/ledger write and owner queue. V10.7M all CI passed. No actual provider connection or cron installed; final CI pending. See [V10.7N](docs/V107N_SCHEDULED_TENDER_INGESTION.md).
+
+
+## V10.7O — inquiry response and automatic communication review (source)
+Private owner oldest-first website inquiry response queue, status-based internal response target, explicit response recording, aggregate-only owner reporting, automatic missed-channel internal review reminders across four channels. Both new flags default OFF. No actual message or cron installed. Source CI and live acceptance pending. See [V10.7O](docs/V107O_COMMUNICATION_WORKFLOWS.md).

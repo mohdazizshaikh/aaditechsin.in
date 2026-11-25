@@ -3,6 +3,7 @@ declare(strict_types=1);
 function preflightFlagPaths():array{
     return [
         'analytics.enabled',
+        'communications.auto_review_enabled',
         'communications.batch_import_enabled',
         'communications.bridge_enabled',
         'communications.bridges.calls.authorized',
@@ -61,6 +62,7 @@ function preflightFlagPaths():array{
         'intelligence_dashboard.csv_enabled',
         'intelligence_dashboard.enabled',
         'leads.enabled',
+        'leads.response_queue_enabled',
         'mail.enabled',
         'media.enabled',
         'media_upload.enabled',
@@ -123,6 +125,7 @@ function preflightFlagPaths():array{
 function preflightDependencies():array{
     return [
         'leads.enabled'=>['database.enabled'],
+        'leads.response_queue_enabled'=>['leads.enabled','portal.enabled','database.enabled'],
         'portal.enabled'=>['database.enabled'],
         'portal.admin_totp_enabled'=>['portal.enabled'],
         'analytics.enabled'=>['database.enabled'],
@@ -145,6 +148,7 @@ function preflightDependencies():array{
         'media_upload.retention_enabled'=>['media_upload.inventory_enabled','media_upload.enabled'],
         'media_upload.inbox_batch_enabled'=>['media_upload.inbox_import_enabled','media_upload.enabled'],
         'communications.enabled'=>['growth.enabled'],
+        'communications.auto_review_enabled'=>['communications.reviews_enabled','communications.enabled'],
         'communications.review_batch_enabled'=>['communications.reviews_enabled','communications.enabled'],
         'communications.gmail.renewal.enabled'=>['communications.gmail.enabled','communications.enabled'],
         'oauth_lifecycle.batch_health_enabled'=>['growth.enabled','oauth_lifecycle.enabled'],

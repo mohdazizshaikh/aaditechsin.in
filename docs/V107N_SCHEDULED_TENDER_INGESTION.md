@@ -24,3 +24,7 @@ For each current eligible listed notice, select first matching service from oper
 All 14 service routing choices, exact contract, no provider selection, empty response, expiry, private credential and source authorization tests. Disposable DB tests exercise actual pending task insert, cadence/dedup, malformed response, pause and config change during fake fetch, empty feed. CI pending. No external provider call, actual scheduled hosting, credential, or real research-task import. No new migration. Source implementation for scheduled normalized tender intake complete; actual source rights/endpoint and live staging acceptance remain open. No whole-project percent claim.
 
 Owner reporting integration: `/discoveryruns` works with tender polling enabled even if generic discovery feeds are OFF; tender counts labeled created/preserved research tasks, never blended with generic lead/opportunity source-run totals. Daily health summary separates tender polls. Disposable tests confirm owner queue and ledger.
+
+
+## V10.7O — inquiry response and automatic communication review (source)
+Private owner oldest-first website inquiry response queue, status-based internal response target, explicit response recording, aggregate-only owner reporting, automatic missed-channel internal review reminders across four channels. Both new flags default OFF. No actual message or cron installed. Source CI and live acceptance pending. See [V10.7O](V107O_COMMUNICATION_WORKFLOWS.md).
