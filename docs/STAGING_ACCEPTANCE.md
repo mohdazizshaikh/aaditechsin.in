@@ -350,3 +350,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final CI and separately approved SFTP destination, private fresh inbox, pinned host key and OpenSSH hardlink extension; no overwrite fallback.
 - [ ] Verify original reviewed packet, actual local full decode, separately reviewed transfer plan, exact private spool, remote chmod and SHA-256 readback. Inspect partial/final links and reconcile interruption without automatic retry.
 - [ ] Verify actual server owner approval and separate V10.7T import on isolated staging. No publication from transfer; real provider acceptance remains separate.
+
+
+## V10.7V Google social renewal (pending live acceptance)
+- [ ] Verify final CI and independently authorized Google Business and YouTube exact scope grants, target identity, review expiry and private candidate directory.
+- [ ] Verify due/skip/pause/revocation gates, fixed HTTPS exchange, candidate private permissions, no overwrite or active credential mutation on isolated staging.
+- [ ] Review V10.7J HMAC rotation candidate and separately authorize active rotation; verify no token logging, no automatic activation, no publication, and no unsupervised cron during live operations. Other providers remain pending.
