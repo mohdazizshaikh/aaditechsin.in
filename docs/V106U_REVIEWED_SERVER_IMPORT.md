@@ -10,3 +10,7 @@ After local review, individual server manifest registration/approval and authori
 
 ## Verification
 84 synthetic request matrix cases (12 valid sizes, 72 invalid position/mutation cases), plus bounds/duplicate checks and disposable MariaDB approval, disabled, pause, digest, source tamper, exact file reuse and retention scenarios. New CI pending. No actual hosting, files, SFTP, external provider or production deployment. Test cases are not independent production tasks.
+
+## Subsequent CI evidence
+
+Both V10.6U CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568784213 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568789959. Actual hosted imports remain pending.

@@ -205,3 +205,7 @@
 ## V10.6U security (pending runtime)
 
 - [ ] Verify batch flag OFF by default, current individual approvals, private sibling roots, independent digest, all-item preflight, audit rollback and partial-file recovery. No automatic publication or cleanup. Actual hosting acceptance pending.
+
+## V10.6V security (pending runtime)
+
+- [ ] Validate aggregate reverse audit classifications, sample truncation, memory/read bounds and private outputs; stop workers and verify backup and policy before paused quarantine planning. No automated removal or bulk apply. Actual retention acceptance pending.

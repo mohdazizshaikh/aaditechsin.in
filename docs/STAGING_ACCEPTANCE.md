@@ -238,3 +238,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6U acceptance (pending)
 
 - [ ] Authorized isolated host: validate plan without writes, apply reviewed digest, test disabled/pause/stale approval/tamper, destination conflicts, interrupted copy and audit recovery, private permissions and original source retention. See V106U_REVIEWED_SERVER_IMPORT.md.
+
+## V10.6V acceptance (pending)
+
+- [ ] Test isolated reference audit with missing/unsafe/hash-invalid files, all source projections, sample/budget limits, read-only plan eligibility, current references and existing quarantine destinations. Independently approve retention; existing single moves only. See V106V_MEDIA_INTEGRITY_AUDIT.md.

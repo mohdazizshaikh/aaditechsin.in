@@ -8,6 +8,13 @@ try{
     $db=opsDb($cfg);$root=miRoot($cfg);$mode=$argv[1]??'';
     if($mode==='--inventory'&&count($argv)===2){
         echo json_encode(storageInventory($db,$root,500),JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";
+    }elseif($mode==='--reference-audit'&&count($argv)===2){
+        // Read-only bounded diagnostic; stop workers for a stable observation.
+        echo json_encode(storageReferenceAudit($db,$root),JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";
+    }elseif($mode==='--quarantine-plan'&&count($argv)===2){
+        $raw=stream_get_contents(STDIN,8193);if(!is_string($raw))throw new RuntimeException('Plan unavailable');
+        $db->beginTransaction();$plan=storageQuarantinePlan($db,$cfg,$raw);$db->rollBack();
+        echo json_encode($plan,JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";
     }elseif(count($argv)===3&&in_array($mode,['--quarantine','--restore'],true)){
         $db->beginTransaction();storageMove($db,$cfg,$argv[2],$mode==='--restore');$db->commit();echo ($mode==='--restore'?'Restored ':'Quarantined ').$argv[2]."\n";
     }else throw new InvalidArgumentException('Explicit command required');
