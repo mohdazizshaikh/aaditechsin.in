@@ -257,3 +257,7 @@ Commit-derived bounded SHA-256 inventory of all tracked public files/private mai
 
 ## V10.7H — strict JSON boundaries (source only)
 Seven reviewed decode calls reject repeated decoded members; existing scope/authorization controls retained. 200 matrix cases and six integrated scope tests authored; development push CI trigger added. V10.7G PR/CI unconfirmed at initial check; new CI and actual hosting pending. See [V10.7H](V107H_STRICT_JSON_BOUNDARIES.md).
+
+
+## V10.7I — local native video review candidates (source only)
+Offline fixed CogVideoX candidate adapter, reviewed 1–12 job/model/font/seed plan, 14-service/9-channel coverage, bounded private motion rendering and review-only index, no transfer or publication. 126 plan cases and synthetic moving-frame codec tests authored. Prior V10.7H CI passed; actual GPU/model, new CI and hosted acceptance pending. See [V10.7I](V107I_NATIVE_VIDEO_CANDIDATES.md).
