@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import shutil
+import subprocess
 from PIL import Image,ImageDraw
 root=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location("native",root/"workers/native-video-candidate.py")
@@ -66,6 +67,13 @@ with tempfile.TemporaryDirectory() as tmp:
     decisions={"version":1,"index_sha256":idx_hash,"decisions":[{**row,"decision":"forward_for_editorial_review","reason":"ready_for_editorial_review"}]}
     report=m.review_decisions(verified,decisions)
     assert report["report"]["publication_authorized"] is False and m.exact_hash(report["sha256"])
+    packet=m.editorial_packet(doc,model_sha,font_sha,42,a["plan_sha256"],out,idx_hash,decisions,report["sha256"])
+    assert packet["publication_authorized"] is False and packet["items"]==[{"review_sha256":row["review_sha256"],"review":review}]
+    # Cross-language canonical digest and schema check of actual generated private candidate.
+    raw=m.canonical(packet)+b"\n"
+    code='require $argv[1]; $raw=stream_get_contents(STDIN); $cfg=["growth"=>["enabled"=>true],"creative"=>["enabled"=>true],"media"=>["enabled"=>true,"native_review_enabled"=>true]]; $p=nativeReviewScope($cfg,$raw,hash("sha256",$raw)); if(count($p["items"])!==1)exit(1);'
+    subprocess.run(["php","-r",code,str(root/"secure-setup/maintenance/native-review-lib.php")],input=raw,check=True,timeout=10)
+    assert not (bundle/"manifest.json").exists() and not (out/"batch-index.json").exists()
     rejected={**row,"decision":"reject","reason":"visual_artifacts"}
     assert m.review_decisions(verified,{**decisions,"decisions":[rejected]})["report"]["decisions"]==[rejected]
     decision_cases=0
