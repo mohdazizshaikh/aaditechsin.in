@@ -42,3 +42,189 @@ Lead intake → admin qualifies → creates case and optionally assigns partner 
 - PHP >= 8.1, PDO MySQL, MySQL/MariaDB, TLS; `mbstring` optional fallback for validation, `openssl` for secure sessions/randomness.
 - Composer + PHPMailer for optional SMTP; cURL required for existing Google Reviews endpoint.
 - JS browser support: modern evergreen browsers, no external JS framework.
+
+## V9–V10 growth architecture (development snapshot)
+
+Private owner Telegram webhook → reviewed growth tasks and audit ledger → separately enabled analytics/discovery/creative/social/report modules. V9.7 local PC claims catalog-only jobs via authenticated HTTPS lease API; no inbound model port. V9.8 PNG/MP4 generated and retained on private PC; only metadata hashes registered. V9.9 public static guide is separate from private structured expert drafts. V10.0 read-only local SEO audit → private CLI summary → owner Telegram; no page modification or external crawl. All external actions require separately authorized destinations and approved revisions. Database additions are additive through V10.0. See PROJECT_STATUS.md for verification and blockers.
+
+## V10.1 Meta boundary
+
+Separate text-only Meta ledger for Facebook Pages and Threads. Explicit owner schedule, exact approved channel/revision/account, global pause at claim, private CLI identity check and fixed provider HTTPS endpoint. No retries after claim, ambiguous states require manual reconciliation; pause cannot revoke an in-flight send. Instagram and all media uploads remain pending. See V101_META.md.
+
+## V10.2 network boundary
+
+Separate LinkedIn organization, X user-context and GBP account/location text ledger, fixed HTTPS hosts and scoped destination preflight, owner-approved exact revisions, no uncertain retries. Unified /publications counts all three ledgers. Instagram and YouTube require actual authorized binary transfer and upload. See V102_NETWORKS.md.
+
+## V10.2A media boundary
+
+Trusted PC -> manual authenticated private transfer -> CLI SHA256-bound content-addressed MP4 storage -> immutable metadata and exact manifest/revision/visibility/channel review -> explicit YouTube resumable upload -> receipt ledger. No public media URL. Uncertain sends never requeued. Instagram and other media providers remain pending. See V102A_MEDIA_UPLOAD.md.
+
+## V10.2B Instagram boundary
+
+Private hash-verified MP4 -> owner-approved public Reel -> fixed Meta resumable binary endpoint -> processing container ledger -> read-only FINISHED status -> separate explicit publish CLI and receipt. No publicly served binary or provider-supplied upload URL. Recheck Page/linked account at each stage. See V102B_INSTAGRAM.md.
+
+## V10.2C Facebook media boundary
+
+Approved private PNG/MP4 -> hash and profile check -> exclusive text-or-media reservation -> explicit owner approval of kind and Page -> direct multipart exact bytes to fixed Meta host. Local Pillow/FFmpeg/ffprobe verify trusted source assets; server checks hash/basic profile. See V102C_FACEBOOK_MEDIA.md.
+
+## V10.2D network image boundary
+
+Private PNG, exact revision/hash/target, exclusive text-or-image reservation, explicit public owner approval, bounded provider upload/readiness and attachment, no blind retries. See V102D_NETWORK_MEDIA.md.
+
+## V10.2E Meta image boundary
+
+Private JPEG separately reviewed and approved -> expiring bearer capability (digest only, 15 minutes, 20 fetches, exact hash) -> Meta container -> FINISHED check -> revoke token and explicit publish. Anyone holding URL can fetch during window; non-sensitive public marketing only, log redaction mandatory. No permanent public files. See V102E_META_IMAGES.md.
+
+V10.2E uses a separately reviewed 1080x1350 Instagram JPEG derivative while preserving the original 1080x1920 Reel manifest profile. Fetch requires explicit log-redaction verification flag.
+
+## V10.2F private storage boundary
+
+Owner-only existing HTTPS admin session and exact hash-verified referenced media preview. Bounded inventory; protect every historical manifest/ledger reference. Explicit paused private CLI moves old unreferenced bytes to private quarantine or restores them; audit ledger, no deletion. See V102F_MEDIA_STORAGE.md.
+
+## V10.2G OAuth boundary
+
+Private configured credential and non-secret generation/deadline -> optional source-compatible expiry guard (mandatory for live release) -> existing identity preflight -> sanitized latest read-only health record. Local revoke blocks target resolution, not provider consent. No automatic refresh or secrets in DB. See V102G_OAUTH_HEALTH.md.
+
+## V10.2H intermediate media evidence
+
+LinkedIn initialization and uploaded image URN, X uploaded image ID are persisted before final publication. Failure to persist evidence stops send. Read-only reconciliation, no replay or provider token persistence. Video and carousel adapters remain pending. See V102H_MEDIA_RECOVERY.md.
+
+## V10.2H.1 video and reconciliation batch
+
+Private approved MP4 -> exclusive revision -> explicit public authorization -> persistent LinkedIn video URN -> bounded signed multipart PUT -> ordered ETags/finalize -> AVAILABLE owner check -> separate explicit publish. Instagram records Reel container before binary transfer. /mediarecovery includes both. See V102H1_VIDEO_BATCH.md.
+
+## V10.2H.2 X and Threads video boundary
+
+X: private exact MP4, exclusive revision, explicit public approval, persistent media ID, ordered bounded append/finalize, read-only succeeded/expiry check and separate publish. Threads: approved manifest MP4 and exact asset-type approval, same private expiring bearer fetch (15 minutes, 20 requests), FINISHED container and explicit publish; no automatic retry, no permanent public media. Recovery and inventory include both. Carousels need separate ordered multi-asset approval. See V102H2_VIDEO_BATCH.md.
+
+## V10.2H.3 carousel and private inbox boundary
+
+Ordered 2–5 JPEG bundle digest binds asset hashes and byte sizes to approved manifest and account. Distinct owner approval, per-child 15-minute bearer digest/cap, durable child container IDs before next provider write, separate parent assembly and publish claim. Exclusive revision across text/single image/video/carousel. Single bounded video GET ranges after full hash verification; private inbox importer verifies approved PNG/MP4 pair before copying to private storage, no network access or publication. See V102H3_CAROUSEL_TRANSFER.md.
+
+## V10.2I/J transfer and integration health
+
+Explicit local approved manifest digest and exact asset bytes -> private spool -> pinned OpenSSH SFTP batch -> private inbox -> existing approved server-side import. No provider credentials or publication in transport; no cron. Existing owner daily-report preference and separately enabled OAuth alerts summarize configured provider local expiry and stale identity evidence. All publication ledgers contribute historical failed/unknown and current in-flight/processing counts. See V102IJ_TRANSFER_HEALTH.md.
+
+## V10.2K/V10.3 Telegram media and communications boundary
+
+Exact approved private PNG/MP4 -> exclusive Telegram revision -> owner type/manifest/channel approval -> separate business bot identity and channel administrator permission check -> one multipart send -> validated message/channel receipt. No owner bot reuse or unknown replay. Communications: authorized private CLI imports only aggregate channel/completed UTC-day counts, rejects extra fields and conflicting duplicate summaries, no message bodies or identifiers. Existing owner daily reports include previous UTC day only when enabled. See V102K_V103_COMMUNICATIONS.md.
+
+## V10.3A/V10.4 intelligence boundary
+
+Dedicated authorized Gmail metadata credential, exact mailbox profile, fixed INBOX label counts, generation/expiry and pause gates -> single latest sanitized snapshot (no message IDs, headers or bodies). Authorized local discovery JSON uses existing allowlisted feed schema and service matching, transactional batch, duplicate fingerprints and run evidence. Qualified opportunities receive owner-set UTC internal review dates; completion/cancellation audit only, no send. /intelligence and existing daily owner reports aggregate stored evidence. See V103A_V104_INTELLIGENCE.md.
+
+## V10.5 private owner dashboard boundary
+
+/portal/intelligence.php uses existing HTTPS and owner session fingerprint with a 30-minute inactivity gate. Independent default-OFF flag. GET only with fixed 7/30 completed UTC-day periods, no mutation or external requests; server-side escaped aggregate tables and bounded task/due queues. Lead cohorts use creation date and current status, communications show coverage and missing versus zero, workflow counts remain current historical inventories. Disabled modules hidden; no customer details, messages, raw credentials, evidence URLs or drafts. Existing private headers/CSP apply. See V105_OWNER_DASHBOARD.md.
+
+## V10.5A/V10.6A reporting and release verification
+
+Existing owner-only dashboard adds consented website daily trends using completed IST days, separate from UTC inquiry and communications windows; no person-level attribution or raw session IDs. Independent default-OFF aggregate CSV attachment is GET only with same session and private headers, fixed bounded fields and spreadsheet formula escaping. Private communications batch validates all channel/day counts before atomic import; exact duplicates no-op, conflicts roll back. Release contract inventories 28 ordered migrations and 40 required tables; disposable CI replays V9.6 to latest and compares fresh schema metadata. Read-only staging checker inspects required columns and pause without applying changes. See V105A_V106A_RELEASE_READINESS.md.
+
+## V10.6B credentials and retention boundary
+
+Explicit private Gmail renewal candidate uses configured authorized refresh grant, fixed Google token endpoint, exact metadata scope, mailbox identity and INBOX label verification. Candidate stored exclusively in private 0700 directory with 0600 file; never replaces active config or enters DB/logs. Paused growth required before exchange and before save. Communications retention dry-run computes digest over cutoff and locked candidate IDs/snapshot generation; explicit apply rechecks digest, deletes only eligible aggregate rows and stale Gmail snapshot in transaction, retains audit/publication/evidence records. See V106B_CREDENTIAL_RETENTION.md.
+
+## V10.6C signed communications and release gates
+
+Private CLI fetches one authorized per-channel HTTPS aggregate endpoint using a pinned public IPv4, explicit bearer and separate HMAC key. Signed payload binds credential generation, channel, completed UTC day, freshness and counts; strict validation and pause gates before read and commit. Existing immutable aggregate ledger and owner reports reused; no customer details or native provider API connection. Release inventory pins 30 schema/migration/fixture Git blob hashes; read-only DB checker reports unresolved worker/lease, publication and bearer evidence, blocks until reviewed. See V106C_COMMUNICATIONS_RELEASE.md.
+
+## V10.6D reviewed reconciliation and backup integrity
+
+Private paused CLI inspects unknown publication across 12 allowlisted ledgers, hashes the full stored row and intermediate resource evidence, records immutable owner-attested confirmed-present/absent review with independent evidence digest. No original status change, retry, or provider write. Release gate treats only unchanged reviewed unknown rows separately; all in-flight/processing and other blockers remain. Private gzip backup verifier checks SHA256 and bounded decompression, no SQL execution. Gmail candidate local inspection and digest-bound identity revalidation do not activate credentials. See V106D_RECONCILIATION_BACKUP.md.
+
+## V10.6E native usage and synthetic restore
+
+Private explicit GET-only adapters request account-scoped WABA sent/delivered analytics and Twilio inbound SMS/call usage for the previous completed UTC day. Strict account/category/time and local credential gates, latest sanitized snapshot per source, no message or call records requested. Owner reports distinguish provider usage from received/answered/missed aggregates. Disposable CI adds actual MariaDB dump and restore with metadata and synthetic record comparisons, not a production restore. See V106E_NATIVE_USAGE_RESTORE.md.
+
+## V10.6F albums and authenticated inbound boundary
+
+Telegram fixed two-item PNG then MP4 album uses existing approved manifest and exclusive media/text revision ledger, independent owner bundle approval and one multipart sendMediaGroup, validates matching channel/group and two message receipts. WhatsApp inbound endpoint verifies challenge and HMAC-SHA256 over raw payload, exact WABA/phone binding, bounded message IDs/time and stable keyed event digest; persists only digest, account hash and UTC day. No sender/content stored or outbound action; reports distinguish partial webhook observations from inbox/response metrics. See V106F_ALBUMS_INBOUND.md.
+
+## V10.6G Twilio callbacks and retention
+
+Separate fixed HTTPS SMS and terminal inbound voice status callback endpoints verify Twilio URL + sorted form HMAC-SHA1, exact account/destination and event SID; reject duplicate form keys, persist only keyed event digest/account hash/channel/receipt UTC day. SMS empty TwiML sends no reply; voice status endpoint 204 is not call routing. Owner reports distinguish recorded callbacks from complete call or inbox coverage. WhatsApp cleanup is paused and digest-bound, exact oldest batch with 30-day cutoff. Twilio digests are excluded because classic signed forms lack a reliable freshness guarantee. See V106G_INBOUND_RETENTION.md.
+
+## V10.6H mixed carousel and communications reviews
+
+Existing carousel ledger adds typed children with default image for legacy rows. Image-only digest is unchanged; a mixed bundle binds ordered type/hash/size, one exact approved manifest MP4 and one to four JPEG derivatives. Separate provider flags; per-stage and fetch revalidation, existing bounded bearer access and explicit parent/publish steps. Internal communication reviews link one imported missed-count aggregate to a due date and status, not a customer or message; retention refuses to delete eligible aggregates with open reviews. See V106H_MIXED_REVIEWS.md.
+
+## V10.6I Search Console boundary
+
+Explicit private CLI uses a dedicated authorized webmasters.readonly OAuth refresh grant with exact scope verification and fixed Google endpoints, no persisted access token or active config replacement. Exact Aaditechs property allowlist, property-access check and finalized web-search date aggregation over seven Pacific Time days ending three days before today. Stores one generation/property-bound aggregate snapshot with reported-day coverage, clicks, impressions and impression-weighted position. No keywords, query text, URLs from results, or raw provider payload retained. Owner reports label missing and stale evidence. See V106I_SEARCH_CONSOLE.md.
+
+## V10.6J SEO history and public observation
+
+Search Console keeps optional per-property/per-generation/per-PT-day finalized observations, replaces revised values instead of summing overlapping captures, and exposes 7/30 observed-day windows with missing dates distinct from zero. Default property aligned with source sitemap aaditechs.in; previous aaditechsin.in allowlist retained only for explicitly authorized verified properties. Separate local bounded crawler fetches robots and seven fixed public pages via pinned IPv4 HTTPS, no redirect/proxy/cookies or arbitrary path; operator imports sanitized aggregate only. No remote execution, live indexing claim or source mutation. See V106J_SEO_HISTORY_CRAWL.md.
+
+## V10.6K runtime readiness and retention
+
+Explicit local runtime diagnostic checks one installed Ollama model tag and operator-pinned digest; optional synthetic structured inference and real temporary H.264 encode/decode test. No business inputs, downloads or automated activation. Paused private SEO cleanup computes exact digest for up to 1000 daily rows older than proposed 180 PT days; no snapshot or unrelated ledger deletion. Separate GBP scoped media-list read check reuses existing exact target and OAuth gate, no write or upload permission assertion. See V106K_RUNTIME_RETENTION.md.
+
+## V10.6L discovery automation boundary
+
+Remote feed admission locks growth control, blocks unresolved source runs and optionally limits attempts per source by minimum interval. Checks pause after fetch and before each record, including run state; partial committed imports remain pending owner review. Local batch uses savepoint rollback on failure. Private interrupted-run recovery requires paused growth, stopped workers attested by operator, exact state digest and age at least one hour; marks run failed only, never retries or modifies opportunities. See V106L_DISCOVERY_AUTOMATION.md.
+
+## V10.6M bulk coverage and replay retention
+
+One independently enabled private creative planner computes missing service/channel cells for one objective across the 14×9 catalog. Paused growth blocks plan/apply; exact matrix digest and global growth lock serialize creation. Existing tasks in any status prevent duplicate coverage, savepoint makes batch atomic; all new requests remain regeneration_requested and require separate generation/review/publication gates. Owner /coveragegrid OBJECTIVE reports coverage, not publishing. Twilio historical cleanup moves eligible keyed replay digests into a dedicated hash-only table and removes associated day/account/channel metadata transactionally, retaining duplicate protection under the same stable key and target. Shared reconciliation ledger registry used by release worker-state check. See V106M_BULK_COVERAGE_RELEASE.md.
+
+## V10.6N bounded creative review
+
+Private batch plan binds full inventory, chosen objective and chunk limit (1–126); applies only reviewed selected cells. Creative result import uses a savepoint for draft, result and audit consistency, and validates UTF-8 and stored catalog dimensions. No new schema, external calls or publication. See V106N_BOUNDED_CREATIVE_REVIEW.md.
+
+## V10.6O discovery scheduler readiness
+
+Independent default-off scheduler admission requires explicit cadence and configured authorized sources; read-only advisory status reports pause/unresolved/recent/due. Scheduled invocation uses existing file and DB locks and transport; no outgoing messages. Opportunity evidence validates UTF-8; intake and outreach draft audit/link mutations use savepoints. See V106O_DISCOVERY_SCHEDULER_INTEGRITY.md.
+
+## V10.6P owner coverage intelligence
+
+Existing owner read-only snapshot adds catalog-complete opportunities, four-objective creative channel coverage, and fixed page/source/service aggregate dimensions in the completed IST window. No raw personal identifiers or new collection; no provider writes. See V106P_OWNER_COVERAGE_INTELLIGENCE.md.
+
+## V10.6Q pinned local worker
+
+Optional pinned mode checks exact model inventory before claim and before/after inference. Bounded sequential polling stops at empty/failure/uncertainty. Exact checked-in catalog and strict JSON protect inputs/outputs. No new network destination or publication capability. See V106Q_PINNED_LOCAL_WORKER.md.
+
+## V10.6R schema parity gate
+
+Read-only fixed information_schema queries compare trusted reference table, column, index and FK metadata, bound to exact contract and independently recorded reference digest. Backup verification checks canonical file identity. No automatic restore or schema mutation. See V106R_SCHEMA_RESTORE_GATE.md.
+
+## V10.6S local media batches
+
+Canonical digest binds ordered validated job set; sequential private batch render and verification emits index only after success, removes new batch on caught failure. Existing individual review and manifest registration unchanged. Exact private bundle validation and codec checks; no native generative video. See V106S_REVIEWED_MEDIA_BATCHES.md.
+
+## V10.6T reviewed media transfer
+
+Exact completed index binds ordered local bundle manifests. All-bundle validation before sequential pinned SFTP; per-bundle revalidation and private spool. No remote atomic transaction, automatic retry or publication. See V106T_REVIEWED_MEDIA_TRANSFER.md.
+
+## V10.6U server-side media import
+
+Independent opt-in bounded import plan binds exact approved manifests, hashes, sizes and roots under growth control lock; apply rechecks all input before writes, audit savepoint and content-addressed file reuse. Filesystem not transactional; source retained. See V106U_REVIEWED_SERVER_IMPORT.md.
+
+## V10.6V media reference integrity
+
+Shared 15 fixed source projections protect retention and provide bounded reference-first storage audit with deduplicated integrity checks and byte budget. Read-only quarantine scope planning verifies protected references, age and destinations. Existing single-file move unchanged. See V106V_MEDIA_INTEGRITY_AUDIT.md.
+
+## V10.6W OAuth health batching
+
+Strict lifecycle metadata and reviewed digest-bound ordered provider scope. Existing read-only identity probes with per-probe pause checks and independent evidence transactions; stop on failure. No credential activation or provider mutation. See V106W_OAUTH_HEALTH_BATCH.md.
+
+
+## V10.6X — reviewed opportunity follow-up batches (source only)
+Private OFF-by-default 1–50 reminder set/reschedule/complete/cancel batches, read-only exact-state plan, digest-bound atomic apply, per-item audit, single-action audit rollback and 73 scope + 84 service regression cases. No external outreach or production changes. See [V10.6X](V106X_REVIEWED_FOLLOWUP_BATCH.md) for operator gates; CI and actual staging pending.
+
+
+## V10.6Y — reviewed communications and retention integrity (source only)
+New default-OFF private 1–50 aggregate review batch across email, WhatsApp, SMS and calls; exact-state plan/apply, per-item audit, local rollback and full-state retention digest. 108 scope and 24 channel scenarios authored, plus retention drift tests. Prior V10.6X CI passed. New CI and actual hosting/consent/retention acceptance pending. See [V10.6Y](V106Y_COMMUNICATION_REVIEW_BATCH.md).
+
+
+## V10.6Z — private page-level SEO diagnostics (source only)
+Optional detailed seven-page observation v2 with strict path/status/finding consistency, aggregate-only persistence, v1 compatibility, atomic Search Console snapshot/history/audit and live SEO audit rollback. 56 crawler + 126 report validation scenarios authored. Prior V10.6Y CI passed; new CI and actual crawl/provider/staging acceptance pending. See [V10.6Z](V106Z_PAGE_SEO_DIAGNOSTICS.md).
+
+
+## V10.7A — competitor editorial evidence (source only)
+Offline private operator-supplied own/peer comparison across 14 services and six editorial signals (84 cells), 1–5 peers, explicit unknown evidence, source references and review-only gap suggestions, 504 synthetic decision cases. No scraping, actual competitor claims, rankings, publishing or database changes. Prior V10.6Z CI passed; new CI and real evidence acceptance pending. See [V10.7A](V107A_COMPETITOR_EVIDENCE.md).
+
+
+## V10.7B — reviewed editorial task batches (source only)
+Private default-OFF competitor-to-SEO review handoff, 1–84 selected cells, exact reviewed plan, stale digest rejection, atomic audited pending-review task creation and existing-task preservation. 84 export + 168 scope cases and synthetic 84-task database test authored. No live competitor data, external publishing or production changes. See [V10.7B](V107B_COMPETITOR_REVIEW_TASKS.md).
