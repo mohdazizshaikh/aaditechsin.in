@@ -37,6 +37,7 @@ assert all(x["signals"]==dict.fromkeys(m.e.SIGNALS,"unknown") for s in packet["s
 assert "Private fixture" not in m.canonical(packet).decode()
 expected=m.digest(m.canonical(packet))
 decisions={"version":1,"capture_sha256":expected,"subjects":[{"host":s["host"],"observations":[{k:v for k,v in r.items() if k in ("service_id","source_url","observed_on","signals")} for r in s["observations"]]} for s in packet["subjects"]]}
+assert m.template(packet,today)==decisions
 assert m.e.task_scope(m.review(packet,expected,decisions,today),today)["items"]==[]
 cases=0
 for i,s in enumerate(ids):
