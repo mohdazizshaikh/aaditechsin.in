@@ -51,6 +51,7 @@ jobs:
           php tests/credential_retention_rules.php
           php tests/communications_bridge_rules.php
           php tests/release_gate_rules.php
+          php tests/preflight_rules.php
           php tests/reconciliation_rules.php
           php tests/native_usage_rules.php
           php tests/albums_inbound_rules.php
