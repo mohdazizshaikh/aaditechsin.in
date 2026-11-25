@@ -160,7 +160,7 @@ def review(packet,expected,decisions,today=None):
     today=today or utc_day()
     if not hash_ok(expected) or digest(canonical(packet))!=expected:raise ValueError("Exact capture digest required")
     e.exact(packet,("version","scope","review_day_utc","plan_sha256","subjects","publication_authorized"))
-    if packet["version"]!=1 or packet["scope"]!="private-unreviewed-editorial-capture" or packet["publication_authorized"] is not False or packet["review_day_utc"]!=today.isoformat() or not hash_ok(packet["plan_sha256"]):raise ValueError("Capture scope")
+    if type(packet["version"]) is not int or packet["version"]!=1 or packet["scope"]!="private-unreviewed-editorial-capture" or packet["publication_authorized"] is not False or packet["review_day_utc"]!=today.isoformat() or not hash_ok(packet["plan_sha256"]):raise ValueError("Capture scope")
     e.exact(decisions,("version","capture_sha256","subjects"))
     if type(decisions["version"]) is not int or decisions["version"]!=1 or decisions["capture_sha256"]!=expected:raise ValueError("Review binding")
     evidence={"version":1,"scope":"reviewed-public-editorial-evidence","subjects":decisions["subjects"]}
@@ -180,12 +180,19 @@ def review(packet,expected,decisions,today=None):
         if services!=set(checked[host]):raise ValueError("Review scope changed")
     if seen!=set(checked):raise ValueError("Review subject changed")
     return evidence
+def template(packet,today=None):
+    today=today or utc_day();expected=digest(canonical(packet))
+    decisions={"version":1,"capture_sha256":expected,"subjects":[{"host":s["host"],"observations":[{k:r[k] for k in ("service_id","source_url","observed_on","signals")} for r in s["observations"]]} for s in packet["subjects"]]}
+    review(packet,expected,decisions,today)
+    return decisions
+
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument("mode",choices=("plan","capture","review"));p.add_argument("--expected");p.add_argument("--decisions",type=Path);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument("mode",choices=("plan","capture","review-template","review"));p.add_argument("--expected");p.add_argument("--decisions",type=Path);a=p.parse_args()
     try:
         doc=e.decode(sys.stdin.buffer.read(e.LIMIT+1))
         if a.mode=="plan":out=plan(doc)
         elif a.mode=="capture":out=capture(doc,a.expected)
+        elif a.mode=="review-template":out=template(doc)
         else:
             if a.decisions is None:raise ValueError("Reviewed decisions required")
             with a.decisions.open("rb") as f:decisions=e.decode(f.read(e.LIMIT+1))
