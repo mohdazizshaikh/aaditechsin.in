@@ -92,7 +92,7 @@ class Page(HTMLParser):
         if self.in_title:
             self.title.append(data)
 
-def crawl(read, wait=lambda: time.sleep(1)):
+def crawl(read, wait=lambda: time.sleep(1), page_detail=False):
     status, kind, raw = read("/robots.txt")
     if status != 200 or kind != "text/plain" or len(raw) > 8192:
         raise ValueError("Robots unavailable")
@@ -104,12 +104,14 @@ def crawl(read, wait=lambda: time.sleep(1)):
     counts = dict.fromkeys(("html_ok", "http_non200", "unavailable", "missing_title",
                            "missing_description", "h1_review", "canonical_review",
                            "noindex_meta", "missing_alt_page"), 0)
+    details = []
     for path in PATHS:
         wait()
         try:
             status, kind, raw = read(path)
             if status != 200:
                 counts["http_non200"] += 1
+                details.append({"path": path, "status": "http_non200", "findings": []})
                 continue
             if kind != "text/html" or not raw or len(raw) > 524288:
                 raise ValueError("Not bounded HTML")
@@ -117,6 +119,7 @@ def crawl(read, wait=lambda: time.sleep(1)):
             page.feed(raw.decode("utf-8"))
             page.close()
             counts["html_ok"] += 1
+            findings = []
             for key, condition in (
                 ("missing_title", not "".join(page.title).strip()),
                 ("missing_description", not any(x.strip() for x in page.desc)),
@@ -126,19 +129,27 @@ def crawl(read, wait=lambda: time.sleep(1)):
                 ("missing_alt_page", page.missing_alt),
             ):
                 counts[key] += int(condition)
+                if condition:
+                    findings.append(key)
+            details.append({"path": path, "status": "html_ok", "findings": findings})
         except (OSError, ValueError, UnicodeError, http.client.HTTPException):
             counts["unavailable"] += 1
-    return {"version": 1, "scope": "public-html-observation", "origin": "https://" + HOST,
-            "captured_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "pages": len(PATHS), "counts": counts}
+            details.append({"path": path, "status": "unavailable", "findings": []})
+    report = {"version": 2 if page_detail else 1, "scope": "public-html-observation", "origin": "https://" + HOST,
+              "captured_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "pages": len(PATHS), "counts": counts}
+    if page_detail:
+        report["page_details"] = details
+    return report
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--capture-authorized", action="store_true", required=True)
-    parser.parse_args()
+    parser.add_argument("--page-detail", action="store_true", help="Private fixed-path findings; no page contents")
+    args = parser.parse_args()
     try:
         ip = pinned_ip()
-        print(json.dumps(crawl(lambda path: fetch(ip, path)), separators=(",", ":")))
+        print(json.dumps(crawl(lambda path: fetch(ip, path), page_detail=args.page_detail), separators=(",", ":")))
     except Exception:
         parser.exit(1, "BLOCKED: DNS, robots or transport policy; no report produced.\n")
 

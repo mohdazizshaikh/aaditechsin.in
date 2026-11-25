@@ -20,11 +20,12 @@ function scCount(mixed $v):int{
 }
 function scParse(array $r,array $window):array{
     if(isset($r['error'])||($r['responseAggregationType']??null)!=='byProperty')throw new RuntimeException('Unverified aggregation');
-    $rows=$r['rows']??[];if(!is_array($rows)||!array_is_list($rows)||count($rows)>7)throw new RuntimeException('Invalid rows');
+    $rows=array_key_exists('rows',$r)?$r['rows']:[];if(!is_array($rows)||!array_is_list($rows)||count($rows)>7)throw new RuntimeException('Invalid rows');
     $seen=[];$clicks=0;$impressions=0;$weighted=0.0;
     foreach($rows as $row){
-        $keys=$row['keys']??null;$day=$keys[0]??null;
-        if(!is_array($keys)||count($keys)!==1||!is_string($day)||!preg_match('/^\d{4}-\d{2}-\d{2}$/D',$day)||$day<$window['start']||$day>$window['end']||isset($seen[$day]))throw new RuntimeException('Invalid date');
+        if(!is_array($row))throw new RuntimeException('Invalid row');
+        $keys=$row['keys']??null;$day=is_array($keys)?($keys[0]??null):null;
+        if(!is_array($keys)||!array_is_list($keys)||count($keys)!==1||!is_string($day)||!preg_match('/^\d{4}-\d{2}-\d{2}$/D',$day)||$day<$window['start']||$day>$window['end']||isset($seen[$day]))throw new RuntimeException('Invalid date');
         $d=DateTimeImmutable::createFromFormat('!Y-m-d',$day,new DateTimeZone('UTC'));if(!$d||$d->format('Y-m-d')!==$day)throw new RuntimeException('Invalid date');
         $seen[$day]=true;$c=scCount($row['clicks']??null);$i=scCount($row['impressions']??null);$p=$row['position']??null;
         if($c>$i||(!is_int($p)&&!is_float($p))||!is_finite((float)$p)||$p<0||$p>1000000||($i>0&&$p<1))throw new RuntimeException('Invalid metrics');
@@ -36,9 +37,13 @@ function scCapture(PDO $db,array $cfg,array $window,array $response,?DateTimeImm
     $now=($now??new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC'));$p=scConfig($cfg,$now->getTimestamp());
     if(!$p||!$db->inTransaction()||$window!==scWindow($now))throw new RuntimeException('Disabled or stale window');creativeActive($db);
     $r=scParse($response,$window);
+    $db->exec('SAVEPOINT search_console_capture');
+    try{
     $db->prepare('INSERT INTO growth_search_console(id,generation,property_hash,start_day,end_day,days_reported,clicks,impressions,average_position,captured_at) VALUES(1,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE generation=VALUES(generation),property_hash=VALUES(property_hash),start_day=VALUES(start_day),end_day=VALUES(end_day),days_reported=VALUES(days_reported),clicks=VALUES(clicks),impressions=VALUES(impressions),average_position=VALUES(average_position),captured_at=VALUES(captured_at)')->execute([$p['generation'],hash('sha256',$p['property']),$window['start'],$window['end'],$r['days'],$r['clicks'],$r['impressions'],$r['position'],$now->format('Y-m-d H:i:s')]);
     if(($cfg['seo']['search_console']['history_enabled']??false)===true)scHistoryCapture($db,$p,$response,$window,$now);
     growthAudit($db,null,null,'search_console_capture','private_cli');
+    $db->exec('RELEASE SAVEPOINT search_console_capture');
+    }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT search_console_capture');$db->exec('RELEASE SAVEPOINT search_console_capture');throw $e;}
 }
 function scSummary(PDO $db,array $cfg,?DateTimeImmutable $now=null):string{
     $now=$now??new DateTimeImmutable('now');$p=scConfig($cfg,$now->getTimestamp());if(!$p)return 'Search Console disabled or authorization review expired.';
@@ -51,13 +56,17 @@ function scSummary(PDO $db,array $cfg,?DateTimeImmutable $now=null):string{
 }
 
 function scHistoryCapture(PDO $db,array $p,array $response,array $window,DateTimeImmutable $now):void{
-    scParse($response,$window);$hash=hash('sha256',$p['property']);$gen=$p['generation'];
+    if(!$db->inTransaction())throw new LogicException('Transaction required');
+    creativeActive($db);scParse($response,$window);$hash=hash('sha256',$p['property']);$gen=$p['generation'];
     $total=(int)$db->query('SELECT COUNT(*) FROM growth_search_console_daily')->fetchColumn();
     $q=$db->prepare('SELECT COUNT(*) FROM growth_search_console_daily WHERE property_hash=? AND generation=? AND day_pt=?');
     $put=$db->prepare('INSERT INTO growth_search_console_daily(property_hash,generation,day_pt,clicks,impressions,average_position,captured_at) VALUES(?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE clicks=VALUES(clicks),impressions=VALUES(impressions),average_position=VALUES(average_position),captured_at=VALUES(captured_at)');
     foreach($response['rows']??[] as $row){
-        $day=$row['keys'][0];$q->execute([$hash,$gen,$day]);if((int)$q->fetchColumn()===0&&++$total>5000)throw new RuntimeException('History cap; review retention');
-        $i=scCount($row['impressions']);$put->execute([$hash,$gen,$day,scCount($row['clicks']),$i,$i?round((float)$row['position'],4):null,$now->format('Y-m-d H:i:s')]);
+        $q->execute([$hash,$gen,$row['keys'][0]]);
+        if((int)$q->fetchColumn()===0&&++$total>5000)throw new RuntimeException('History cap; review retention');
+    }
+    foreach($response['rows']??[] as $row){
+        $day=$row['keys'][0];$i=scCount($row['impressions']);$put->execute([$hash,$gen,$day,scCount($row['clicks']),$i,$i?round((float)$row['position'],4):null,$now->format('Y-m-d H:i:s')]);
     }
 }
 function scHistory(PDO $db,array $cfg,int $days,?DateTimeImmutable $now=null):?array{
