@@ -19,3 +19,7 @@ Private gzip verifier additionally refuses intermediate symlink aliases and hard
 ## Subsequent CI evidence
 
 V10.6R incremental CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45560435935. Cumulative run https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45560440719 was in progress at V10.6S initial inspection. Actual hosted restore remains pending.
+
+
+## V10.7C — restore row-count reconciliation (source only)
+Private read-only count capture/compare across 49 contract tables; exact metadata/backup binding, canonical reference, table-specific match/drift, pause and worker gates, backup FIFO/size safeguards. 98 table-specific scenarios and disposable DB count checks authored. Prior V10.7B CI passed; new CI and actual isolated restore pending. See [V10.7C](V107C_RESTORE_COUNT_RECONCILIATION.md).

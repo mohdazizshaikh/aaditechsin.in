@@ -21,6 +21,7 @@ with tempfile.TemporaryDirectory() as tmp:
     blocked(lambda:m.verify(alias/p.name,h))
     import os
     hard=Path(tmp)/"hard.gz";os.link(p,hard);blocked(lambda:m.verify(p,h));hard.unlink()
+    fifo=Path(tmp)/"fifo.gz";os.mkfifo(fifo,0o600);blocked(lambda:m.verify(fifo,h));fifo.unlink()
     for limit in (0,-1,True,4*1024**3+1):blocked(lambda:m.verify(p,h,limit))
     p.write_bytes(gzip.compress(b""));blocked(lambda:m.verify(p,hashlib.sha256(p.read_bytes()).hexdigest()))
     p.write_bytes(raw[:-5]);blocked(lambda:m.verify(p,hashlib.sha256(raw[:-5]).hexdigest()))

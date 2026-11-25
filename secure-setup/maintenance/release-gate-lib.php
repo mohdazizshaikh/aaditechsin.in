@@ -84,3 +84,57 @@ function releaseMetadataCompare(array $current,string $raw,string $digest):array
     }
     return $out;
 }
+
+/** Count metadata only. Caller must use an isolated, quiescent read-only snapshot. */
+function releaseCountDigest(string $value):bool{return preg_match('/^[a-f0-9]{64}$/D',$value)===1;}
+function releaseCountValue(mixed $value):string{
+    if(!is_string($value)&&!is_int($value))throw new RuntimeException('Invalid count');
+    $n=(string)$value;
+    if(!preg_match('/^(?:0|[1-9][0-9]{0,19})$/D',$n)||(strlen($n)===20&&strcmp($n,'18446744073709551615')>0))throw new RuntimeException('Invalid count');
+    return $n;
+}
+function releaseCountTables(array $contract):array{
+    $tables=array_keys($contract['tables']??[]);
+    if(!$tables||count($tables)>1000)throw new RuntimeException('Invalid table inventory');
+    foreach($tables as $table)if(!is_string($table)||!preg_match('/^[a-z0-9_]+$/D',$table))throw new RuntimeException('Invalid table');
+    sort($tables,SORT_STRING);return $tables;
+}
+function releaseCountManifest(array $contract,array $metadata,string $backup,array $counts):array{
+    if(!releaseCountDigest($backup))throw new RuntimeException('Backup digest required');
+    $tables=releaseCountTables($contract);ksort($counts,SORT_STRING);
+    if(array_keys($counts)!==$tables)throw new RuntimeException('Count inventory mismatch');
+    foreach($counts as &$n)$n=releaseCountValue($n);unset($n);
+    $contractHash=hash('sha256',json_encode($contract,JSON_THROW_ON_ERROR));
+    if(($metadata['contract_sha256']??null)!==$contractHash)throw new RuntimeException('Metadata contract mismatch');
+    return ['version'=>1,'scope'=>'restore-row-counts','contract_sha256'=>$contractHash,'metadata_sha256'=>hash('sha256',releaseMetadataBytes($metadata)),'backup_sha256'=>$backup,'counts'=>$counts];
+}
+function releaseCaptureCounts(PDO $db,array $contract,string $backup):array{
+    if(!$db->inTransaction()||!releaseCountDigest($backup))throw new RuntimeException('Snapshot required');
+    $paused=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
+    if($paused===false||(string)$paused!=='1'||!releaseWorkerClear(releaseWorkerState($db)))throw new RuntimeException('Release state not clear');
+    $metadata=releaseMetadata($db,$contract);$counts=[];
+    foreach(releaseCountTables($contract) as $table){
+        $counts[$table]=releaseCountValue($db->query('SELECT COUNT(*) FROM '.chr(96).$table.chr(96))->fetchColumn());
+    }
+    return releaseCountManifest($contract,$metadata,$backup,$counts);
+}
+function releaseCountBytes(array $manifest):string{
+    $raw=json_encode($manifest,JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES)."\n";
+    if(strlen($raw)>65536)throw new RuntimeException('Count reference too large');
+    return $raw;
+}
+function releaseCompareCounts(array $current,string $raw,string $digest):array{
+    if(strlen($raw)>65536||!releaseCountDigest($digest)||!hash_equals($digest,hash('sha256',$raw)))throw new RuntimeException('Count reference integrity');
+    $r=json_decode($raw,true,8,JSON_THROW_ON_ERROR);
+    if(!is_array($r)||array_keys($r)!==['version','scope','contract_sha256','metadata_sha256','backup_sha256','counts']||$r['version']!==1||$r['scope']!=='restore-row-counts'||!is_array($r['counts']))throw new RuntimeException('Count reference shape');
+    if(releaseCountBytes($r)!==$raw)throw new RuntimeException('Noncanonical count reference');
+    foreach(['contract_sha256','metadata_sha256','backup_sha256'] as $k)
+        if(!is_string($r[$k])||!releaseCountDigest($r[$k])||!hash_equals($current[$k],$r[$k]))throw new RuntimeException('Count reference binding');
+    if(array_keys($r['counts'])!==array_keys($current['counts']))throw new RuntimeException('Count inventory mismatch');
+    $out=[];
+    foreach($r['counts'] as $table=>$n){
+        if(!is_string($n)||releaseCountValue($n)!==$n)throw new RuntimeException('Invalid count');
+        $out[$table]=hash_equals($current['counts'][$table],$n);
+    }
+    return $out;
+}
