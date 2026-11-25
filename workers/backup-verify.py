@@ -21,18 +21,20 @@ def verify(path, expected, max_plain=4*1024**3):
     # Refuse aliases through symlinked intermediate directories as well.
     if path.absolute()!=resolved:
         raise ValueError("Use an absolute canonical private backup path")
-        raise ValueError("Private backup required")
     parent=resolved.parent.stat()
     if parent.st_mode&0o077:
         raise ValueError("Private directory required")
-    fd=os.open(resolved,os.O_RDONLY|os.O_NOFOLLOW)
+    fd=os.open(resolved,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
     with os.fdopen(fd,"rb") as raw:
         before=os.fstat(raw.fileno())
         if not stat.S_ISREG(before.st_mode) or before.st_mode&0o077 or before.st_nlink!=1 or not 0<before.st_size<=4*1024**3:
             raise ValueError("Private bounded regular file required")
-        h=hashlib.sha256()
-        for chunk in iter(lambda:raw.read(1024*1024),b""): h.update(chunk)
-        if h.hexdigest()!=expected: raise ValueError("Digest mismatch")
+        h=hashlib.sha256();compressed=0
+        for chunk in iter(lambda:raw.read(1024*1024),b""):
+            compressed+=len(chunk)
+            if compressed>before.st_size: raise ValueError("Backup grew while reading")
+            h.update(chunk)
+        if compressed!=before.st_size or h.hexdigest()!=expected: raise ValueError("Digest mismatch")
         raw.seek(0);size=0
         with gzip.GzipFile(fileobj=raw,mode="rb") as gz:
             for chunk in iter(lambda:gz.read(1024*1024),b""):

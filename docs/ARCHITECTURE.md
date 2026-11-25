@@ -228,3 +228,7 @@ Offline private operator-supplied own/peer comparison across 14 services and six
 
 ## V10.7B — reviewed editorial task batches (source only)
 Private default-OFF competitor-to-SEO review handoff, 1–84 selected cells, exact reviewed plan, stale digest rejection, atomic audited pending-review task creation and existing-task preservation. 84 export + 168 scope cases and synthetic 84-task database test authored. No live competitor data, external publishing or production changes. See [V10.7B](V107B_COMPETITOR_REVIEW_TASKS.md).
+
+
+## V10.7C — restore row-count reconciliation (source only)
+Private read-only count capture/compare across 49 contract tables; exact metadata/backup binding, canonical reference, table-specific match/drift, pause and worker gates, backup FIFO/size safeguards. 98 table-specific scenarios and disposable DB count checks authored. Prior V10.7B CI passed; new CI and actual isolated restore pending. See [V10.7C](V107C_RESTORE_COUNT_RECONCILIATION.md).
