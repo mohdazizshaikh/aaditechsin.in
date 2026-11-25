@@ -21,8 +21,15 @@ function googleCaptureRun(PDO $db,callable $config,string $provider,callable $ex
     $q=$db->prepare('SELECT GET_LOCK(?,0)');$q->execute([$lock]);if((string)$q->fetchColumn()!=='1')return ['status'=>'busy'];
     try{
         $start=$clock();$cfg=$config();$p=googleCaptureGrant($cfg,$provider,$start->getTimestamp());
-        $fresh=static function()use($config,$clock,$p,$provider):array{
-            $cfg=$config();if(googleCaptureGrant($cfg,$provider,$clock()->getTimestamp())!==$p)throw new RuntimeException('Grant changed');return $cfg;
+        $database=$cfg['database']??null;
+        $lastTime=$start->getTimestamp();
+        $fresh=static function()use($config,$clock,$p,$provider,$database,&$lastTime):array{
+            $now=$clock()->getTimestamp();
+            if($now<$lastTime)throw new RuntimeException('Clock moved backward');
+            $lastTime=$now;
+            $cfg=$config();
+            if(($cfg['database']??null)!==$database||googleCaptureGrant($cfg,$provider,$now)!==$p)throw new RuntimeException('Grant or database changed');
+            return $cfg;
         };
         $db->beginTransaction();creativeActive($db);$fresh();
         $table=$provider==='gmail'?'growth_gmail_snapshot':'growth_search_console';
@@ -34,20 +41,29 @@ function googleCaptureRun(PDO $db,callable $config,string $provider,callable $ex
         $db->commit();
         $scope=$provider==='gmail'?'https://www.googleapis.com/auth/gmail.metadata':'https://www.googleapis.com/auth/webmasters.readonly';
         $token=googleEphemeralToken($p,$scope,$exchange);
-        // Recheck between refresh and provider data access, and before committing.
-        $fresh();$db->beginTransaction();creativeActive($db);$db->commit();
+        // A fresh pause/grant/time gate before EVERY provider read; no DB transaction spans HTTP.
+        $boundary=static function()use($db,$fresh,&$lastTime,$start,$token):void{
+            $fresh();
+            if($lastTime >= $start->getTimestamp()+$token['lifetime']-60)throw new RuntimeException('Token window elapsed');
+            $db->beginTransaction();creativeActive($db);$db->commit();
+        };
         if($provider==='gmail'){
-            $response=gmailCollect(['mailbox'=>$p['mailbox'],'token'=>$token['token']],$read);
+            $response=gmailCollect(['mailbox'=>$p['mailbox'],'token'=>$token['token']],static function(array $target,string $resource)use($boundary,$read):array{
+                $boundary();return $read($target,$resource);
+            });
         }else{
+            $boundary();
             $site=$read($p,$token['token'],'site',null);
             if(($site['siteUrl']??null)!==$p['property']||!in_array($site['permissionLevel']??null,['siteOwner','siteFullUser','siteRestrictedUser'],true))throw new RuntimeException('Property unverified');
-            $fresh();$db->beginTransaction();creativeActive($db);$db->commit();
+            $boundary();
             $response=$read($p,$token['token'],'query',['startDate'=>$window['start'],'endDate'=>$window['end'],'dimensions'=>['date'],'type'=>'web','dataState'=>'final','aggregationType'=>'byProperty','rowLimit'=>7]);
             scParse($response,$window);
         }
         $end=$clock();
-        if($end<$start||$end->getTimestamp()>=$start->getTimestamp()+$token['lifetime']-60)throw new RuntimeException('Token window elapsed');
+        if($end->getTimestamp()<$lastTime||$end->getTimestamp()>=$start->getTimestamp()+$token['lifetime']-60)throw new RuntimeException('Token window elapsed');
+        $lastTime=$end->getTimestamp();
         $db->beginTransaction();creativeActive($db);$cfg=$fresh();
+        if($lastTime >= $start->getTimestamp()+$token['lifetime']-60)throw new RuntimeException('Token window elapsed');
         if($provider==='gmail')gmailCapture($db,$cfg,$response,$end,true);
         else scCapture($db,$cfg,$window,$response,$end);
         $db->commit();return ['status'=>'captured','provider'=>$provider,'token_persisted'=>false];

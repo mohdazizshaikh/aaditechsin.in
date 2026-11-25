@@ -42,6 +42,48 @@ $scToken=array_replace($gmailToken,['scope'=>'https://www.googleapis.com/auth/we
 $scRead=static fn($p,$token,$resource,$body)=>$resource==='site'?['siteUrl'=>$p['property'],'permissionLevel'=>'siteRestrictedUser']:['responseAggregationType'=>'byProperty','rows'=>[['keys'=>[$body['startDate']],'clicks'=>1,'impressions'=>2,'position'=>3.0]]];
 $r=googleCaptureRun($db,$get,'search-console',static fn()=>$scToken,$scRead,$clock);gcCheck($r['status']==='captured'&&str_contains(scSummary($db,$cfg,$now),'Clicks 1'),'Search Console snapshot');
 gcCheck(googleCaptureRun($db,$get,'search-console',static fn()=>throw new LogicException('Unexpected exchange'),$scRead,$clock)['status']==='not_due','Search cadence');
+
+// Fail closed between individual Gmail/SC provider reads, including mid-flight revocation.
+foreach(['gmail','search-console'] as $provider){
+    $token=$provider==='gmail'?$gmailToken:array_replace($gmailToken,['scope'=>'https://www.googleapis.com/auth/webmasters.readonly']);
+    $first=$provider==='gmail'?'profile':'site';
+    $table=$provider==='gmail'?'growth_gmail_snapshot':'growth_search_console';
+    $db->exec("UPDATE ".$table." SET captured_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 5 HOUR) WHERE id=1");
+    $before=$db->query("SELECT * FROM ".$table." WHERE id=1")->fetch(PDO::FETCH_ASSOC);
+    foreach(['revoke','pause','database','clock-back','token-elapsed','identity'] as $event){
+        $mutable=$cfg;$mutable['database']=['enabled'=>true,'name'=>'synthetic-db'];
+        $moment=$now;$resources=[];$exchanges=0;
+        $getMutable=static function()use(&$mutable){return $mutable;};
+        $getTime=static function()use(&$moment){return $moment;};
+        $exchangeOnce=static function()use(&$exchanges,$token){++$exchanges;return $token;};
+        $handle=static function(string $resource)use(&$resources,$first,$event,&$mutable,&$moment,$provider,$pause):array{
+            $resources[]=$resource;
+            if($resource!==$first)throw new LogicException('Second provider read must not run');
+            switch($event){
+                case 'revoke':
+                    if($provider==='gmail')$mutable['communications']['gmail']['revoked']=true;
+                    else $mutable['seo']['search_console']['revoked']=true;
+                    break;
+                case 'pause':$pause('/pause');break;
+                case 'database':$mutable['database']['name']='different-db';break;
+                case 'clock-back':$moment=$moment->modify('-1 second');break;
+                case 'token-elapsed':$moment=$moment->modify('+3540 seconds');break;
+            }
+            if($provider==='gmail')return ['emailAddress'=>$event==='identity'?'wrong@example.com':'synthetic@example.com'];
+            return ['siteUrl'=>$event==='identity'?'sc-domain:wrong.example':'sc-domain:aaditechs.in','permissionLevel'=>'siteRestrictedUser'];
+        };
+        $guardRead=$provider==='gmail'?static fn($p,$resource)=>$handle($resource):static fn($p,$token,$resource,$body)=>$handle($resource);
+        try{
+            gcBlocked(static fn()=>googleCaptureRun($db,$getMutable,$provider,$exchangeOnce,$guardRead,$getTime));
+            gcCheck($resources===[$first]&&$exchanges===1,'Only first read: '.$provider.' '.$event);
+            gcCheck(!$db->inTransaction(),'Transaction released: '.$provider.' '.$event);
+            gcCheck($db->query("SELECT * FROM ".$table." WHERE id=1")->fetch(PDO::FETCH_ASSOC)===$before,'Snapshot preserved: '.$provider.' '.$event);
+            $lock=$db->prepare('SELECT IS_FREE_LOCK(?)');$lock->execute(['aaditechs-google-capture-'.$provider]);
+            gcCheck((string)$lock->fetchColumn()==='1','Lock released: '.$provider.' '.$event);
+        }finally{$pause('/resume');}
+    }
+}
+echo "Twelve inter-read safety scenarios preserve snapshots and release locks PASS\n";
 $db->exec("DELETE FROM growth_gmail_snapshot WHERE generation='".str_repeat('d',32)."'");
 $db->exec("DELETE FROM growth_search_console WHERE generation='".str_repeat('e',32)."'");
 $pause('/resume');echo "Disposable Gmail/SC auto-refresh, pause, grant change, cadence and aggregate capture PASS\n";
