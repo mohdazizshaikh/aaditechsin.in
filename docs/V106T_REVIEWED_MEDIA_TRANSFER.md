@@ -9,3 +9,7 @@ Default validates locally only: exact index, one revision per task, 1–12 safe 
 
 ## Verification
 18 positive channel/renderer profile fixtures and 108 negative manifest mutations (126 cases), mocked two-bundle transfer and interruption, scope and index rejection, no network calls when final bundle invalid. Header-only transfer fixtures are not full codec tests; actual local media codec suite separate. New CI pending. No real SFTP connection, production deployment, model inference or native AI video. Actual hosted transfer/import and provider authorization remain pending.
+
+## Subsequent CI evidence
+
+Both V10.6T CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568204750 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45568209111. Actual SFTP remains pending. V10.6U adds separately gated reviewed server batch import.

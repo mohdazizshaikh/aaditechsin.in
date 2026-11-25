@@ -196,3 +196,7 @@ Canonical digest binds ordered validated job set; sequential private batch rende
 ## V10.6T reviewed media transfer
 
 Exact completed index binds ordered local bundle manifests. All-bundle validation before sequential pinned SFTP; per-bundle revalidation and private spool. No remote atomic transaction, automatic retry or publication. See V106T_REVIEWED_MEDIA_TRANSFER.md.
+
+## V10.6U server-side media import
+
+Independent opt-in bounded import plan binds exact approved manifests, hashes, sizes and roots under growth control lock; apply rechecks all input before writes, audit savepoint and content-addressed file reuse. Filesystem not transactional; source retained. See V106U_REVIEWED_SERVER_IMPORT.md.

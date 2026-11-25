@@ -22,6 +22,24 @@ foreach(['threads','instagram'] as $provider){
     caCheck(caChildren($p,$row,$mock,static function($pos,$id)use(&$seen){$seen[]=$id;})&&$seen===['111','222'],'Child persistence');
     caCheck(caParent($p,$row,$mock)==='999'&&miPublish($p,$row,$mock)==='888','Separate parent and publish');
 }
+// Explicit bounded import scope: each position exercised with six invalid variants.
+$valid=[];$cases=0;
+for($i=1;$i<=12;$i++){
+    $valid[]=['task_id'=>$i,'revision'=>1,'manifest_sha256'=>str_repeat('a',64)];
+    caCheck(count(inboxBatchRequest(json_encode(['version'=>1,'items'=>$valid],JSON_THROW_ON_ERROR)))===$i,'Valid batch size');++$cases;
+}
+foreach(array_keys($valid) as $i){
+    foreach([['task_id'=>0],['revision'=>0],['task_id'=>'1'],['revision'=>true],['manifest_sha256'=>'invalid'],['unexpected'=>1]] as $patch){
+        $bad=$valid;$bad[$i]=array_replace($bad[$i],$patch);
+        try{inboxBatchRequest(json_encode(['version'=>1,'items'=>$bad],JSON_THROW_ON_ERROR));throw new LogicException('Invalid scope accepted');}catch(InvalidArgumentException $e){}
+        ++$cases;
+    }
+}
+caCheck($cases===84,'Scope matrix');
+foreach([[],array_merge($valid,[['task_id'=>13,'revision'=>1,'manifest_sha256'=>str_repeat('b',64)]]),[$valid[0],$valid[0]]] as $bad){
+    try{inboxBatchRequest(json_encode(['version'=>1,'items'=>$bad],JSON_THROW_ON_ERROR));throw new LogicException('Invalid batch accepted');}catch(InvalidArgumentException $e){}
+}
+echo "Inbox batch scope matrix: $cases cases PASS\n";
 if(($argv[1]??'')!=='--database'){echo "Carousel mock and range rules: PASS\n";exit;}
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1')exit(2);
 $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aaditechs_ci;charset=utf8mb4','aaditechs_ci',getenv('CI_DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false]);
@@ -34,7 +52,30 @@ try{
     growthCommand($db,'/resume',$cfg);$task=creativeCreate($db,'infrastructure','threads','education');
     creativeImport($db,['version'=>1,'task_id'=>$task,'revision'=>1,'model'=>'local-test:1b','caption'=>'Plan IT requirements.','visual_brief'=>'Illustration','video_brief'=>'Planning','review_notes'=>'Review']);growthCommand($db,"/approve $task 1",$cfg);
     $raw=json_encode(['version'=>1,'task_id'=>$task,'revision'=>1,'channel'=>'threads','renderer'=>'template','width'=>1080,'height'=>1080,'image_sha256'=>$ih,'video_sha256'=>$vh]);$manifest=mediaRegister($db,$raw)['manifest_sha256'];growthCommand($db,"/approvemedia $task 1 $manifest",$cfg);
-    inboxImport($inbox,$root,['image_hash'=>$ih,'video_hash'=>$vh,'width'=>1080,'height'=>1080]);caCheck(file_get_contents($root.'/'.$ih.'.png')===$png&&file_get_contents($root.'/'.$vh.'.mp4')===$mp4,'Exact inbox import');
+    $task2=creativeCreate($db,'infrastructure','threads','awareness');
+    creativeImport($db,['version'=>1,'task_id'=>$task2,'revision'=>1,'model'=>'local-test:1b','caption'=>'Plan IT requirements.','visual_brief'=>'Illustration','video_brief'=>'Planning','review_notes'=>'Review']);
+    growthCommand($db,"/approve $task2 1",$cfg);
+    $raw2=json_encode(['version'=>1,'task_id'=>$task2,'revision'=>1,'channel'=>'threads','renderer'=>'template','width'=>1080,'height'=>1080,'image_sha256'=>$ih,'video_sha256'=>$vh],JSON_THROW_ON_ERROR);
+    $manifest2=mediaRegister($db,$raw2)['manifest_sha256'];
+    $scope=json_encode(['version'=>1,'items'=>[['task_id'=>$task,'revision'=>1,'manifest_sha256'=>$manifest],['task_id'=>$task2,'revision'=>1,'manifest_sha256'=>$manifest2]]],JSON_THROW_ON_ERROR);
+    $cfg['media_upload']['inbox_import_enabled']=true;
+    try{inboxBatchPlan($db,$cfg,$inbox,$root,$scope);throw new LogicException('Disabled batch accepted');}catch(RuntimeException $e){}
+    $cfg['media_upload']['inbox_batch_enabled']=true;
+    try{inboxBatchPlan($db,$cfg,$inbox,$root,$scope);throw new LogicException('Unapproved batch accepted');}catch(RuntimeException $e){}
+    growthCommand($db,"/approvemedia $task2 1 $manifest2",$cfg);
+    $plan=inboxBatchPlan($db,$cfg,$inbox,$root,$scope);
+    caCheck($plan['count']===2&&!file_exists($root.'/'.$ih.'.png'),'Plan does not copy files');
+    try{inboxBatchApply($db,$cfg,$inbox,$root,$scope,str_repeat('0',64));throw new LogicException('Wrong digest accepted');}catch(RuntimeException $e){}
+    caCheck(!file_exists($root.'/'.$ih.'.png'),'Wrong digest no files');
+    file_put_contents($inbox.'/'.$vh.'.mp4','tampered');
+    try{inboxBatchApply($db,$cfg,$inbox,$root,$scope,$plan['sha256']);throw new LogicException('Tamper accepted');}catch(RuntimeException $e){}
+    caCheck(!file_exists($root.'/'.$ih.'.png'),'Tamper no files');file_put_contents($inbox.'/'.$vh.'.mp4',$mp4);
+    growthCommand($db,'/pause',$cfg);
+    try{inboxBatchApply($db,$cfg,$inbox,$root,$scope,$plan['sha256']);throw new LogicException('Pause bypass');}catch(RuntimeException $e){}
+    growthCommand($db,'/resume',$cfg);
+    caCheck(inboxBatchApply($db,$cfg,$inbox,$root,$scope,$plan['sha256'])===2,'Approved batch applied');
+    caCheck(inboxBatchApply($db,$cfg,$inbox,$root,$scope,$plan['sha256'])===2,'Exact files reusable');
+    inboxImport($inbox,$root,['image_hash'=>$ih,'video_hash'=>$vh,'width'=>1080,'height'=>1080]);caCheck(file_get_contents($root.'/'.$ih.'.png')===$png&&file_get_contents($root.'/'.$vh.'.mp4')===$mp4&&file_get_contents($inbox.'/'.$vh.'.mp4')===$mp4,'Exact inbox import/source retained');
     $id=caRegister($db,$cfg,'threads',$task,1,$manifest,$items);$digest=caDigest($items);
     caCheck(str_contains(growthCommand($db,"/approvecarousel $id $digest threads 123",$cfg),'approved'),'Exact bundle approval');
     try{miRegister($db,$cfg,'threads',$task,1,$manifest,$items[0]['asset_hash'],100);throw new LogicException('Duplicate');}catch(InvalidArgumentException $e){}

@@ -201,3 +201,7 @@
 ## V10.6T security (pending runtime)
 
 - [ ] Verify independent index digest and individual server approvals, canonical private paths, host key/account/inbox authorization, full local codec checks, no connection by default, no automatic retry on uncertain delivery. Actual server import and permissions still required.
+
+## V10.6U security (pending runtime)
+
+- [ ] Verify batch flag OFF by default, current individual approvals, private sibling roots, independent digest, all-item preflight, audit rollback and partial-file recovery. No automatic publication or cleanup. Actual hosting acceptance pending.
