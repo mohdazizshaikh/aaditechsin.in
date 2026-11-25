@@ -42,7 +42,8 @@ try{
             $db->exec('UPDATE growth_control SET paused=0 WHERE id=1');srBlocked(static fn()=>socialRenewRun($db,$load,$p,$exchange,$probe));$db->exec('UPDATE growth_control SET paused=1 WHERE id=1');srCheck($calls===0,'No exchange while resumed');
             $current['oauth_lifecycle']['providers'][$p]['expires_utc']=gmdate('Y-m-d\TH:i:s\Z',time()+7200);
             srCheck(socialRenewRun($db,$load,$p,$exchange,$probe)['status']==='not_due'&&$calls===0,'Skip not due');$current=$cfg;
-            srBlocked(static fn()=>socialRenewRun($db,$load,$p,static function($data)use(&$current,$p,$reply){$current['oauth_lifecycle']['providers'][$p]['revoked']=true;return $reply($p);},$probe));
+            $revokingExchange=static function($data)use(&$current,$p,$reply){$current['oauth_lifecycle']['providers'][$p]['revoked']=true;return $reply($p);};
+            srBlocked(static fn()=>socialRenewRun($db,$load,$p,$revokingExchange,$probe));
             srCheck($probes===0&&!file_exists($path),'Revocation stops probe');$current=$cfg;
             srBlocked(static fn()=>socialRenewRun($db,$load,$p,$exchange,static fn()=>false));srCheck(!file_exists($path),'Identity refusal');
             $result=socialRenewRun($db,$load,$p,$exchange,$probe);srCheck($result['status']==='candidate_created'&&!$result['activation_authorized']&&file_exists($path),'Candidate created');
