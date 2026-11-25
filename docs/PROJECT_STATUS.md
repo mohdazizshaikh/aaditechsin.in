@@ -348,3 +348,7 @@ Adds independently enabled confidential-client refresh, exact reviewed scopes an
 
 ## V10.7Y — unified reviewed OAuth lifecycle orchestration (source)
 V10.7W cumulative CI passed. Added all-seven-provider private status inventory, candidate/journal/unsafe-file detection, exact HMAC batch plans, due-only dispatch and per-provider and batch drift/pause/stop gates. 127 reviewed subsets and disposable DB batch tests authored; final CI pending. No active credential mutation, installed cron or live provider access. Controlled activation/reconciliation and hosted acceptance remain open. See [V10.7Y](V107Y_OAUTH_ORCHESTRATOR.md).
+
+
+## V10.7Z — reviewed staging OAuth activation (source)
+Adds all-seven-provider explicit HMAC activation with exact static private configuration and candidate binding, LinkedIn/X refresh response reconciliation, independent read-only identity checks, pause and global/provider locks, verified private backup and exact replacement. Threads renewal suspended until new grant metadata independently reviewed. 127 provider subsets and disposable fixture replacement/backup tests authored; CI pending. No actual staging config mutation, provider calls, automatic rollback, unpause or deployment. See [V10.7Z](V107Z_OAUTH_ACTIVATION.md).
