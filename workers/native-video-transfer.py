@@ -81,7 +81,7 @@ def send(cfg,prepared,reviewed_plan,directory,run=subprocess.run):
     args,remote=transfer.options(cfg)
     exe=shutil.which("sftp")
     if not exe:raise ValueError("OpenSSH sftp required")
-    acknowledged=0
+    acknowledged=0;delivered=set()
     with tempfile.TemporaryDirectory(prefix="aaditechs-native-sftp-") as tmp:
         stage=Path(tmp);spool(root,plan,stage)
         # Each pair is sent and read back; a lost acknowledgement stops the batch.
@@ -92,7 +92,10 @@ def send(cfg,prepared,reviewed_plan,directory,run=subprocess.run):
                 for a in row["assets"]:
                     name=a["remote_name"];suffix=secrets.token_hex(16)
                     partial=".incoming-"+suffix+"-"+name;readback="readback-"+suffix
-                    lines.extend(["put "+name+" "+partial,"chmod 600 "+partial,"rename "+partial+" "+name,"get "+name+" "+readback])
+                    if name not in delivered:
+                        # OpenSSH hardlink extension fails if final name exists.
+                        lines.extend(["put "+name+" "+partial,"chmod 600 "+partial,"ln "+partial+" "+name,"rm "+partial])
+                    lines.append("get "+name+" "+readback")
                     readbacks.append((stage/readback,a))
                 run([exe,*args],input="\n".join(lines)+"\n",text=True,cwd=tmp,timeout=180,check=True,capture_output=True)
                 for path,a in readbacks:
@@ -100,6 +103,7 @@ def send(cfg,prepared,reviewed_plan,directory,run=subprocess.run):
                     path.chmod(0o600)
                     if native.private_asset(path,20*1024**2)!=a["sha256"] or path.stat().st_size!=a["bytes"]:raise ValueError("Remote readback mismatch")
                     path.unlink()
+                delivered.update(a['remote_name'] for a in row['assets'])
                 acknowledged+=1
             except Exception as exc:
                 raise transfer.BatchInterrupted(acknowledged) from exc
