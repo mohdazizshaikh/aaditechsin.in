@@ -26,12 +26,25 @@ function followCommand(PDO $db,array $cfg,string $cmd):?string{
         if(!followDate($m[2]))return 'Choose a UTC date within 90 days.';
         try{creativeActive($db);}catch(RuntimeException $e){return 'Growth paused.';}
         $q=$db->prepare("SELECT status FROM growth_opportunities WHERE id=? FOR UPDATE");$q->execute([(int)$m[1]]);if($q->fetchColumn()!=='qualified')return 'Qualified opportunity required.';
-        $db->prepare("INSERT INTO growth_opportunity_followups(opportunity_id,due_on,status) VALUES(?,?,'open') ON DUPLICATE KEY UPDATE due_on=VALUES(due_on),status='open'")->execute([(int)$m[1],$m[2]]);
-        growthAudit($db,null,null,'followup_set_'.$m[1],'owner');return 'Internal review reminder set. No outreach sent.';
+        followAtomic($db,static function()use($db,$m):void{
+            $db->prepare("INSERT INTO growth_opportunity_followups(opportunity_id,due_on,status) VALUES(?,?,'open') ON DUPLICATE KEY UPDATE due_on=VALUES(due_on),status='open'")->execute([(int)$m[1],$m[2]]);
+            growthAudit($db,null,null,'followup_set_'.$m[1],'owner');
+        });return 'Internal review reminder set. No outreach sent.';
     }
     if(preg_match('/^\/(completefollowup|cancelfollowup) ([1-9][0-9]{0,14})$/D',$cmd,$m)){
-        $state=$m[1]==='completefollowup'?'completed':'cancelled';$q=$db->prepare("UPDATE growth_opportunity_followups SET status=? WHERE opportunity_id=? AND status='open'");$q->execute([$state,(int)$m[2]]);if($q->rowCount()!==1)return 'No open reminder.';
-        growthAudit($db,null,null,'followup_'.$state.'_'.$m[2],'owner');return 'Internal reminder '.$state.'. No outreach sent.';
+        $state=$m[1]==='completefollowup'?'completed':'cancelled';
+        $closed=followAtomic($db,static function()use($db,$m,$state):bool{
+            $q=$db->prepare("UPDATE growth_opportunity_followups SET status=? WHERE opportunity_id=? AND status='open'");$q->execute([$state,(int)$m[2]]);if($q->rowCount()!==1)return false;
+            growthAudit($db,null,null,'followup_'.$state.'_'.$m[2],'owner');return true;
+        });
+        return $closed?'Internal reminder '.$state.'. No outreach sent.':'No open reminder.';
     }
     return 'Use /followups, /followup ID YYYY-MM-DD, /completefollowup ID or /cancelfollowup ID.';
+}
+
+function followAtomic(PDO $db,callable $work):mixed{
+    if(!$db->inTransaction())throw new LogicException('Transaction required');
+    $db->exec('SAVEPOINT followup_action');
+    try{$result=$work();$db->exec('RELEASE SAVEPOINT followup_action');return $result;}
+    catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT followup_action');$db->exec('RELEASE SAVEPOINT followup_action');throw $e;}
 }

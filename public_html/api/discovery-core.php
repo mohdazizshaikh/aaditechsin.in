@@ -93,8 +93,12 @@ function discoveryCommand(PDO $db,array $cfg,string $cmd):?string {
     if($action==='qualify'||$action==='dismiss'){
         if($r['status']!=='pending_review')return 'Opportunity is no longer pending review.';
         $state=$action==='qualify'?'qualified':'rejected';
-        $db->prepare('UPDATE growth_opportunities SET status=? WHERE id=?')->execute([$state,$id]);
-        growthAudit($db,null,null,'opportunity_'.$action.'_'.$id,'owner');
+        $db->exec('SAVEPOINT opportunity_review');
+        try{
+            $db->prepare('UPDATE growth_opportunities SET status=? WHERE id=?')->execute([$state,$id]);
+            growthAudit($db,null,null,'opportunity_'.$action.'_'.$id,'owner');
+            $db->exec('RELEASE SAVEPOINT opportunity_review');
+        }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT opportunity_review');$db->exec('RELEASE SAVEPOINT opportunity_review');throw $e;}
         return $state.' — owner review recorded. No message sent.';
     }
     if($r['status']!=='qualified')return 'Qualify opportunity first.';
