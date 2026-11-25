@@ -228,26 +228,51 @@ def review_decisions(verified,decisions):
         out.append(dict(item))
     report={"version":1,"scope":"native-video-editorial-decision-only","plan_sha256":verified["plan_sha256"],"index_sha256":verified["index_sha256"],"decisions":out,"publication_authorized":False}
     return {"report":report,"sha256":digest(report)}
+def editorial_packet(doc,model_sha,font_sha,seed,expected,directory,index_digest,decisions,decision_digest,day=None):
+    """Review-only handoff; never creates a publication manifest or copies media."""
+    from datetime import datetime,timezone
+    verified=verify_batch(doc,model_sha,font_sha,seed,expected,directory,index_digest)
+    report=review_decisions(verified,decisions)
+    if not exact_hash(decision_digest) or report["sha256"]!=decision_digest:
+        raise ValueError("Reviewed decision changed")
+    root=private_candidate_dir(directory)
+    items=[]
+    for job,row,choice in zip(doc["jobs"],verified["candidates"],report["report"]["decisions"]):
+        if choice["decision"]!="forward_for_editorial_review":continue
+        name=f"task-{job['task_id']}-r{job['revision']}"
+        review,h=private_json(root/name/"review.json",8192)
+        if h!=row["review_sha256"]:raise ValueError("Review changed")
+        items.append({"review_sha256":h,"review":review})
+    if not items:raise ValueError("No forwarded candidates")
+    if private_asset(root/"review-index.json",65536)!=index_digest:raise ValueError("Index changed")
+    day=day or datetime.now(timezone.utc).date().isoformat()
+    return {"version":1,"scope":"native-video-owner-review","review_day_utc":day,"plan_sha256":expected,"index_sha256":index_digest,"decision_sha256":decision_digest,"publication_authorized":False,"items":items}
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("mode",choices=["plan","render","verify","review"]);p.add_argument("--jobs",type=Path,required=True);p.add_argument("--model",type=Path,required=True);p.add_argument("--font",type=Path,required=True);p.add_argument("--seed",type=int,required=True);p.add_argument("--output",type=Path);p.add_argument("--plan-sha256");p.add_argument("--directory",type=Path);p.add_argument("--index-sha256");p.add_argument("--decisions",type=Path)
+    p.add_argument("mode",choices=["plan","render","verify","review","handoff"]);p.add_argument("--jobs",type=Path,required=True);p.add_argument("--model",type=Path,required=True);p.add_argument("--font",type=Path,required=True);p.add_argument("--seed",type=int,required=True);p.add_argument("--output",type=Path);p.add_argument("--plan-sha256");p.add_argument("--directory",type=Path);p.add_argument("--index-sha256");p.add_argument("--decisions",type=Path);p.add_argument("--decision-sha256")
     a=p.parse_args()
     try:
         doc=media.read_json(a.jobs,65536)
         if a.mode=="plan":
-            if any(x is not None for x in (a.output,a.plan_sha256,a.directory,a.index_sha256,a.decisions)):raise ValueError("Unexpected argument")
+            if any(x is not None for x in (a.output,a.plan_sha256,a.directory,a.index_sha256,a.decisions,a.decision_sha256)):raise ValueError("Unexpected argument")
             print(json.dumps(plan(doc,model_inventory(a.model),font_digest(a.font),a.seed)))
         elif a.mode=="render":
-            if a.output is None or any(x is not None for x in (a.directory,a.index_sha256,a.decisions)):raise ValueError("Private output required")
+            if a.output is None or any(x is not None for x in (a.directory,a.index_sha256,a.decisions,a.decision_sha256)):raise ValueError("Private output required")
             out=render_batch(doc,a.plan_sha256,a.model,a.font,a.seed,a.output)
             print(out)
             print("Review index SHA256:",media.sha(out/"review-index.json"))
             print("Private candidate only; no approved media manifest or publication.")
         else:
-            if a.directory is None or a.output is not None or (a.mode=="review")!=(a.decisions is not None):raise ValueError("Explicit review input required")
-            verified=verify_batch(doc,model_inventory(a.model),font_digest(a.font),a.seed,a.plan_sha256,a.directory,a.index_sha256)
-            if a.mode=="verify":print(json.dumps(verified))
-            else:print(json.dumps(review_decisions(verified,media.read_json(a.decisions,65536))))
+            if a.directory is None or a.output is not None or (a.mode in ("review","handoff"))!=(a.decisions is not None) or (a.mode=="handoff")!=(a.decision_sha256 is not None):raise ValueError("Explicit review input required")
+            model_sha=model_inventory(a.model);font_sha=font_digest(a.font)
+            if a.mode=="handoff":
+                packet=editorial_packet(doc,model_sha,font_sha,a.seed,a.plan_sha256,a.directory,a.index_sha256,media.read_json(a.decisions,65536),a.decision_sha256)
+                sys.stdout.buffer.write(canonical(packet)+b"\n")
+            else:
+                verified=verify_batch(doc,model_sha,font_sha,a.seed,a.plan_sha256,a.directory,a.index_sha256)
+                if a.mode=="verify":print(json.dumps(verified))
+                else:print(json.dumps(review_decisions(verified,media.read_json(a.decisions,65536))))
         return 0
     except Exception:
         print("BLOCKED: reviewed job, local model, font, CUDA or candidate validation.",file=sys.stderr)
