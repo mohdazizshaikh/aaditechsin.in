@@ -316,3 +316,7 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 
 ## V10.7Q — Google scheduled capture safety (source)
 V10.7P both PR-triggered CI runs passed. V10.7Q guards every individual Google read against pause, revocation, grant/database drift, backward clock movement and expired token safety window; CLI binds the database connection to reloaded config. Twelve disposable integration scenarios verify no second read, no snapshot mutation and lock/transaction cleanup. V10.7Q CI pending. Actual provider authorization, hosted cron, Hostinger staging and database/media restoration remain pending. See [V10.7Q](V107Q_GOOGLE_CAPTURE_SAFETY.md).
+
+
+## V10.7R — disposable database and media restore rehearsal (source tests)
+V10.7Q [CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45697990011). Expanded actual synthetic MariaDB dump/restore with a private generated media archive, 49 table row counts and keyed content fingerprints, 15 reference sources, two media zones and negative same-count/missing-media drift checks. V10.7R CI pending. No hosted restore or production acceptance. See [V10.7R](V107R_RESTORE_REHEARSAL.md).
