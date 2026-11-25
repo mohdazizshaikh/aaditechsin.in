@@ -1,0 +1,15 @@
+# V10.6P owner coverage intelligence
+
+Source continuation of V10.6O. Prior incremental and cumulative CI passed on ed59d5114036cc3f8740d30859a08da274cdc70b: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45496537252 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45496555590. No schema, feature flag or provider changes. Contract remains 36 ordered migrations, 49 tables and 38 pinned source hashes.
+
+## Owner-only reporting
+Existing authenticated read-only HTTPS dashboard and CSV gates are unchanged. Discovery shows the complete fourteen-service inventory including zero rows, rather than only services with stored opportunities. Creative coverage requires existing creative batch flag and shows four objectives × fourteen services, nine channels each; counts channels with at least one task requested, approved, awaiting generation, awaiting review, or exclusively rejected. Categories may overlap; these are all-time current inventory, not published posts, conversion, reach, or model quality. No task IDs in the new coverage section or CSV.
+
+Consented website breakdown uses same completed IST window as daily website analytics. Seven page IDs, six broad traffic categories and fourteen services; no raw URLs, session IDs, event IDs, user agent, contacts or new tracking. If no known event for a category group, values are unavailable; zero represents no recorded matching category within a group that has at least one observed event, not proof of no visitors. CSV carries bounded aggregate metrics and blank unavailable cells. Existing owner authentication, private headers and CSV formula protections remain. No external API or publication action.
+
+## Acceptance
+56 synthetic objective/service rows with generation/review/approve/reject outcomes, plus 27 category dimensions, missing/zero distinction, complete opportunity catalog, CSV privacy and disabled-module checks. Existing CI runs synthetic PHP and MariaDB; new CI pending at writing. No live browser, actual owner data, inference, production deployment or merge. Test cases are not 56 independent production features. P0 actual isolated hosting/backup restore and cumulative validation; P1 actual authorized provider, local inference/native video, scheduler, retention and OAuth remain open.
+
+## Subsequent CI evidence
+
+Both V10.6P CI runs passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45498426102 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45498432910. Synthetic only; actual hosted acceptance pending.
