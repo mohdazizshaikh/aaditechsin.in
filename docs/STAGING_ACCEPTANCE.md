@@ -380,3 +380,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify cumulative CI, actual isolated database/grants/HTTPS origin, static canonical private 0600 config, protected separate backup, stopped workers and paused growth.
 - [ ] Verify offline reviewed exact HMAC plan and identity probes, scope/destination/expiry, linked refresh journal, unchanged unselected config, private backup and exact post-replacement bytes.
 - [ ] Retain journals and backup, reconcile refresh credentials, independently review Threads issue/expiry metadata and reload workers only after acceptance. Do not automatically restore potentially consumed credentials or unpause.
+
+
+## V10.8A authorized editorial capture (pending live acceptance)
+- [ ] Verify cumulative CI, explicit authorization and current terms/robots policy for every exact reviewed hostname and path.
+- [ ] Verify public DNS/TLS pinning, reviewed robots preflight, bounded HTML capture, no raw content or personal data retention, no redirects, and fail-stop on drift/restrictions.
+- [ ] Independently review actual page content, keep unknown evidence unknown, verify exact capture digest and template handoff, then separately review eligible task scope. No ranking, copying, outreach or publication.
