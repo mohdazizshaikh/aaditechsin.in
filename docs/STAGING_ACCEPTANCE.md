@@ -398,3 +398,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify cumulative CI and independently authorized exact private source copies, current-day capture digest, model provenance/license and offline inference if enabled.
 - [ ] Verify bounded cue output, no raw excerpt retention in report, unknown evidence not treated as absent; independently inspect HTML visibility and possible personal data.
 - [ ] Verify exact reviewed own/peer evidence and scoped task proposal; no automatic editorial claims, task creation, outreach or publication.
+
+
+## V10.8D tender intelligence (pending live acceptance)
+- [ ] Verify cumulative CI and authorized normalized issuer/provider observations, current tender terms and actual deadline/eligibility; scores are review priority only.
+- [ ] Verify original audited task remains unchanged, amendment/cancellation dedup, stale/empty/unconfirmed exclusions, config/database/pause gates and separate counts.
+- [ ] Verify owner-only recorded deadline and amendment queues, truncation and stale labels; no automatic bidding/outreach. Actual feed and cron remain unconnected.
