@@ -64,7 +64,7 @@ Production is unchanged. Main remains V9.6 at verified commit 7582be3c9beafa7335
 | V10.7F | [PR #78 CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45649879579), [draft #79 CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45649892096) | 113 explicit flags, dependency consistency, all-off baseline and 49-table column coverage; actual hosting pending |
 | V10.7G | Commit 683220ba78b70b9d8865212c7cf36ea715580f06; inherited V10.7H CI passed | Exact commit-derived public and private maintenance parity, restricted config paths, 102 file cases; actual hosting pending |
 | V10.7H | [Initial CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45650983018), [final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45651129083) | Sixteen decode calls hardened, 200 matrix cases, six scope integrations, development branch CI trigger; actual hosting pending |
-| V10.7I | Offline CI failed on font fixture; disposable DB passed ([run](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45676327042)); correction in V10.7J | Offline fixed CogVideoX adapter, reviewed 1–12 job batch, nine profiles, private verification and editorial disposition; real GPU/model and publication integration pending |
+| V10.7I | Font fixture corrected in V10.7J; inherited CI passed | Offline fixed CogVideoX adapter, reviewed 1–12 job batch, nine profiles, private verification and editorial disposition; real GPU/model and publication integration pending |
 
 Priority backlog: P0 source CI and authorization; P1 verify private media staging and YouTube upload, Instagram direct Reel runtime acceptance, Facebook media runtime, Threads/X/LinkedIn video runtime, Instagram and Threads carousel runtime, mixed video carousels, live pinned SFTP delivery and import acceptance, bearer endpoint acceptance, private preview/retention runtime, referenced asset retention policy, actual OAuth consent, automatic refresh/revocation, live daily alert delivery and provider acceptance; P1 authorized Gmail metadata runtime, native WhatsApp/Twilio reporting runtime, consented WhatsApp inbound runtime and retention, native SMS/telephony callback runtime, replay-safe retention and follow-up adapters and authorized aggregate bridge runtime, consent/retention and GBP media (API approval required); P1 authorized discovery feed runtime; P1 owner dashboard staging acceptance and actionable lead intelligence; final isolated staging and production release gate. Do not mark full social integration complete until media, OAuth, live receipts and reconciliation accepted.
 
@@ -269,3 +269,12 @@ V10.7I follow-up adds exact read-only candidate re-verification, complete index/
 
 ## V10.7J — reviewed OAuth rotation and native-video CI correction (source only)
 Seven provider replacement credentials can be privately planned and identity-verified without activation. 84 provider cases authored; separate default-OFF flag, HMAC binding, pause/config gates and fail-stop. Corrects V10.7I font fixture without relaxing production checks. New CI pending; actual provider renewal, GPU inference and hosted acceptance pending. See [V10.7J](V107J_OAUTH_ROTATION_REVIEW.md).
+
+
+## V10.7K — business-facing website completion (source only)
+Nine new dedicated service pages; catalog coverage 5/14 to 14/14, static homepage navigation, sitemap/analytics/live SEO coverage 16 public paths, first-load improvements and no-JS inquiry safety. Real performance measurement, content sign-off and deployment pending. See [V10.7K](V107K_SERVICE_WEBSITE.md).
+
+| Milestone | Verified status | Scope |
+|---|---|---|
+| V10.7J | [All CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45677309456) | Reviewed OAuth rotation, corrected video fixture; actual provider/GPU pending |
+| V10.7K | Source committed; CI pending | 14/14 dedicated service pages, 16 public routes, static navigation and first-load improvements |

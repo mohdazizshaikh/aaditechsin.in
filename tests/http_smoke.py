@@ -37,6 +37,9 @@ try:
     assert status==404,('invalid tracking token',status)
     status,body=request('/data-recovery/')
     assert status==200 and b'Data Recovery Assessment' in body,('data recovery page',status)
-    print('PHP HTTP disabled/unconfigured/invalid-token paths: PASS')
+    for slug in ["it-infrastructure","software-web-development","it-amc","cloud-modern-it","security-compliance","data-management-backup","it-asset-procurement","smart-office-solutions","it-special-projects","video-conferencing-solutions","auditorium-av-solutions","professional-sound-systems","av-installation-maintenance","data-recovery"]:
+        status,body=request('/'+slug+'/')
+        assert status==200 and b'<h1>' in body, (slug,status)
+    print('PHP HTTP disabled/unconfigured/invalid-token paths and 14 service routes: PASS')
 finally:
     server.terminate();server.wait(timeout=5)

@@ -12,6 +12,7 @@ from html.parser import HTMLParser
 HOST = "aaditechs.in"
 PATHS = ("/", "/video-conferencing-solutions/", "/auditorium-av-solutions/",
          "/professional-sound-systems/", "/av-project-planner/", "/data-recovery/", "/it-amc/")
+FULL_PATHS = PATHS + ("/it-infrastructure/", "/software-web-development/", "/cloud-modern-it/", "/security-compliance/", "/data-management-backup/", "/it-asset-procurement/", "/smart-office-solutions/", "/it-special-projects/", "/av-installation-maintenance/",)
 ROBOTS = {"User-agent: *", "Disallow: /portal/", "Disallow: /track/",
           "Disallow: /api/", "Sitemap: https://aaditechs.in/sitemap.xml"}
 
@@ -34,7 +35,7 @@ class PinnedHTTPS(http.client.HTTPSConnection):
             raise
 
 def fetch(ip, path):
-    if path not in PATHS and path != "/robots.txt":
+    if path not in FULL_PATHS and path != "/robots.txt":
         raise ValueError("Path not allowed")
     conn = PinnedHTTPS(ip)
     try:
@@ -92,7 +93,9 @@ class Page(HTMLParser):
         if self.in_title:
             self.title.append(data)
 
-def crawl(read, wait=lambda: time.sleep(1), page_detail=False):
+def crawl(read, wait=lambda: time.sleep(1), page_detail=False, all_services=False):
+    paths = FULL_PATHS if all_services else PATHS
+    page_detail = page_detail or all_services
     status, kind, raw = read("/robots.txt")
     if status != 200 or kind != "text/plain" or len(raw) > 8192:
         raise ValueError("Robots unavailable")
@@ -105,7 +108,7 @@ def crawl(read, wait=lambda: time.sleep(1), page_detail=False):
                            "missing_description", "h1_review", "canonical_review",
                            "noindex_meta", "missing_alt_page"), 0)
     details = []
-    for path in PATHS:
+    for path in paths:
         wait()
         try:
             status, kind, raw = read(path)
@@ -135,9 +138,9 @@ def crawl(read, wait=lambda: time.sleep(1), page_detail=False):
         except (OSError, ValueError, UnicodeError, http.client.HTTPException):
             counts["unavailable"] += 1
             details.append({"path": path, "status": "unavailable", "findings": []})
-    report = {"version": 2 if page_detail else 1, "scope": "public-html-observation", "origin": "https://" + HOST,
+    report = {"version": 3 if all_services else (2 if page_detail else 1), "scope": "public-html-observation", "origin": "https://" + HOST,
               "captured_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-              "pages": len(PATHS), "counts": counts}
+              "pages": len(paths), "counts": counts}
     if page_detail:
         report["page_details"] = details
     return report
@@ -146,10 +149,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--capture-authorized", action="store_true", required=True)
     parser.add_argument("--page-detail", action="store_true", help="Private fixed-path findings; no page contents")
+    parser.add_argument("--all-services", action="store_true", help="Version 3: all 16 fixed public pages, with private page details")
     args = parser.parse_args()
     try:
         ip = pinned_ip()
-        print(json.dumps(crawl(lambda path: fetch(ip, path), page_detail=args.page_detail), separators=(",", ":")))
+        print(json.dumps(crawl(lambda path: fetch(ip, path), page_detail=args.page_detail, all_services=args.all_services), separators=(",", ":")))
     except Exception:
         parser.exit(1, "BLOCKED: DNS, robots or transport policy; no report produced.\n")
 

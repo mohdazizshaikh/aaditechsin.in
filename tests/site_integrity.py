@@ -31,3 +31,27 @@ if not re.search(r'leadSubmission:\s*false',public):issues.append('public lead f
 if issues:
     print('\n'.join(issues));raise SystemExit(f'FAILED: {len(issues)} issues')
 print('Local links + source references + service pages + OFF flags: PASS')
+
+# Service directory must be crawlable without running JavaScript.
+import json
+catalog=json.loads((WEB/'assets/service-registry.json').read_text())['services']
+route_map={"infrastructure":"it-infrastructure","software-web":"software-web-development","it-amc":"it-amc","cloud":"cloud-modern-it","security":"security-compliance","data-backup":"data-management-backup","it-procurement":"it-asset-procurement","smart-office":"smart-office-solutions","special-projects":"it-special-projects","video-conferencing":"video-conferencing-solutions","auditorium-av":"auditorium-av-solutions","professional-sound":"professional-sound-systems","av-maintenance":"av-installation-maintenance","data-recovery":"data-recovery"}
+assert set(route_map)=={s['id'] for s in catalog} and len(route_map)==14
+home=BeautifulSoup((WEB/'index.html').read_text(),'html.parser')
+assert len(home.select('#services article'))==14
+for service in catalog:
+    path=route_map[service['id']]
+    assert home.select_one('#services a[href="'+path+'/"]'),path
+    page=BeautifulSoup((WEB/path/'index.html').read_text(),'html.parser')
+    assert len(page.select('h1'))==1 and page.select_one('link[rel=canonical]')['href']=='https://aaditechs.in/'+path+'/'
+    assert page.select_one('a[href^="tel:"]'),path
+    assert len(page.select('details'))>=3,path
+assert not home.select('link[href*="fonts.googleapis.com"]')
+assert home.select_one('.hero-photo[fetchpriority=high]') and home.select_one('link[rel=preload][as=image]')
+print('14 dedicated service pages and static homepage navigation: PASS')
+
+for slug in ["it-infrastructure","software-web-development","cloud-modern-it","security-compliance","data-management-backup","it-asset-procurement","smart-office-solutions","it-special-projects","av-installation-maintenance","it-amc","data-recovery"]:
+    page=BeautifulSoup((WEB/slug/'index.html').read_text(),'html.parser')
+    assert page.select_one('a[href="../?service='+slug+'#contact"]'),slug
+assert home.select_one('#contactFields[disabled]') and home.select_one('#contactForm[method=post]')
+print('Service-specific consultation links and no-JS privacy guard: PASS')
