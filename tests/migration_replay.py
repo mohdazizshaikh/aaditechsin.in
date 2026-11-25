@@ -149,11 +149,11 @@ try:
         assert cur.fetchone()==(1,)
         assert capture(restored)==reference,"Restored schema, row-count, keyed content or media manifest drift"
         # Same-count mutation must affect content only; missing referenced media must block readiness.
-        cur.execute("UPDATE growth_tasks SET title='Synthetic drift' WHERE id=%s",(task_id,))
+        cur.execute("UPDATE growth_tasks SET title='Synthetic drift',updated_at=updated_at WHERE id=%s",(task_id,))
         mutated=capture(restored)
         assert mutated["counts"]==reference["counts"] and mutated["media"]==reference["media"]
         assert {k for k,v in mutated["content"]["tables"].items() if v!=reference["content"]["tables"][k]}=={"growth_tasks"}
-        cur.execute("UPDATE growth_tasks SET title='Synthetic migration' WHERE id=%s",(task_id,))
+        cur.execute("UPDATE growth_tasks SET title='Synthetic migration',updated_at=updated_at WHERE id=%s",(task_id,))
         video_path=restored/(video_hash+".mp4")
         video_path.unlink()
         missing=capture(restored)
