@@ -326,3 +326,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify revocation or growth pause between identity and aggregate requests stops the second request; repeat with database configuration drift and token safety-window expiry using controlled test doubles, never real credential disclosure.
 - [ ] Confirm old dated snapshot remains unchanged on refusal, private worker exits nonzero and no overlapping worker lock is left behind.
 - [ ] Confirm exact live read-only provider consent and isolated scheduled capture separately. V10.7P source CI passed; V10.7Q CI pending. No production or hosting acceptance inferred.
+
+
+## V10.7R full restore rehearsal (live acceptance remains pending)
+- [ ] Verify final CI synthetic dump and media tar restoration, all 49 table counts/fingerprints and all 17 media zone/reference comparisons. CI is not hosted restore.
+- [ ] Obtain independently recorded source database/media archive digests on frozen, isolated hosting; capture metadata/count/content/media references before restoring to an independent target.
+- [ ] Compare actual restored target against source references, ensure no missing/quarantined referenced assets and complete application acceptance; record measured recovery time and any drift. Do not enable production or use a source database as its own hosted reference.
