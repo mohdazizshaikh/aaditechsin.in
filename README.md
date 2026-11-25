@@ -139,3 +139,7 @@ Optional detailed seven-page observation v2 with strict path/status/finding cons
 
 ## V10.7A — competitor editorial evidence (source only)
 Offline private operator-supplied own/peer comparison across 14 services and six editorial signals (84 cells), 1–5 peers, explicit unknown evidence, source references and review-only gap suggestions, 504 synthetic decision cases. No scraping, actual competitor claims, rankings, publishing or database changes. Prior V10.6Z CI passed; new CI and real evidence acceptance pending. See [V10.7A](docs/V107A_COMPETITOR_EVIDENCE.md).
+
+
+## V10.7B — reviewed editorial task batches (source only)
+Private default-OFF competitor-to-SEO review handoff, 1–84 selected cells, exact reviewed plan, stale digest rejection, atomic audited pending-review task creation and existing-task preservation. 84 export + 168 scope cases and synthetic 84-task database test authored. No live competitor data, external publishing or production changes. See [V10.7B](docs/V107B_COMPETITOR_REVIEW_TASKS.md).

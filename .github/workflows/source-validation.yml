@@ -58,6 +58,7 @@ jobs:
           php tests/mixed_review_rules.php
           php tests/search_console_rules.php
           php tests/seo_history_rules.php
+          php tests/competitor_review_rules.php
           php tests/runtime_retention_rules.php
           python3 tests/local_runtime_check.py
           python3 tests/live_seo_crawl.py
@@ -153,6 +154,7 @@ jobs:
           php tests/mixed_review_rules.php --database
           php tests/search_console_rules.php --database
           php tests/seo_history_rules.php --database
+          php tests/competitor_review_rules.php --database
           php tests/runtime_retention_rules.php --database
           php tests/intelligence_rules.php --database
           php tests/dashboard_rules.php --database
