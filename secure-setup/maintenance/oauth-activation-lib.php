@@ -84,9 +84,10 @@ function activationWrite(string $path,string $raw):void{
     if(!$f)throw new RuntimeException('Existing private file');
     try{if(!chmod($path,0600)||fwrite($f,$raw)!==strlen($raw)||!fflush($f)||(function_exists('fsync')&&!fsync($f)))throw new RuntimeException('Private write failed');}finally{fclose($f);}
 }
-function activationApply(PDO $db,string $path,string $scope,string $key,string $expected,string $origin,string $webroot,string $backupDir,callable $probe,?callable $clock=null):array{
+function activationApply(PDO $db,string $path,string $scope,string $key,string $expected,string $origin,string $webroot,string $backupDir,callable $probe,?callable $clock=null,?string $connectedConfig=null):array{
     if($db->inTransaction()||!preg_match('/^[a-f0-9]{64}$/D',$expected))throw new InvalidArgumentException('Explicit reviewed plan required');
     $clock=$clock??static fn()=>time();$last=$clock();$loaded=activationConfig($path,$webroot);$database=$loaded['config']['database']??null;
+    if($connectedConfig!==null&&$loaded['bytes']!==$connectedConfig)throw new RuntimeException('Connected configuration changed');
     // Single configuration writer; provider locks exclude individual acquisition and batch dispatch.
     $locks=[];$tmp=null;$backup=null;
     try{
