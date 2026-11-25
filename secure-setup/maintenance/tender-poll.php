@@ -8,11 +8,12 @@ try{
     if(count($argv)!==2||!in_array($mode,['--check','--status','--scheduled-run'],true))throw new InvalidArgumentException('Explicit mode');
     $cfg=opsConfig();$p=tenderPollConfig($cfg);
     if($mode==='--check'){echo json_encode(['sources'=>array_keys($p['sources']),'interval_minutes'=>$p['minutes'],'network'=>false,'database'=>false],JSON_THROW_ON_ERROR)."\n";exit;}
-    $db=opsDb($cfg);
+    $db=opsDb($cfg);$database=$cfg['database']??null;
+    $load=static function()use($database):array{$c=opsConfig();if(($c['database']??null)!==$database)throw new RuntimeException('Database changed');return $c;};
     if($mode==='--status'){echo json_encode(tenderPollStatus($db,$cfg),JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";exit;}
     $failed=false;
     foreach(array_keys($p['sources']) as $id){
-        $result=tenderPollRun($db,'opsConfig',$id,static fn($src)=>feedFetch($src,$src['bearer_token']));
+        $result=tenderPollRun($db,$load,$id,static fn($src)=>feedFetch($src,$src['bearer_token']));
         echo $id.' '.json_encode($result,JSON_THROW_ON_ERROR)."\n";
         if(!in_array($result['status'],['completed','not_due'],true)){$failed=true;break;}
     }
