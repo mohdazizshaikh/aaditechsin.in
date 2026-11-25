@@ -73,6 +73,12 @@ with tempfile.TemporaryDirectory() as tmp:
     raw=m.canonical(packet)+b"\n"
     code='require $argv[1]; $raw=stream_get_contents(STDIN); $cfg=["growth"=>["enabled"=>true],"creative"=>["enabled"=>true],"media"=>["enabled"=>true,"native_review_enabled"=>true]]; $p=nativeReviewScope($cfg,$raw,hash("sha256",$raw)); if(count($p["items"])!==1)exit(1);'
     subprocess.run(["php","-r",code,str(root/"secure-setup/maintenance/native-review-lib.php")],input=raw,check=True,timeout=10)
+    # Real rendered candidate bytes also pass server-side private inbox checks.
+    inbox=p/"native-inbox";inbox.mkdir(mode=0o700)
+    for source,name in ((bundle/"poster.png",review["poster_sha256"]+".png"),(bundle/"candidate.mp4",review["candidate_sha256"]+".mp4")):
+        dest=inbox/name;shutil.copyfile(source,dest);dest.chmod(0o600)
+    code='require $argv[1]; $r=json_decode(stream_get_contents(STDIN),true,16,JSON_THROW_ON_ERROR); [$png,$mp4]=nativeImportPair($argv[2],$r); if(hash("sha256",$png)!==$r["poster_sha256"]||hash("sha256",$mp4)!==$r["candidate_sha256"])exit(1);'
+    subprocess.run(["php","-r",code,str(root/"secure-setup/maintenance/native-import-lib.php"),str(inbox)],input=m.canonical(review),check=True,timeout=10)
     assert not (bundle/"manifest.json").exists() and not (out/"batch-index.json").exists()
     rejected={**row,"decision":"reject","reason":"visual_artifacts"}
     assert m.review_decisions(verified,{**decisions,"decisions":[rejected]})["report"]["decisions"]==[rejected]
