@@ -22,3 +22,5 @@ Import requires exact pending revision, resumed control and validated output. Ch
 
 ## Remaining
 Automated authenticated local-worker transport/scheduling, model runtime acceptance, AI technical Q&A, opportunity analysis, content calendar scheduling, actual image/video rendering, official provider OAuth/posting/inbox/metrics, scheduled Telegram notifications, permissions and production staging. Keep external execution disabled until individual connectors and review gates pass. Synthetic tests use mock Ollama output only.
+
+V10.6Q requires exact local catalog match for exported jobs and rejects duplicate JSON keys. Keep local checkout and staging catalog synchronized; see [pinned worker guide](V106Q_PINNED_LOCAL_WORKER.md).
