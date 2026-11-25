@@ -13,11 +13,16 @@ $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aadi
 $db->beginTransaction();
 try{
     $now=new DateTimeImmutable('now',new DateTimeZone('UTC'));
+    $cfg['creative']=['enabled'=>true];$cfg['social']=['enabled'=>true,'meta'=>['enabled'=>true,'facebook'=>['enabled'=>true,'account_id'=>'123','access_token'=>str_repeat('x',40),'api_version'=>'v27.0']]];
+    $cfg['oauth_lifecycle']=['enabled'=>true,'alerts_enabled'=>true,'providers'=>['facebook'=>['generation'=>str_repeat('a',32),'expires_utc'=>$now->modify('+1 day')->format('Y-m-d\TH:i:s\Z'),'revoked'=>false]]];
+    reportCheck(str_contains(oauthAlertText($db,$cfg,$now->getTimestamp()),'facebook: renew_soon')&&!str_contains(oauthAlertText($db,$cfg,$now->getTimestamp()),'youtube:'),'Watch enabled provider only');
+    reportCheck(str_contains(growthCommand($db,'/connectionalerts',$cfg),'facebook: renew_soon'),'On-demand alert');
+    reportCheck(count(reportPublicationAttention($db))===3,'All ledgers summary');
     growthCommand($db,'/notifydaily off',$cfg);
     reportCheck(reportClaim($db,$cfg,'daily',$now)===null,'Daily opt out');
     growthCommand($db,'/notifydaily on',$cfg);
     $row=reportClaim($db,$cfg,'daily',$now);
-    reportCheck($row!==null&&$row['chat']==='12345'&&str_contains($row['text'],'day-to-date'),'Daily snapshot');
+    reportCheck($row!==null&&$row['chat']==='12345'&&str_contains($row['text'],'day-to-date')&&str_contains($row['text'],'facebook: renew_soon')&&str_contains($row['text'],'all ledgers'),'Daily snapshot');
     reportFinish($db,$row['id'],['status'=>'accepted','receipt'=>'42','error'=>'']);
     reportCheck(reportClaim($db,$cfg,'daily',$now)===null,'Period deduplication');
     $errorNow=new DateTimeImmutable('2001-01-01 10:30:00',new DateTimeZone('UTC'));
