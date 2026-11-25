@@ -68,9 +68,16 @@ function discoveryImport(PDO $db,array $input):array {
     }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT opportunity_intake');$db->exec('RELEASE SAVEPOINT opportunity_intake');throw $e;}
 }
 function discoveryCommand(PDO $db,array $cfg,string $cmd):?string {
-    if(!preg_match('/^\/(?:opportunities|opportunity|qualify|dismiss|draftoutreach|outreach)(?: |$)/',$cmd))return null;
+    if(!preg_match('/^\/(?:opportunities|opportunity|qualify|dismiss|draftoutreach|outreach|tenders)(?: |$)/',$cmd))return null;
     if(!discoveryEnabled($cfg))return 'Discovery disabled or unconfigured.';
     if(!$db->inTransaction())throw new LogicException('Transaction required');
+    if($cmd==='/tenders'){
+        if(($cfg['discovery']['tender_review_enabled']??false)!==true)return 'Tender review disabled.';
+        $lines=['Pending tender research tasks (up to 10; recorded notices, not current bid status):'];
+        foreach($db->query("SELECT id,service_id,title FROM growth_tasks WHERE task_type='research' AND status='pending_review' AND title LIKE 'Tender review: %' ORDER BY id LIMIT 10")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]=$r['title'].' | '.$r['service_id'].' — /task '.$r['id'];
+        $lines[]='Recheck official deadlines and eligibility; no bid or outreach authorized.';
+        return implode("\n",$lines);
+    }
     if($cmd==='/opportunities'){
         $lines=['Pending opportunities (top 10; ranking, not probability):'];
         foreach($db->query("SELECT id,service_id,relevance_score FROM growth_opportunities WHERE status='pending_review' ORDER BY relevance_score DESC,id LIMIT 10")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='#'.$r['id'].' '.$r['service_id'].' '.$r['relevance_score'].'/100 — /opportunity '.$r['id'];

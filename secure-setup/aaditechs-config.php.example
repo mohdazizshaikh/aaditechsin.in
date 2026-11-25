@@ -19,6 +19,7 @@ return [
         'followups_enabled' => false,
         'followup_batch_enabled' => false, // Explicit private reviewed reminder batches only
         'local_batch_enabled' => false,
+        'tender_review_enabled' => false,
         'enabled' => false,
         'recovery_enabled' => false, 'scheduler_enabled' => false, 'cadence_enabled' => false, 'minimum_interval_minutes' => 1440,
         'feeds_enabled' => false, // Explicitly authorize each provider before enabling.
