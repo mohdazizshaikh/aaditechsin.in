@@ -338,3 +338,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final source CI, actual local model provenance/rights, approved text export, human review and exact reviewed decision/packet SHA-256.
 - [ ] Verify separate default-OFF flag, current approved source binding, read-only plan, atomic pending system-task apply, stale plan refusal and duplicate preservation on isolated staging.
 - [ ] Confirm no registered media manifests or queued publication, no private asset or customer exposure. Native binary import and real GPU/provider acceptance remain separate; generic review task approval is not media approval.
+
+
+## V10.7T native binary import (pending live acceptance)
+- [ ] Verify final CI and reviewed backup/migration/fresh schema/restore parity for 37 migrations, 49 tables, 39 pinned hashes; apply only on isolated target.
+- [ ] Verify exact original native handoff packet and owner-approved editorial task, current approved source, private SFTP inbox, asset hash/profile, read-only plan, stale plan refusal, separate default-OFF import gate and pending native-video media manifest.
+- [ ] Verify full local decode and model provenance, source retained and replay preserves approval/rejection; reconcile partial exact files if failure. Explicit media and provider approval remain separate. No automatic provider action.
