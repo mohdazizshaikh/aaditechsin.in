@@ -183,3 +183,7 @@ Nine new dedicated service pages; catalog coverage 5/14 to 14/14, static homepag
 
 ## V10.7L — competitor-informed service conversion (source)
 Public editorial benchmark of 10 pages (7 page-text, 3 indexed excerpts), 14 service-specific proposal checklists (56 topics), 14 local discussion brief builders and related navigation. No fabricated claims, no automated sending or new collection. V10.7K final CI passed; V10.7L CI and hosted acceptance pending. See [V10.7L](docs/V107L_COMPETITOR_RESEARCH_AND_CONVERSION.md).
+
+
+## V10.7M — tender discovery and review (source)
+Eight dated public observations (six listed candidates, one unconfirmed, one archived); fixed official source registry, offline 14-service tender shortlist and selected pending research-task bridge. Default OFF, no actual bid/outreach or live import. V10.7L all three CI passed; new CI and automated authorized ingestion pending. See [V10.7M](docs/V107M_TENDER_DISCOVERY.md).

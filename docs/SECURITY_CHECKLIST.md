@@ -271,3 +271,7 @@ Seven provider replacement credentials can be privately planned and identity-ver
 
 ## V10.7K — business-facing website completion (source only)
 Nine new dedicated service pages; catalog coverage 5/14 to 14/14, static homepage navigation, sitemap/analytics/live SEO coverage 16 public paths, first-load improvements and no-JS inquiry safety. Real performance measurement, content sign-off and deployment pending. See [V10.7K](V107K_SERVICE_WEBSITE.md).
+
+
+## V10.7M — tender discovery and review (source)
+Eight dated public observations (six listed candidates, one unconfirmed, one archived); fixed official source registry, offline 14-service tender shortlist and selected pending research-task bridge. Default OFF, no actual bid/outreach or live import. V10.7L all three CI passed; new CI and automated authorized ingestion pending. See [V10.7M](V107M_TENDER_DISCOVERY.md).

@@ -30,3 +30,7 @@ This closes source implementation of the proposal checklist/brief feature, 14/14
 1. Actual permitted tender/opportunity sources: validate source permissions, select real evidence and qualify without assuming purchase intent.
 2. Owner-approved differentiated service content, evidence of work only where verified, and local search reporting after deployment.
 3. Isolated staging, actual browser testing and customer inquiry delivery; do not enable submission or analytics before existing approval gates.
+
+
+## V10.7M — tender discovery and review (source)
+Eight dated public observations (six listed candidates, one unconfirmed, one archived); fixed official source registry, offline 14-service tender shortlist and selected pending research-task bridge. Default OFF, no actual bid/outreach or live import. V10.7L all three CI passed; new CI and automated authorized ingestion pending. See [V10.7M](V107M_TENDER_DISCOVERY.md).
