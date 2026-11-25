@@ -52,3 +52,5 @@
 if(window.AADITECHS_PUBLIC_CONFIG?.features?.analytics===true){
   const script=document.createElement('script');script.src='/assets/analytics.js';document.head.append(script);
 }
+
+if(window.AADITECHS_PUBLIC_CONFIG?.features?.technicalGuide===true){const script=document.createElement('script');script.src='/assets/expert-guide.js';document.head.append(script);}

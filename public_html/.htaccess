@@ -6,3 +6,14 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"
 <FilesMatch "^(?:\.env|composer\.(json|lock)|.*\.(?:sql|log|bak|ini))$">
 Require all denied
 </FilesMatch>
+
+# Short cache lifetime for static styles, scripts and images only. HTML, PHP
+# and private API responses are not covered; no immutable claim without versioned URLs.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(?:css|js|png|jpe?g|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml image/svg+xml
+</IfModule>

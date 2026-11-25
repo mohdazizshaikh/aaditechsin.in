@@ -19,6 +19,7 @@ function socialSchedule(PDO $db,array $cfg,int $task,int $rev,string $target,str
     if(!$date||$date->format('Y-m-d\TH:i\Z')!==$when||$date<$now||$date>$now->modify('+30 days'))throw new InvalidArgumentException('Schedule outside window');
     $q=$db->prepare("SELECT c.channel,t.status,t.revision,r.caption FROM growth_tasks t JOIN growth_creative c ON c.task_id=t.id JOIN growth_creative_results r ON r.task_id=t.id AND r.revision=t.revision WHERE t.id=? FOR UPDATE");$q->execute([$task]);$r=$q->fetch(PDO::FETCH_ASSOC);
     if(!$r||$r['channel']!=='telegram'||$r['status']!=='approved'||(int)$r['revision']!==$rev)throw new InvalidArgumentException('Approved Telegram revision required');
+    $q=$db->prepare('SELECT id FROM growth_telegram_media WHERE task_id=? AND revision=?');$q->execute([$task,$rev]);if($q->fetchColumn()!==false)throw new InvalidArgumentException('Revision reserved for media');
     $q=$db->prepare('SELECT id FROM growth_publications WHERE task_id=? AND revision=?');$q->execute([$task,$rev]);
     if($q->fetchColumn()!==false)throw new InvalidArgumentException('Publication already recorded');
     $q=$db->prepare('INSERT INTO growth_publications(task_id,revision,target_chat_id,due_at) VALUES(?,?,?,?)');

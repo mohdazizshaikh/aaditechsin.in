@@ -1,6 +1,7 @@
 """Local-only Ollama creative draft generator. No publish, network tools or DB access."""
 import argparse
 import json
+from pathlib import Path
 import re
 import sys
 import urllib.request
@@ -23,14 +24,29 @@ def request_local(payload):
         body = response.read(262145)
     if len(body)>262144:
         raise ValueError("Response too large")
-    return json.loads(body)
+    return strict_json(body)
 
-def generate(job, model, transport=request_local):
-    if not isinstance(job,dict) or set(job)!={"version","task_id","revision","service","channel","objective"} or job["version"]!=1:
+def strict_json(raw):
+    def unique(pairs):
+        out={}
+        for k,v in pairs:
+            if k in out:
+                raise ValueError("Duplicate JSON field")
+            out[k]=v
+        return out
+    return json.loads(raw,object_pairs_hook=unique)
+
+def validate_model(model):
+    if not isinstance(model,str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,99}",model) or "cloud" in model.lower():
+        raise ValueError("Use an installed local model tag (no cloud tag)")
+    return model
+
+def validate_job(job):
+    if not isinstance(job,dict) or set(job)!={"version","task_id","revision","service","channel","objective"} or type(job["version"]) is not int or job["version"]!=1:
         raise ValueError("Invalid job")
     if any(type(job[k]) is not int or job[k]<1 for k in ("task_id","revision")):
         raise ValueError("Invalid identifiers")
-    if job["channel"] not in CHANNELS or job["objective"] not in OBJECTIVES:
+    if not isinstance(job['channel'],str) or not isinstance(job['objective'],str) or job['channel'] not in CHANNELS or job['objective'] not in OBJECTIVES:
         raise ValueError("Invalid channel/objective")
     svc=job["service"]
     if not isinstance(svc,dict) or set(svc)!={"id","title","description","category","capabilities"}:
@@ -39,8 +55,14 @@ def generate(job, model, transport=request_local):
         raise ValueError("Invalid capabilities")
     if any(not isinstance(s,str) or not s.strip() or len(s.encode())>500 for s in [svc["id"],svc["title"],svc["description"],svc["category"],*svc["capabilities"]]):
         raise ValueError("Invalid catalog text")
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,99}",model) or "cloud" in model.lower():
-        raise ValueError("Use an installed local model tag (no cloud tag)")
+    catalog=strict_json((Path(__file__).resolve().parents[1]/"public_html/assets/service-registry.json").read_text(encoding="utf-8"))["services"]
+    if sum(s==svc for s in catalog)!=1:
+        raise ValueError("Only an exact local catalog entry is permitted")
+    return svc
+
+def generate(job, model, transport=request_local):
+    svc=validate_job(job)
+    validate_model(model)
     limits=dict(LIMITS)
     limits["caption"]={"x":280,"threads":500}.get(job["channel"],900)
     system=("You are Aaditechs' draft-only technical content editor. Use only the supplied service catalog as business facts. "
@@ -51,9 +73,9 @@ def generate(job, model, transport=request_local):
             "No tool calls or actions. Keep each field within these UTF-8 byte limits: "+json.dumps(limits))
     schema={"type":"object","properties":{k:{"type":"string","maxLength":v} for k,v in limits.items()},"required":list(limits),"additionalProperties":False}
     result=transport({"model":model,"stream":False,"format":schema,"messages":[{"role":"system","content":system},{"role":"user","content":json.dumps({"service":svc,"channel":job["channel"],"objective":job["objective"]},ensure_ascii=False)}],"options":{"temperature":0.3,"num_predict":1200}})
-    if result.get("done") is not True or result.get("message",{}).get("tool_calls"):
-        raise ValueError("Incomplete or tool-call response")
-    data=json.loads(result["message"]["content"])
+    if not isinstance(result,dict) or result.get("done") is not True or not isinstance(result.get("message"),dict) or result["message"].get("tool_calls") or ("model" in result and result["model"]!=model):
+        raise ValueError("Incomplete, mismatched or tool-call response")
+    data=strict_json(result["message"]["content"])
     if not isinstance(data,dict) or set(data)!=set(limits):
         raise ValueError("Invalid structured output")
     for key,limit in limits.items():
@@ -72,7 +94,7 @@ def main():
         raw=sys.stdin.buffer.read(16385)
         if len(raw)>16384:
             raise ValueError("Job too large")
-        print(json.dumps(generate(json.loads(raw),args.model),ensure_ascii=False))
+        print(json.dumps(generate(strict_json(raw),args.model),ensure_ascii=False))
     except Exception:
         print("BLOCKED: invalid job, unavailable local model or invalid generated draft.",file=sys.stderr)
         return 1
