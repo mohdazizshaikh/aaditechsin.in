@@ -20,6 +20,8 @@ return [
         'followup_batch_enabled' => false, // Explicit private reviewed reminder batches only
         'local_batch_enabled' => false,
         'tender_review_enabled' => false,
+        'tender_poll_enabled' => false, 'tender_poll_minutes' => 1440,
+        'tender_feeds' => [], // Authorized normalized JSON only; no provider connected by default.
         'enabled' => false,
         'recovery_enabled' => false, 'scheduler_enabled' => false, 'cadence_enabled' => false, 'minimum_interval_minutes' => 1440,
         'feeds_enabled' => false, // Explicitly authorize each provider before enabling.

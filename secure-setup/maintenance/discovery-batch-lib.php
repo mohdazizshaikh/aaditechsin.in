@@ -5,6 +5,7 @@ require_once __DIR__.'/discovery-feed-lib.php';
 require_once dirname(__DIR__,2).'/public_html/api/creative-core.php';
 function discoveryBatchSource(array $cfg,string $id):array{
     if(!discoveryEnabled($cfg)||($cfg['discovery']['local_batch_enabled']??false)!==true)throw new RuntimeException('Disabled');
+    if(str_starts_with($id,'tender-feed-'))throw new InvalidArgumentException('Reserved source ID');
     $source=$cfg['discovery']['feeds'][$id]??null;if(!is_array($source))throw new RuntimeException('Unknown authorized source');
     return feedDefinition($id,$source);
 }

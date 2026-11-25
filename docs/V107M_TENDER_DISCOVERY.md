@@ -32,3 +32,7 @@ Plan rolls back; apply locks growth control and existing matching research task 
 Test 43 additional aliases, deadline and state classification, duplicate and malformed input, synthetic DB reviewed plan/apply/pause/expiry/dedup/rollback. CI pending. Actual source-provider permission, automated scheduled ingestion, official document recheck, real owner review, and hosted operation remain pending. Source coverage of all 14 services is not a percentage of whole project.
 
 Owner command `/tenders` lists up to ten pending tender research tasks with readable source/reference and `/task ID`. This is stored review inventory, not current bid status; owner must revisit official source. Dated public fixture added to CI to verify six review candidates, one unconfirmed and one archived, none preselected; later date confirms staleness. Archive listing cannot be supplied as active. Canonical references reject leading/trailing and repeated spaces. No actual owner bot delivery.
+
+
+## V10.7N — scheduled tender ingestion (source)
+Authorized normalized HTTPS tender feed worker (1–5 sources, 25 notices/source), optional private bearer, reviewed service routing, cadence, atomic pending research task/ledger write and owner queue. V10.7M all CI passed. No actual provider connection or cron installed; final CI pending. See [V10.7N](V107N_SCHEDULED_TENDER_INGESTION.md).
