@@ -362,3 +362,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final CI and independent Meta app/user/Page or Threads long-lived consent, exact target, scope, provider expiry and private storage.
 - [ ] Verify paused maintenance, distinct candidate, scope/identity and grant drift refusal, no overwrite, and no active credential mutation. Threads same-token response and missing debug fields require manual review.
 - [ ] Verify separate V10.7J rotation approval, no token logging and no publication. Actual provider responses, hosted cron and LinkedIn/X remain open.
+
+
+## V10.7X LinkedIn/X renewal (pending live acceptance)
+- [ ] Verify CI, LinkedIn programmatic-refresh eligibility and confidential-client authorization, exact scopes/target, refresh expiry and private storage.
+- [ ] Verify paused maintenance, attempt marker before exchange, no retry after uncertain response, separate private unverified refresh response, per-request identity and expiry checks and exact rotation candidate.
+- [ ] Independently reconcile any rotated refresh token, review and separately authorize active credential rotation; verify no automatic activation or publication, no token logging and protected journal retention. Hosted cron and live provider acceptance remain open.
