@@ -233,3 +233,5 @@ V10.6R: no migration or new flag. With workers stopped and growth paused, captur
 V10.6S: no migration/new flags. Explicit local batch-plan then batch-render for 1–12 exported approved text jobs. Keep private, verify individual manifests and actual imagery, review current revision before server registration; no automatic transfer or publish. See docs/V106S_REVIEWED_MEDIA_BATCHES.md.
 
 V10.6T: no migration/new flag. Verify every approved media revision and completed batch index independently, use local-only batch preflight, explicit --send only for authorized isolated SFTP. Stop and inspect partial remote files on uncertainty; individual approved server import required. See docs/V106T_REVIEWED_MEDIA_TRANSFER.md.
+
+V10.6U: no migration. New inbox_batch_enabled OFF; authorize isolated staging first. Use --batch-plan then --batch-apply SHA256 for 1–12 individually approved scopes; preserve source and inspect partial destination files after failure. See docs/V106U_REVIEWED_SERVER_IMPORT.md.

@@ -126,6 +126,7 @@ $flags = [
     'reconciliation.enabled' => ['reconciliation','enabled'],
     'seo.history_retention_enabled' => ['seo','history_retention_enabled'],
     'media_upload.gbp_media_check_enabled' => ['media_upload','gbp_media_check_enabled'],
+    'media_upload.inbox_batch_enabled' => ['media_upload','inbox_batch_enabled'],
     'seo.live_crawl_enabled' => ['seo','live_crawl_enabled'],
     'seo.search_console.history_enabled' => ['seo','search_console','history_enabled'],
     'seo.search_console.enabled' => ['seo','search_console','enabled'],

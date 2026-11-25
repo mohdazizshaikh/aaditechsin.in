@@ -234,3 +234,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6T acceptance (pending)
 
 - [ ] Test isolated SFTP with approved 1–12 bundle index, all-item preflight, pinned host key, interruption recovery, exact remote file verification and individual server-side imports. Never assume SFTP acknowledgement is publication or approval. See V106T_REVIEWED_MEDIA_TRANSFER.md.
+
+## V10.6U acceptance (pending)
+
+- [ ] Authorized isolated host: validate plan without writes, apply reviewed digest, test disabled/pause/stale approval/tamper, destination conflicts, interrupted copy and audit recovery, private permissions and original source retention. See V106U_REVIEWED_SERVER_IMPORT.md.

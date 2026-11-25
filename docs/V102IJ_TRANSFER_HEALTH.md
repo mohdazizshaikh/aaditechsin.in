@@ -21,3 +21,5 @@ Current /errors and daily report now summarize all eleven publication ledgers: h
 Next priorities: CI verification, remaining mixed-media/Telegram/GBP adapters, actual OAuth renewal/alerts, communications monitoring, opportunity discovery, central dashboard and staging/release.
 
 V10.6T extends explicit private transfer with reviewed completed batch index (1–12 bundles), full local preflight, sequential delivery and stop on uncertainty. See [V106T_REVIEWED_MEDIA_TRANSFER.md](V106T_REVIEWED_MEDIA_TRANSFER.md). Existing single-bundle mode remains; individual approvals/imports mandatory.
+
+V10.6U adds independently gated 1–12 approved server import scopes with reviewed digest and repeat preflight. See [V106U_REVIEWED_SERVER_IMPORT.md](V106U_REVIEWED_SERVER_IMPORT.md). No atomic filesystem rollback or publication.
