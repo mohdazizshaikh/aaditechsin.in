@@ -344,3 +344,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final CI and reviewed backup/migration/fresh schema/restore parity for 37 migrations, 49 tables, 39 pinned hashes; apply only on isolated target.
 - [ ] Verify exact original native handoff packet and owner-approved editorial task, current approved source, private SFTP inbox, asset hash/profile, read-only plan, stale plan refusal, separate default-OFF import gate and pending native-video media manifest.
 - [ ] Verify full local decode and model provenance, source retained and replay preserves approval/rejection; reconcile partial exact files if failure. Explicit media and provider approval remain separate. No automatic provider action.
+
+
+## V10.7U native private transfer (pending live acceptance)
+- [ ] Verify final CI and separately approved SFTP destination, private fresh inbox, pinned host key and OpenSSH hardlink extension; no overwrite fallback.
+- [ ] Verify original reviewed packet, actual local full decode, separately reviewed transfer plan, exact private spool, remote chmod and SHA-256 readback. Inspect partial/final links and reconcile interruption without automatic retry.
+- [ ] Verify actual server owner approval and separate V10.7T import on isolated staging. No publication from transfer; real provider acceptance remains separate.

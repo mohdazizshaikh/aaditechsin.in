@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import shutil
 import subprocess
+from unittest.mock import patch
 from PIL import Image,ImageDraw
 root=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location("native",root/"workers/native-video-candidate.py")
@@ -80,6 +81,43 @@ with tempfile.TemporaryDirectory() as tmp:
     code='require $argv[1]; $r=json_decode(stream_get_contents(STDIN),true,16,JSON_THROW_ON_ERROR); [$png,$mp4]=nativeImportPair($argv[2],$r); if(hash("sha256",$png)!==$r["poster_sha256"]||hash("sha256",$mp4)!==$r["candidate_sha256"])exit(1);'
     subprocess.run(["php","-r",code,str(root/"secure-setup/maintenance/native-import-lib.php"),str(inbox)],input=m.canonical(review),check=True,timeout=10)
     assert not (bundle/"manifest.json").exists() and not (out/"batch-index.json").exists()
+    # Native transfer uses the original reviewed packet, separate reviewed destination and readback.
+    tspec=importlib.util.spec_from_file_location("native_transfer",root/"workers/native-video-transfer.py")
+    t=importlib.util.module_from_spec(tspec);tspec.loader.exec_module(t)
+    packet_path=p/"packet.json";packet_path.write_bytes(raw);packet_path.chmod(0o600)
+    key=p/"key";known=p/"known";key.write_bytes(b"mock key");known.write_bytes(b"mock known host")
+    key.chmod(0o600);known.chmod(0o600)
+    cfg=dict(enabled=True,host="staging.example.invalid",port=22,user="media",identity_file=str(key),known_hosts=str(known),remote_inbox="/private/inbox")
+    params=(doc,model_sha,font_sha,42,a["plan_sha256"],out,idx_hash,decisions,report["sha256"],packet_path,t.transfer.digest(raw))
+    prepared=t.prepare(cfg,*params)
+    assert len(prepared["plan"]["rows"])==1 and prepared["plan"]["publication_authorized"] is False
+    calls=[]
+    def fake(args,**kw):
+        assert "StrictHostKeyChecking=yes" in args and "IdentityAgent=none" in args
+        assert kw["input"].startswith("cd /private/inbox\n") and kw["input"].count("chmod 600 ")==2
+        assert kw["input"].count("ln ")==2 and kw["input"].count("rm ")==2 and kw["input"].count("get ")==2
+        for line in kw["input"].splitlines():
+            if line.startswith("get "):
+                _,name,local=line.split();shutil.copyfile(Path(kw["cwd"])/name,Path(kw["cwd"])/local)
+        calls.append(kw["input"])
+    with patch.object(t.shutil,"which",return_value="/usr/bin/sftp"):
+        blocked(lambda:t.send(cfg,prepared,"0"*64,out,fake))
+        blocked(lambda:t.send(dict(cfg,remote_inbox="/private/other"),prepared,prepared["plan_sha256"],out,fake))
+        known.write_bytes(b"changed");blocked(lambda:t.send(cfg,prepared,prepared["plan_sha256"],out,fake));known.write_bytes(b"mock known host")
+        assert not calls
+        assert t.send(cfg,prepared,prepared["plan_sha256"],out,fake)==1 and len(calls)==1
+        def corrupt(args,**kw):
+            fake(args,**kw)
+            for line in kw["input"].splitlines():
+                if line.startswith("get "):(Path(kw["cwd"])/line.split()[2]).write_bytes(b"corrupt")
+        try:t.send(cfg,prepared,prepared["plan_sha256"],out,corrupt)
+        except t.transfer.BatchInterrupted as exc:assert exc.acknowledged==0
+        else:raise AssertionError("Corrupt readback accepted")
+        video=bundle/"candidate.mp4";original_video=video.read_bytes()
+        video.write_bytes(b"tampered");before=len(calls)
+        blocked(lambda:t.send(cfg,prepared,prepared["plan_sha256"],out,fake))
+        assert len(calls)==before;video.write_bytes(original_video)
+    blocked(lambda:t.read_packet(packet_path,"0"*64))
     rejected={**row,"decision":"reject","reason":"visual_artifacts"}
     assert m.review_decisions(verified,{**decisions,"decisions":[rejected]})["report"]["decisions"]==[rejected]
     decision_cases=0
