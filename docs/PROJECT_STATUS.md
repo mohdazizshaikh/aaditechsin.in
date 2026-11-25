@@ -359,7 +359,7 @@ V10.7X cumulative CI passed. Adds reviewed exact HTTPS service-page capture acro
 
 
 ## V10.8B — bounded competitor monitoring and historical change review (source)
-V10.7Y cumulative CI passed. Adds exact HMAC reviewed, expiring monitoring policy, 1–30 day cadence, private fail-stop capture history, maximum 84-page comparison, exact byte digest and structural deltas; 168 historical page/change cases and cadence/expiry/interruption fixtures authored. No real collection, installed cron, semantic competitor claims, publication or hosted acceptance. CI pending. See [V10.8B](V108B_COMPETITOR_MONITOR.md).
+V10.7Y cumulative CI passed. Adds exact HMAC reviewed, expiring monitoring policy, 1–30 day cadence, private fail-stop capture history, maximum 84-page comparison, exact byte digest and structural deltas; 168 historical page/change cases and cadence/expiry/interruption fixtures authored. No real collection, installed cron, semantic competitor claims, publication or hosted acceptance. [Final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45718263649). See [V10.8B](V108B_COMPETITOR_MONITOR.md).
 
 
 ## V10.8C — offline competitor content analysis and reviewed recommendations (source)
@@ -368,3 +368,7 @@ V10.7Z cumulative CI passed. Adds exact digest-bound local HTML analysis, bounde
 
 ## V10.8D — tender opportunity ranking, amendment and deadline intelligence (source)
 V10.8A cumulative CI passed. Adds transparent 14-service opportunity priority, separately audited amendment/cancellation review tasks, original evidence preservation, owner deadline and change queues, scheduled poll integration with config/database/pause boundaries. 168 ranking cases and disposable DB amendment/dedup/owner queue tests authored. No actual authorized feed, live notices, automatic bid/outreach or hosting; CI pending. See [V10.8D](V108D_TENDER_INTELLIGENCE.md).
+
+
+## V10.8E — private inquiry qualification and follow-up review (source)
+V10.8B CI passed. V10.8C/D offline CI failed at missing bs4; both disposable DB jobs passed and D offline tender ranking passed. Corrected dependency interpreter. Adds default-OFF owner qualification, private internal reminders, exact stale/duplicate/disposition gates and aggregate reports. 98 service/date, 14 qualification and 56 reminder lifecycle cases authored. New CI pending, no live records or notification. See [V10.8E](V108E_LEAD_INTELLIGENCE.md) and [proposed release acceptance baseline](RELEASE_ACCEPTANCE_BASELINE.md).
