@@ -374,3 +374,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final CI and independent grant authorization for exact provider scope; private status must not expose secrets, IDs or paths.
 - [ ] Verify offline reviewed HMAC plan, paused maintenance, provider order, due-only dispatch, remaining scope drift refusal and fail-stop behavior on busy/uncertain result.
 - [ ] Reconcile candidates and refresh journals privately, separately authorize active credential replacement, and verify actual provider permissions. No automated activation or publication.
+
+
+## V10.7Z controlled OAuth activation (pending live acceptance)
+- [ ] Verify cumulative CI, actual isolated database/grants/HTTPS origin, static canonical private 0600 config, protected separate backup, stopped workers and paused growth.
+- [ ] Verify offline reviewed exact HMAC plan and identity probes, scope/destination/expiry, linked refresh journal, unchanged unselected config, private backup and exact post-replacement bytes.
+- [ ] Retain journals and backup, reconcile refresh credentials, independently review Threads issue/expiry metadata and reload workers only after acceptance. Do not automatically restore potentially consumed credentials or unpause.
