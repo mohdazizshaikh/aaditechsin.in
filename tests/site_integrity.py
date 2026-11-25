@@ -49,3 +49,9 @@ for service in catalog:
 assert not home.select('link[href*="fonts.googleapis.com"]')
 assert home.select_one('.hero-photo[fetchpriority=high]') and home.select_one('link[rel=preload][as=image]')
 print('14 dedicated service pages and static homepage navigation: PASS')
+
+for slug in ["it-infrastructure","software-web-development","cloud-modern-it","security-compliance","data-management-backup","it-asset-procurement","smart-office-solutions","it-special-projects","av-installation-maintenance","it-amc","data-recovery"]:
+    page=BeautifulSoup((WEB/slug/'index.html').read_text(),'html.parser')
+    assert page.select_one('a[href="../?service='+slug+'#contact"]'),slug
+assert home.select_one('#contactFields[disabled]') and home.select_one('#contactForm[method=post]')
+print('Service-specific consultation links and no-JS privacy guard: PASS')

@@ -51,7 +51,7 @@ try{
     dashCheck($s['creative_coverage']===$expected,'All 56 objective/service aggregate rows');
     dashCheck(count($s['services'])===14,'Complete opportunity service catalog');
     $b=$s['web_breakdown'];
-    dashCheck($b['pages']['home']>=2&&$b['sources']['direct']>=2&&count($b['pages'])===7&&count($b['sources'])===6&&count($b['services'])===14,'Page/source dimensions');
+    dashCheck($b['pages']['home']>=2&&$b['sources']['direct']>=2&&count($b['pages'])===16&&count($b['sources'])===6&&count($b['services'])===14,'Page/source dimensions');
     // A distant synthetic window has no observations in any category.
     $none=dashboardWebBreakdown($db,['start'=>'2000-01-01','end'=>'2000-01-08']);
     foreach($none as $rows)foreach($rows as $n)dashCheck($n===null,'Missing data distinct from zero');
