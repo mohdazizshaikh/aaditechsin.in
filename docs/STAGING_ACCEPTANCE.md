@@ -242,3 +242,7 @@ The GitHub Actions `disposable-mariadb-integration` job provides reproducible **
 ## V10.6V acceptance (pending)
 
 - [ ] Test isolated reference audit with missing/unsafe/hash-invalid files, all source projections, sample/budget limits, read-only plan eligibility, current references and existing quarantine destinations. Independently approve retention; existing single moves only. See V106V_MEDIA_INTEGRITY_AUDIT.md.
+
+## V10.6W acceptance (pending)
+
+- [ ] Verify actual authorized provider identity probes with reviewed scope, changed configuration rejection, expiry/revocation gates, pause and failure recovery, sanitized evidence. Renewal and provider permissions separate. See V106W_OAUTH_HEALTH_BATCH.md.

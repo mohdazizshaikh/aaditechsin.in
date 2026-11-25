@@ -10,3 +10,7 @@ Existing retention flag plus global pause required. Stop workers, back up files 
 
 ## Verification
 100 request cases (50 valid sizes, 50 invalid position cases), bounds and duplicates, all six audit classifications, disposable database reverse lookup and plan eligibility/read-only behavior. New CI pending. No live host, asset move, provider call, deployment or merge. Tests are not independent production features.
+
+## Subsequent CI links
+
+V10.6V incremental https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45569155055 and cumulative https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45569161982 were running at V10.6W initial inspection. Actual retention remains pending.

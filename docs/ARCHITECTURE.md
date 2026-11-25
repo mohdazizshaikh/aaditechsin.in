@@ -204,3 +204,7 @@ Independent opt-in bounded import plan binds exact approved manifests, hashes, s
 ## V10.6V media reference integrity
 
 Shared 15 fixed source projections protect retention and provide bounded reference-first storage audit with deduplicated integrity checks and byte budget. Read-only quarantine scope planning verifies protected references, age and destinations. Existing single-file move unchanged. See V106V_MEDIA_INTEGRITY_AUDIT.md.
+
+## V10.6W OAuth health batching
+
+Strict lifecycle metadata and reviewed digest-bound ordered provider scope. Existing read-only identity probes with per-probe pause checks and independent evidence transactions; stop on failure. No credential activation or provider mutation. See V106W_OAUTH_HEALTH_BATCH.md.
