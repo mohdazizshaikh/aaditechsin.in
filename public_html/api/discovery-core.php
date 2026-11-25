@@ -20,7 +20,7 @@ function discoveryNormalize(array $in,?string $today=null):array {
     $fields=['source_type','source_url','organization','location_label','evidence','observed_on','signal_type','service_id'];
     if(count($in)!==count($fields)||array_diff(array_keys($in),$fields))throw new InvalidArgumentException('Unexpected opportunity fields');
     foreach($fields as $f){
-        if(!is_string($in[$f]??null))throw new InvalidArgumentException('Invalid field');
+        if(!is_string($in[$f]??null)||preg_match('//u',$in[$f])!==1)throw new InvalidArgumentException('Invalid field');
         $in[$f]=trim($in[$f]);
         if($in[$f]===''||preg_match('/[\x00-\x1F\x7F]/',$in[$f]))throw new InvalidArgumentException('Invalid text');
     }
@@ -57,16 +57,27 @@ function discoveryImport(PDO $db,array $input):array {
     // One opportunity per organization/evidence URL/service, immutable on re-import.
     $q=$db->prepare('SELECT id FROM growth_opportunities WHERE fingerprint=?');$q->execute([$v['fingerprint']]);
     if(($id=$q->fetchColumn())!==false)return ['id'=>(int)$id,'status'=>'duplicate'];
+    $db->exec('SAVEPOINT opportunity_intake');
+    try{
     $q=$db->prepare('INSERT INTO growth_opportunities(fingerprint,source_type,source_url,organization,location_label,evidence,observed_on,signal_type,service_id,relevance_score) VALUES(?,?,?,?,?,?,?,?,?,?)');
     try{$q->execute([$v['fingerprint'],$v['source_type'],$v['source_url'],$v['organization'],$v['location_label'],$v['evidence'],$v['observed_on'],$v['signal_type'],$v['service_id'],$v['relevance_score']]);}
     catch(PDOException $e){if(($e->errorInfo[1]??0)!==1062)throw $e;throw new RuntimeException('Concurrent duplicate; retry import');}
     $id=(int)$db->lastInsertId();growthAudit($db,null,null,'opportunity_import_'.$id,'private_cli');
+    $db->exec('RELEASE SAVEPOINT opportunity_intake');
     return ['id'=>$id,'status'=>'pending_review'];
+    }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT opportunity_intake');$db->exec('RELEASE SAVEPOINT opportunity_intake');throw $e;}
 }
 function discoveryCommand(PDO $db,array $cfg,string $cmd):?string {
-    if(!preg_match('/^\/(?:opportunities|opportunity|qualify|dismiss|draftoutreach|outreach)(?: |$)/',$cmd))return null;
+    if(!preg_match('/^\/(?:opportunities|opportunity|qualify|dismiss|draftoutreach|outreach|tenders)(?: |$)/',$cmd))return null;
     if(!discoveryEnabled($cfg))return 'Discovery disabled or unconfigured.';
     if(!$db->inTransaction())throw new LogicException('Transaction required');
+    if($cmd==='/tenders'){
+        if(($cfg['discovery']['tender_review_enabled']??false)!==true)return 'Tender review disabled.';
+        $lines=['Pending tender research tasks (up to 10; recorded notices, not current bid status):'];
+        foreach($db->query("SELECT id,service_id,title FROM growth_tasks WHERE task_type='research' AND status='pending_review' AND title LIKE 'Tender review: %' ORDER BY id LIMIT 10")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]=$r['title'].' | '.$r['service_id'].' — /task '.$r['id'];
+        $lines[]='Recheck official deadlines and eligibility; no bid or outreach authorized.';
+        return implode("\n",$lines);
+    }
     if($cmd==='/opportunities'){
         $lines=['Pending opportunities (top 10; ranking, not probability):'];
         foreach($db->query("SELECT id,service_id,relevance_score FROM growth_opportunities WHERE status='pending_review' ORDER BY relevance_score DESC,id LIMIT 10")->fetchAll(PDO::FETCH_ASSOC) as $r)$lines[]='#'.$r['id'].' '.$r['service_id'].' '.$r['relevance_score'].'/100 — /opportunity '.$r['id'];
@@ -80,24 +91,34 @@ function discoveryCommand(PDO $db,array $cfg,string $cmd):?string {
     }
     if(!preg_match('/^\/(opportunity|qualify|dismiss|draftoutreach) ([1-9][0-9]{0,14})$/D',$cmd,$m))return 'Use /opportunities, /opportunity ID, /qualify ID, /dismiss ID, /draftoutreach ID or /outreach.';
     $id=(int)$m[2];$action=$m[1];
+    // Acquire control before opportunity locks, matching follow-up and feed lock order.
+    $paused=null;
+    if($action==='draftoutreach')$paused=$db->query('SELECT paused FROM growth_control WHERE id=1 FOR UPDATE')->fetchColumn();
     $q=$db->prepare('SELECT * FROM growth_opportunities WHERE id=? FOR UPDATE');$q->execute([$id]);$r=$q->fetch(PDO::FETCH_ASSOC);
     if(!$r)return 'Opportunity not found.';
     if($action==='opportunity')return '#'.$id.' '.$r['status']."\n".$r['organization'].' | '.$r['location_label']."\n".$r['service_id'].' | ranking '.$r['relevance_score']."/100\n".$r['source_type'].' / '.$r['signal_type']."\n".$r['observed_on']."\n".$r['source_url']."\n".$r['evidence']."\nImported evidence, not verified buying intent. Owner must check source.";
     if($action==='qualify'||$action==='dismiss'){
         if($r['status']!=='pending_review')return 'Opportunity is no longer pending review.';
         $state=$action==='qualify'?'qualified':'rejected';
-        $db->prepare('UPDATE growth_opportunities SET status=? WHERE id=?')->execute([$state,$id]);
-        growthAudit($db,null,null,'opportunity_'.$action.'_'.$id,'owner');
+        $db->exec('SAVEPOINT opportunity_review');
+        try{
+            $db->prepare('UPDATE growth_opportunities SET status=? WHERE id=?')->execute([$state,$id]);
+            growthAudit($db,null,null,'opportunity_'.$action.'_'.$id,'owner');
+            $db->exec('RELEASE SAVEPOINT opportunity_review');
+        }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT opportunity_review');$db->exec('RELEASE SAVEPOINT opportunity_review');throw $e;}
         return $state.' — owner review recorded. No message sent.';
     }
     if($r['status']!=='qualified')return 'Qualify opportunity first.';
     if($r['outreach_task_id']!==null)return 'Existing outreach draft /task '.$r['outreach_task_id'];
-    $paused=$db->query('SELECT paused FROM growth_control WHERE id=1')->fetchColumn();
-    if($paused===false||(int)$paused===1)return 'Growth paused; resume before creating outreach draft.';
+    if($paused===false||$paused===null||(int)$paused!==0)return 'Growth paused; resume before creating outreach draft.';
     $service=growthCatalog()[$r['service_id']]['title'];
     $draft="Review-only outreach concept for ".$r['organization']."\nService: ".$service."\nHello, Aaditechs coordinates ".$service." services. If you are currently evaluating this area, would a requirements discussion be useful?\nBefore sending: verify current need, recipient permission, channel policy and service availability. Source: ".$r['source_url']."\nNo verified contact or delivery; edit and review first.";
+    $db->exec('SAVEPOINT opportunity_draft');
+    try{
     $task=growthCreate($db,['service_id'=>$r['service_id'],'task_type'=>'outreach','title'=>'Outreach concept for opportunity #'.$id,'draft'=>$draft]);
     $db->prepare('UPDATE growth_opportunities SET outreach_task_id=? WHERE id=?')->execute([$task,$id]);
     growthAudit($db,$task,1,'opportunity_draft_linked','owner');
+    $db->exec('RELEASE SAVEPOINT opportunity_draft');
     return 'Review-only outreach draft created: /task '.$task.' — no message sent.';
+    }catch(Throwable $e){$db->exec('ROLLBACK TO SAVEPOINT opportunity_draft');$db->exec('RELEASE SAVEPOINT opportunity_draft');throw $e;}
 }

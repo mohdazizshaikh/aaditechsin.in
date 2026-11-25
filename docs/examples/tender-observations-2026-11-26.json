@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "source": "mumbai-port-meed",
+      "reference": "MEED. 38/2026",
+      "title": "Biometric access control and CCTV camera installation and commissioning",
+      "location": "Mumbai Port, Maharashtra",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-12-16T15:00:00",
+      "state": "listed",
+      "selected_service": null
+    },
+    {
+      "source": "nicsi",
+      "reference": "GEM/2026/B/8294896",
+      "title": "Large displays, tablet computer, VC unit, PTZ camera, microphones and surround sound system",
+      "location": "Not stated on listing",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-12-11T15:00:00",
+      "state": "listed",
+      "selected_service": null
+    },
+    {
+      "source": "nicsi",
+      "reference": "GEM/2026/B/8289562",
+      "title": "Workload distribution appliance, storage switches and object storage integration",
+      "location": "Not stated on listing",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-12-10T18:00:00",
+      "state": "listed",
+      "selected_service": null
+    },
+    {
+      "source": "nicsi",
+      "reference": "GEM/2026/B/8287578",
+      "title": "Network filter gateway, central management and hosting compute equipment",
+      "location": "Not stated on listing",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-12-10T18:00:00",
+      "state": "listed",
+      "selected_service": null
+    },
+    {
+      "source": "nicsi",
+      "reference": "GEM/2026/B/8258685",
+      "title": "VC unit, display, audio speakerphone and network connectivity equipment",
+      "location": "Not stated on listing",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-12-02T18:00:00",
+      "state": "listed",
+      "selected_service": null
+    },
+    {
+      "source": "nicsi",
+      "reference": "GEM/2026/B/8272986",
+      "title": "Laptop and video conferencing camera procurement with other accessories",
+      "location": "Not stated on listing",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-11-30T18:00:00",
+      "state": "listed",
+      "selected_service": null
+    },
+    {
+      "source": "mahatenders",
+      "reference": "2026_MCGM_1357116_1",
+      "title": "Audio visual modernization with recording and live broadcasting for municipal meetings",
+      "location": "Mumbai, Maharashtra",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-11-30T16:00:00",
+      "state": "unconfirmed",
+      "selected_service": null
+    },
+    {
+      "source": "mumbai-port-edp-archive",
+      "reference": "EOI TELECOM AMC OCT 2026",
+      "title": "Annual maintenance of the port telecom network",
+      "location": "Mumbai, Maharashtra",
+      "observed_on": "2026-11-26",
+      "deadline_ist": "2026-10-29T11:00:00",
+      "state": "archived",
+      "selected_service": null
+    }
+  ]
+}
