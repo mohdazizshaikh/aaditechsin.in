@@ -7,7 +7,7 @@ catalog=json.loads((root/"public_html/assets/service-registry.json").read_text()
 topics=json.loads((root/"public_html/assets/seo-topics.json").read_text())["services"]
 assert len(topics)==14 and set(topics)=={s["id"] for s in catalog}
 r=m.audit(root/"public_html")
-assert r["pages"]==7 and r["scope"]=="source-only"
+assert r["pages"]==16 and r["scope"]=="source-only"
 with tempfile.TemporaryDirectory() as d:
     w=Path(d);(w/"index.html").write_text('<html><h1>A</h1><a href="/missing/">Missing</a><img src="x"></html>')
     (w/"sitemap.xml").write_text('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>')

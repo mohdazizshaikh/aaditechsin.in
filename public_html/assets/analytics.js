@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   if(window.AADITECHS_PUBLIC_CONFIG?.features?.analytics!==true || location.protocol!=='https:')return;
-  const pages={'home':'','data-recovery':'data-recovery','it-amc':'it-amc','video-conferencing-solutions':'video-conferencing','auditorium-av-solutions':'auditorium-av','professional-sound-systems':'professional-sound','av-project-planner':'av-maintenance'};
+  const pages={'home':'','data-recovery':'data-recovery','it-amc':'it-amc','video-conferencing-solutions':'video-conferencing','auditorium-av-solutions':'auditorium-av','professional-sound-systems':'professional-sound','av-project-planner':'av-maintenance','it-infrastructure':'infrastructure','software-web-development':'software-web','cloud-modern-it':'cloud','security-compliance':'security','data-management-backup':'data-backup','it-asset-procurement':'it-procurement','smart-office-solutions':'smart-office','it-special-projects':'special-projects','av-installation-maintenance':'av-maintenance'};
   const page=location.pathname.replace(/\/index\.html$/,'/').replace(/^\/|\/$/g,'')||'home';
   if(!Object.prototype.hasOwnProperty.call(pages,page))return;
   const services=['infrastructure','software-web','it-amc','cloud','security','data-backup','it-procurement','smart-office','special-projects','video-conferencing','auditorium-av','professional-sound','av-maintenance','data-recovery'];
