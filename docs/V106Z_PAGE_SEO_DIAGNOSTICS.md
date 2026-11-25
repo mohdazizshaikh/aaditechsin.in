@@ -11,4 +11,8 @@ Existing private `live-seo-import.php --import` accepts v1 and v2 under existing
 Snapshot, optional history and audit now share a local savepoint; history cap is checked before the first history row write. History writes require a transaction and active growth. Explicit null/non-list rows and malformed row/key shapes rejected; missing rows still means no returned observations. Live SEO aggregate capture and audit also share a local savepoint. No actual Search Console requests or changes to authorization rules.
 
 ## Verification
-56 mocked page-specific crawler cases and 126 PHP detailed-report contract cases authored, plus malformed Search Console row checks, v1 compatibility and aggregate-only disposable DB storage. New CI pending. Tests are not independent implementation tasks. Actual crawl consent, Search Console permission, competitor intelligence, local AI, backup/restore and hosting acceptance remain open.
+56 mocked page-specific crawler cases and 126 PHP detailed-report contract cases authored, plus malformed Search Console row checks, v1 compatibility and aggregate-only disposable DB storage. Incremental and cumulative CI passed: https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45611270486 and https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45611277772. Tests are not independent implementation tasks. Actual crawl consent, Search Console permission, competitor intelligence, local AI, backup/restore and hosting acceptance remain open.
+
+
+## V10.7A — competitor editorial evidence (source only)
+Offline private operator-supplied own/peer comparison across 14 services and six editorial signals (84 cells), 1–5 peers, explicit unknown evidence, source references and review-only gap suggestions, 504 synthetic decision cases. No scraping, actual competitor claims, rankings, publishing or database changes. Prior V10.6Z CI passed; new CI and real evidence acceptance pending. See [V10.7A](V107A_COMPETITOR_EVIDENCE.md).

@@ -135,3 +135,7 @@ New default-OFF private 1–50 aggregate review batch across email, WhatsApp, SM
 
 ## V10.6Z — private page-level SEO diagnostics (source only)
 Optional detailed seven-page observation v2 with strict path/status/finding consistency, aggregate-only persistence, v1 compatibility, atomic Search Console snapshot/history/audit and live SEO audit rollback. 56 crawler + 126 report validation scenarios authored. Prior V10.6Y CI passed; new CI and actual crawl/provider/staging acceptance pending. See [V10.6Z](docs/V106Z_PAGE_SEO_DIAGNOSTICS.md).
+
+
+## V10.7A — competitor editorial evidence (source only)
+Offline private operator-supplied own/peer comparison across 14 services and six editorial signals (84 cells), 1–5 peers, explicit unknown evidence, source references and review-only gap suggestions, 504 synthetic decision cases. No scraping, actual competitor claims, rankings, publishing or database changes. Prior V10.6Z CI passed; new CI and real evidence acceptance pending. See [V10.7A](docs/V107A_COMPETITOR_EVIDENCE.md).
