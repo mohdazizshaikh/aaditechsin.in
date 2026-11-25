@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/public_html/api/operations.php';
-require dirname(__DIR__).'/public_html/api/media-storage-core.php';
+require dirname(__DIR__).'/secure-setup/maintenance/media-restore-lib.php';
 function stCheck(bool $ok,string $msg):void{if(!$ok)throw new RuntimeException($msg);}
 $cfg=['growth'=>['enabled'=>true],'creative'=>['enabled'=>true],'media'=>['enabled'=>true],'media_upload'=>['enabled'=>true,'inventory_enabled'=>true,'retention_enabled'=>true],'portal'=>['enabled'=>true,'admin_email'=>'owner@example.invalid','admin_password_hash'=>password_hash('synthetic-password',PASSWORD_DEFAULT)]];
 $now=time();$session=['role'=>'admin','last_seen'=>$now,'admin_fingerprint'=>opsAdminSessionFingerprint($cfg)];
@@ -36,6 +36,34 @@ try{
     stCheck(storageAuditState($root,$badName,$remaining)==='invalid_bytes','Invalid bytes');
     chmod($root.'/'.$badName,0644);stCheck(storageAuditState($root,$badName,$remaining)==='unsafe','Unsafe');unlink($root.'/'.$badName);
     echo "Storage plan scope matrix: $cases cases PASS\n";
+    $key=restoreContentKey(str_repeat('a',64));$backup=str_repeat('b',64);
+    $budget=10000;$active=mediaRestoreZone($root,mediaRestoreNames($root,true),$budget);
+    stCheck($active===[$name=>strlen($bytes)]&&$budget===10000-strlen($bytes),'Full active inventory');
+    $manifest=['version'=>1,'scope'=>'private-media-restore','backup_sha256'=>$backup,'zones'=>[],'references'=>[]];
+    foreach(['active','quarantine'] as $zone)$manifest['zones'][$zone]=mediaRestoreEntry($key,$backup,$zone,[]);
+    foreach(array_keys(storageReferenceSources()) as $source)$manifest['references'][$source]=mediaRestoreEntry($key,$backup,'reference:'.$source,[])+['missing'=>0,'quarantined'=>0];
+    $raw=mediaRestoreBytes($manifest);
+    stCheck(count(array_filter(mediaRestoreCompare($manifest,$raw,hash('sha256',$raw))))===17&&mediaRestoreReady($manifest),'Manifest round trip');
+    $matrix=0;
+    foreach(['zones','references'] as $group)foreach(array_keys($manifest[$group]) as $label){
+        $changed=$manifest;$changed[$group][$label]['hmac_sha256']=str_repeat('f',64);$raw=mediaRestoreBytes($changed);
+        $diff=mediaRestoreCompare($manifest,$raw,hash('sha256',$raw));
+        stCheck(!$diff[$group.':'.$label]&&count(array_filter($diff))===16,'Isolated drift');++$matrix;
+        $changed=$manifest;unset($changed[$group][$label]);$raw=mediaRestoreBytes($changed);
+        try{mediaRestoreCompare($manifest,$raw,hash('sha256',$raw));throw new LogicException('Missing group accepted');}catch(RuntimeException $e){}++$matrix;
+        $changed=$manifest;$changed[$group][$label]['count']=-1;$raw=mediaRestoreBytes($changed);
+        try{mediaRestoreCompare($manifest,$raw,hash('sha256',$raw));throw new LogicException('Invalid count accepted');}catch(RuntimeException $e){}++$matrix;
+    }
+    stCheck($matrix===51,'51 manifest cases');
+    $changed=$manifest;$changed['references']['manifest-video']['count']=1;$changed['references']['manifest-video']['missing']=1;
+    stCheck(!mediaRestoreReady($changed),'Missing reference blocks readiness');
+    $changed['references']['manifest-video']['missing']=0;$changed['references']['manifest-video']['quarantined']=1;
+    stCheck(!mediaRestoreReady($changed),'Quarantined reference blocks readiness');
+    $budget=1;try{mediaRestoreZone($root,[$name],$budget);throw new LogicException('Budget bypass');}catch(RuntimeException $e){}
+    $extra=$root.'/unexpected';file_put_contents($extra,'x');
+    try{mediaRestoreNames($root,true);throw new LogicException('Unexpected file accepted');}catch(RuntimeException $e){}finally{unlink($extra);}
+    stCheck(mediaRestoreDigest($key,$backup,'active',$active)!==mediaRestoreDigest($key,$backup,'quarantine',$active),'Zone binding');
+    echo "Media restore manifest: 51 isolated drift/inventory/shape cases PASS\n";
     if(($argv[1]??'')!=='--database'){echo "Storage owner, hash and path tests: PASS\n";return;}
     if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1')throw new RuntimeException('Not disposable');
     $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aaditechs_ci;charset=utf8mb4','aaditechs_ci',getenv('CI_DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false]);
@@ -61,6 +89,14 @@ try{
     growthCommand($db,'/pause',$cfg);
     try{storageQuarantinePlan($db,$cfg,$scope,$now);throw new LogicException('Referenced plan accepted');}catch(RuntimeException $e){}
     try{storageMove($db,$cfg,$name);throw new LogicException('Referenced asset moved');}catch(RuntimeException $e){}
+    if(releaseWorkerClear(releaseWorkerState($db))){
+        $m=mediaRestoreCapture($db,$cfg,$backup,$key);$raw=mediaRestoreBytes($m);
+        stCheck($m['zones']['active']['count']===1&&$m['references']['manifest-image']['count']>=1&&$m['references']['manifest-video']['missing']>=1&&!mediaRestoreReady($m),'Actual reference completeness');
+        stCheck(count(array_filter(mediaRestoreCompare($m,$raw,hash('sha256',$raw))))===17,'Actual manifest parity');
+        stCheck(!str_contains($raw,$name)&&!str_contains($raw,$root),'No asset names or paths exported');
+    }else{
+        try{mediaRestoreCapture($db,$cfg,$backup,$key);throw new LogicException('Worker gate bypass');}catch(RuntimeException $e){}
+    }
     $q=$db->prepare('SELECT COUNT(*) FROM growth_media_storage_events WHERE asset_name=?');$q->execute([$name]);stCheck((int)$q->fetchColumn()===2,'Audit');
     $db->rollBack();echo "Synthetic inventory, protected references, quarantine and restore: PASS\n";
 }catch(Throwable $e){if(isset($db)&&$db->inTransaction())$db->rollBack();fwrite(STDERR,'Storage test failed: '.$e->getMessage()."\n");exit(1);}

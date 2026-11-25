@@ -267,3 +267,7 @@ Private read-only count capture/compare across 49 contract tables; exact metadat
 
 ## V10.7D — keyed restore content fingerprints (source only)
 Private bounded read-only content fingerprint comparison across 49 tables; keyed per-table HMAC with primary-key order, binary field framing, metadata/backup binding and canonical reference. 98 table cases and same-count mutation regression authored. Prior V10.7C CI passed; new CI and actual isolated restore pending. See [V10.7D](docs/V107D_RESTORE_CONTENT_FINGERPRINTS.md).
+
+
+## V10.7E — private media restore parity (source only)
+Full bounded active/quarantine asset verification and keyed parity across 15 reference sources, missing-reference readiness gate, no raw asset names exported, three staging flag visibility updates. 51 manifest matrix cases authored. Prior V10.7D CI passed; actual restoration and new CI pending. See [V10.7E](docs/V107E_MEDIA_RESTORE_PARITY.md).
