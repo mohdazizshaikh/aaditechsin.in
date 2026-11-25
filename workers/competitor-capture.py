@@ -14,7 +14,6 @@ import time
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
-from urllib.robotparser import RobotFileParser
 
 spec=importlib.util.spec_from_file_location("competitor_evidence",Path(__file__).with_name("competitor-evidence.py"))
 e=importlib.util.module_from_spec(spec);spec.loader.exec_module(e)
@@ -133,14 +132,15 @@ def features(raw):
     p=Features();p.feed(raw.decode("utf-8"));p.close()
     if p.restricted:raise ValueError("Page robots restriction")
     return {"heading_count":p.headings,"link_count":p.links}
-def capture(doc,expected,read=fetch,resolve=pinned_ip,wait=lambda:time.sleep(2),today=None):
-    today=today or utc_day();prepared=plan(doc,today)
+def capture(doc,expected,read=fetch,resolve=pinned_ip,wait=lambda:time.sleep(2),clock=utc_day):
+    today=clock();prepared=plan(doc,today)
     if not hash_ok(expected) or expected!=prepared["sha256"]:raise ValueError("Reviewed plan changed")
     p=prepared["plan"];subjects=[]
     # Check all hosts and robots policies before requesting any page.
     bindings=[]
     for subject in p["subjects"]:
         host=subject["host"];ip=resolve(host);wait()
+        if clock()!=today:raise ValueError("Day changed")
         kind,raw=read(host,ip,"/robots.txt",MAX_ROBOTS)
         if kind!="text/plain":raise ValueError("Robots content type")
         robots(host,raw,subject["robots_sha256"],[x["url"] for x in subject["pages"]])
@@ -149,11 +149,12 @@ def capture(doc,expected,read=fetch,resolve=pinned_ip,wait=lambda:time.sleep(2),
         host=subject["host"];rows=[]
         for page in subject["pages"]:
             wait()
-            if utc_day()!=today and today==p["review_day_utc"]:raise ValueError("Day changed")
+            if clock()!=today:raise ValueError("Day changed")
             kind,raw=read(host,ip,urlsplit(page["url"]).path,MAX_BODY)
             if kind!="text/html":raise ValueError("HTML required")
             rows.append({"service_id":page["service_id"],"source_url":page["url"],"observed_on":today.isoformat(),"body_sha256":digest(raw),"features":features(raw),"signals":dict.fromkeys(e.SIGNALS,"unknown")})
         subjects.append({"host":host,"observations":rows})
+    if clock()!=today:raise ValueError("Day changed")
     return {"version":1,"scope":"private-unreviewed-editorial-capture","review_day_utc":today.isoformat(),"plan_sha256":expected,"subjects":subjects,"publication_authorized":False}
 def review(packet,expected,decisions,today=None):
     today=today or utc_day()
@@ -172,6 +173,8 @@ def review(packet,expected,decisions,today=None):
             e.exact(row,("service_id","source_url","observed_on","body_sha256","features","signals"))
             s=row["service_id"]
             if s in services or s not in checked[host] or not hash_ok(row["body_sha256"]) or row["signals"]!=dict.fromkeys(e.SIGNALS,"unknown"):raise ValueError("Capture row")
+            e.exact(row['features'],('heading_count','link_count'))
+            if any(type(x) is not int or not 0<=x<=MAX_BODY for x in row['features'].values()):raise ValueError('Feature bounds')
             services.add(s);v=checked[host][s]
             if v["source_url"]!=row["source_url"] or v["observed_on"]!=row["observed_on"]:raise ValueError("Evidence source changed")
         if services!=set(checked[host]):raise ValueError("Review scope changed")
