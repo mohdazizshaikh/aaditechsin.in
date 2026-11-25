@@ -55,7 +55,30 @@ with tempfile.TemporaryDirectory() as tmp:
     assert review["candidate_sha256"]==m.media.sha(bundle/"candidate.mp4")
     assert review["model_sha256"]==model_sha and review["seed"]==42
     assert not (bundle/"manifest.json").exists() and not (out/"batch-index.json").exists()
-    m.probe(bundle/"candidate.mp4",job["dimensions"])
+    idx_hash=m.media.sha(out/"review-index.json")
+    verified=m.verify_batch(doc,model_sha,font_sha,42,a["plan_sha256"],out,idx_hash)
+    assert verified["scope"]=="verified-native-candidates" and len(verified["candidates"])==1
+    row=verified["candidates"][0]
+    decisions={"version":1,"index_sha256":idx_hash,"decisions":[{**row,"decision":"forward_for_editorial_review","reason":"ready_for_editorial_review"}]}
+    report=m.review_decisions(verified,decisions)
+    assert report["report"]["publication_authorized"] is False and m.exact_hash(report["sha256"])
+    rejected={**row,"decision":"reject","reason":"visual_artifacts"}
+    assert m.review_decisions(verified,{**decisions,"decisions":[rejected]})["report"]["decisions"]==[rejected]
+    decision_cases=0
+    for patch in ({"task_id":True},{"task_id":2},{"revision":2},{"review_sha256":"0"*64},{"decision":"publish"},{"reason":"wrong_service"},{"reason":[]},{"decision":"reject"}):
+        blocked(lambda:m.review_decisions(verified,{**decisions,"decisions":[{**decisions["decisions"][0],**patch}]}));decision_cases+=1
+    for reason in m.REVIEW_REASONS-{"ready_for_editorial_review"}:
+        assert m.review_decisions(verified,{**decisions,"decisions":[{**rejected,"reason":reason}]})["report"]["decisions"][0]["reason"]==reason;decision_cases+=1
+    blocked(lambda:m.review_decisions(verified,{**decisions,"index_sha256":"0"*64}))
+    blocked(lambda:m.review_decisions(verified,{**decisions,"decisions":[]}))
+    blocked(lambda:m.verify_batch(doc,model_sha,font_sha,43,a["plan_sha256"],out,idx_hash))
+    blocked(lambda:m.verify_batch(doc,model_sha,font_sha,42,a["plan_sha256"],out,"0"*64))
+    extra=bundle/"extra.txt";extra.write_text("unexpected")
+    blocked(lambda:m.verify_batch(doc,model_sha,font_sha,42,a["plan_sha256"],out,idx_hash));extra.unlink()
+    poster=bundle/"poster.png";original=poster.read_bytes();poster.write_bytes(original+b"tampered")
+    blocked(lambda:m.verify_batch(doc,model_sha,font_sha,42,a["plan_sha256"],out,idx_hash));poster.write_bytes(original)
+    poster.chmod(0o644);blocked(lambda:m.verify_batch(doc,model_sha,font_sha,42,a["plan_sha256"],out,idx_hash));poster.chmod(0o600)
+    assert decision_cases==13
     blocked(lambda:m.render_batch(doc,a["plan_sha256"],model,font,42,output,infer=lambda *_:static))
     assert list(output.iterdir())==[out]
 print("Native video candidate: 126 service/channel plan cases, model identity and actual synthetic motion encode PASS")

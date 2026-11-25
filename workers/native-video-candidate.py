@@ -158,19 +158,96 @@ def render_batch(doc,expected,model,font,seed,output,infer=generate):
     except BaseException:
         shutil.rmtree(stage)
         raise
+def private_candidate_dir(path):
+    p=Path(path).expanduser().absolute()
+    if p.resolve(strict=True)!=p or not p.is_dir() or p.stat().st_mode&0o077 or p==media.ROOT or media.ROOT in p.parents or p in media.ROOT.parents or "public_html" in p.parts:
+        raise ValueError("Canonical private candidate directory required")
+    return p
+def private_asset(path,limit):
+    if path.resolve(strict=True)!=path or path.lstat().st_mode&0o077:
+        raise ValueError("Private candidate file required")
+    return stable_hash(path,limit)[0]
+def private_json(path,limit=65536):
+    h=private_asset(path,limit)
+    with path.open("rb") as f:raw=f.read(limit+1)
+    if len(raw)>limit or hashlib.sha256(raw).hexdigest()!=h:
+        raise ValueError("Candidate changed")
+    v=media.local.strict_json(raw)
+    if canonical(v)+b"\n"!=raw:raise ValueError("Canonical candidate required")
+    return v,h
+def verify_batch(doc,model_sha,font_sha,seed,expected,directory,index_digest,probe_video=probe):
+    reviewed=plan(doc,model_sha,font_sha,seed)
+    if expected!=reviewed["plan_sha256"] or not exact_hash(index_digest):
+        raise ValueError("Reviewed plan or index binding")
+    root=private_candidate_dir(directory)
+    index,actual_digest=private_json(root/"review-index.json")
+    if actual_digest!=index_digest or not isinstance(index,dict) or set(index)!={"version","scope","plan_sha256","candidates"} or type(index["version"]) is not int or index["version"]!=1 or index["scope"]!="native-video-review-only" or index["plan_sha256"]!=expected:
+        raise ValueError("Candidate index mismatch")
+    rows=index["candidates"]
+    if not isinstance(rows,list) or len(rows)!=len(doc["jobs"]):raise ValueError("Candidate inventory")
+    expected_names={"review-index.json"}
+    results=[]
+    from PIL import Image
+    for i,(job,row) in enumerate(zip(doc["jobs"],rows)):
+        name=f"task-{job['task_id']}-r{job['revision']}"
+        if not isinstance(row,dict) or set(row)!={"directory","review_sha256"} or row["directory"]!=name or not exact_hash(row["review_sha256"]):
+            raise ValueError("Candidate directory binding")
+        expected_names.add(name)
+        bundle=private_candidate_dir(root/name)
+        if {x.name for x in bundle.iterdir()}!={"poster.png","candidate.mp4","review.json"}:
+            raise ValueError("Candidate bundle inventory")
+        review,h=private_json(bundle/"review.json",8192)
+        poster=private_asset(bundle/"poster.png",10*1024**2)
+        video=private_asset(bundle/"candidate.mp4",20*1024**2)
+        expected_review={"version":1,"scope":"native-video-review-only","task_id":job["task_id"],"revision":job["revision"],"channel":job["channel"],"dimensions":job["dimensions"],"model_sha256":model_sha,"job_sha256":digest(job),"seed":seed+i,"poster_sha256":poster,"candidate_sha256":video}
+        if h!=row["review_sha256"] or canonical(review)!=canonical(expected_review):
+            raise ValueError("Candidate metadata or asset mismatch")
+        with Image.open(bundle/"poster.png") as im:
+            if im.format!="PNG" or im.size!=tuple(job["dimensions"]) or im.mode!="RGB":raise ValueError("Poster profile mismatch")
+            im.verify()
+        probe_video(bundle/"candidate.mp4",job["dimensions"])
+        if private_asset(bundle/"poster.png",10*1024**2)!=poster or private_asset(bundle/"candidate.mp4",20*1024**2)!=video or private_asset(bundle/"review.json",8192)!=h:
+            raise ValueError("Candidate changed during verification")
+        results.append({"task_id":job["task_id"],"revision":job["revision"],"review_sha256":h})
+    if {x.name for x in root.iterdir()}!=expected_names or private_asset(root/"review-index.json",65536)!=index_digest:
+        raise ValueError("Candidate inventory changed")
+    return {"version":1,"scope":"verified-native-candidates","plan_sha256":expected,"index_sha256":index_digest,"candidates":results}
+REVIEW_REASONS={"ready_for_editorial_review","visual_artifacts","wrong_service","brand_or_crop","privacy_or_claims","other_rework"}
+def review_decisions(verified,decisions):
+    if not isinstance(decisions,dict) or set(decisions)!={"version","index_sha256","decisions"} or type(decisions["version"]) is not int or decisions["version"]!=1 or decisions["index_sha256"]!=verified["index_sha256"]:
+        raise ValueError("Decision scope mismatch")
+    items=decisions["decisions"];rows=verified["candidates"]
+    if not isinstance(items,list) or len(items)!=len(rows):raise ValueError("Exact candidate decisions required")
+    out=[]
+    for item,row in zip(items,rows):
+        if not isinstance(item,dict) or set(item)!={"task_id","revision","review_sha256","decision","reason"} or any(type(item[k]) is not int or item[k]!=row[k] for k in ("task_id","revision")) or item["review_sha256"]!=row["review_sha256"]:
+            raise ValueError("Decision candidate mismatch")
+        choice=item["decision"];reason=item["reason"]
+        if not isinstance(choice,str) or choice not in ("forward_for_editorial_review","reject") or not isinstance(reason,str) or reason not in REVIEW_REASONS or (choice=="forward_for_editorial_review")!=(reason=="ready_for_editorial_review"):
+            raise ValueError("Decision or reason mismatch")
+        out.append(dict(item))
+    report={"version":1,"scope":"native-video-editorial-decision-only","plan_sha256":verified["plan_sha256"],"index_sha256":verified["index_sha256"],"decisions":out,"publication_authorized":False}
+    return {"report":report,"sha256":digest(report)}
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("mode",choices=["plan","render"]);p.add_argument("--jobs",type=Path,required=True);p.add_argument("--model",type=Path,required=True);p.add_argument("--font",type=Path,required=True);p.add_argument("--seed",type=int,required=True);p.add_argument("--output",type=Path);p.add_argument("--plan-sha256")
+    p.add_argument("mode",choices=["plan","render","verify","review"]);p.add_argument("--jobs",type=Path,required=True);p.add_argument("--model",type=Path,required=True);p.add_argument("--font",type=Path,required=True);p.add_argument("--seed",type=int,required=True);p.add_argument("--output",type=Path);p.add_argument("--plan-sha256");p.add_argument("--directory",type=Path);p.add_argument("--index-sha256");p.add_argument("--decisions",type=Path)
     a=p.parse_args()
     try:
         doc=media.read_json(a.jobs,65536)
         if a.mode=="plan":
-            if a.output is not None or a.plan_sha256 is not None:raise ValueError("Unexpected argument")
+            if any(x is not None for x in (a.output,a.plan_sha256,a.directory,a.index_sha256,a.decisions)):raise ValueError("Unexpected argument")
             print(json.dumps(plan(doc,model_inventory(a.model),font_digest(a.font),a.seed)))
-        else:
-            if a.output is None:raise ValueError("Private output required")
-            print(render_batch(doc,a.plan_sha256,a.model,a.font,a.seed,a.output))
+        elif a.mode=="render":
+            if a.output is None or any(x is not None for x in (a.directory,a.index_sha256,a.decisions)):raise ValueError("Private output required")
+            out=render_batch(doc,a.plan_sha256,a.model,a.font,a.seed,a.output)
+            print(out)
+            print("Review index SHA256:",media.sha(out/"review-index.json"))
             print("Private candidate only; no approved media manifest or publication.")
+        else:
+            if a.directory is None or a.output is not None or (a.mode=="review")!=(a.decisions is not None):raise ValueError("Explicit review input required")
+            verified=verify_batch(doc,model_inventory(a.model),font_digest(a.font),a.seed,a.plan_sha256,a.directory,a.index_sha256)
+            if a.mode=="verify":print(json.dumps(verified))
+            else:print(json.dumps(review_decisions(verified,media.read_json(a.decisions,65536))))
         return 0
     except Exception:
         print("BLOCKED: reviewed job, local model, font, CUDA or candidate validation.",file=sys.stderr)

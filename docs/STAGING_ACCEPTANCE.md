@@ -290,3 +290,5 @@ Commit-derived bounded SHA-256 inventory of all tracked public files/private mai
 
 ## V10.7I — local native video review candidates (source only)
 Offline fixed CogVideoX candidate adapter, reviewed 1–12 job/model/font/seed plan, 14-service/9-channel coverage, bounded private motion rendering and review-only index, no transfer or publication. 126 plan cases and synthetic moving-frame codec tests authored. Prior V10.7H CI passed; actual GPU/model, new CI and hosted acceptance pending. See [V10.7I](V107I_NATIVE_VIDEO_CANDIDATES.md).
+
+V10.7I follow-up adds exact read-only candidate re-verification, complete index/bundle and per-job binding, asset integrity and explicit editorial disposition report with publication_authorized=false. No server import or actual review. Final-head CI pending.
