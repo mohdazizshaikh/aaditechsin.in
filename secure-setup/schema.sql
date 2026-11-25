@@ -255,7 +255,7 @@ CREATE TABLE IF NOT EXISTS growth_media_manifests (
  manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
  image_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
  video_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
- renderer ENUM('local-diffusion','template') NOT NULL,
+ renderer ENUM('local-diffusion','template','native-video') NOT NULL,
  width SMALLINT UNSIGNED NOT NULL,
  height SMALLINT UNSIGNED NOT NULL,
  status ENUM('pending_review','approved','rejected') NOT NULL DEFAULT 'pending_review',
