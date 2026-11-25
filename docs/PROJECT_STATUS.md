@@ -343,7 +343,7 @@ Adds independent default-OFF Threads long-lived refresh and exact Facebook/Insta
 
 
 ## V10.7X — LinkedIn and X OAuth renewal candidates (source)
-Adds independently enabled confidential-client refresh, exact reviewed scopes and expiry, provider identity and per-request pause/grant checks, durable pre-exchange fail-stop marker, private unverified rotated response and separately reviewed rotation candidate. 46 provider cases and disposable DB uncertainty/revoke/no-retry tests authored. All seven provider candidate adapters now source implemented; no automatic active credential rotation, actual provider consent, provider requests, hosted cron or production acceptance. V10.7V/W CI still queued at last check; V10.7X CI pending. See [V10.7X](V107X_NETWORK_RENEWAL.md).
+Adds independently enabled confidential-client refresh, exact reviewed scopes and expiry, provider identity and per-request pause/grant checks, durable pre-exchange fail-stop marker, private unverified rotated response and separately reviewed rotation candidate. 46 provider cases and disposable DB uncertainty/revoke/no-retry tests authored. All seven provider candidate adapters now source implemented; no automatic active credential rotation, actual provider consent, provider requests, hosted cron or production acceptance. V10.7V/W and [V10.7X cumulative CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45716212738). See [V10.7X](V107X_NETWORK_RENEWAL.md).
 
 
 ## V10.7Y — unified reviewed OAuth lifecycle orchestration (source)
@@ -352,3 +352,7 @@ V10.7W cumulative CI passed. Added all-seven-provider private status inventory, 
 
 ## V10.7Z — reviewed staging OAuth activation (source)
 Adds all-seven-provider explicit HMAC activation with exact static private configuration and candidate binding, LinkedIn/X refresh response reconciliation, independent read-only identity checks, pause and global/provider locks, verified private backup and exact replacement. Threads renewal suspended until new grant metadata independently reviewed. 127 provider subsets and disposable fixture replacement/backup tests authored; CI pending. No actual staging config mutation, provider calls, automatic rollback, unpause or deployment. See [V10.7Z](V107Z_OAUTH_ACTIVATION.md).
+
+
+## V10.8A — authorized competitor editorial capture (source)
+V10.7X cumulative CI passed. Adds reviewed exact HTTPS service-page capture across own site and 1–5 peers, public IPv4/TLS pinning, reviewed robots policy preflight, bounded HTML structural metadata and digest, all-unknown editorial template, exact reviewed handoff to existing 84-cell comparison/task pipeline. 84 cell, 140 URL, 56 review drift and robots/DNS fixture checks authored. No live collection, stored raw content, automatic claims, publishing or hosting; final CI pending. See [V10.8A](V108A_COMPETITOR_CAPTURE.md).
