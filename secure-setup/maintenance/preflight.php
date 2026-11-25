@@ -120,10 +120,36 @@ $flags = [
     'growth.telegram.enabled' => ['growth', 'telegram', 'enabled'],
     'growth.telegram.reports_enabled' => ['growth','telegram','reports_enabled'],
     'analytics.enabled' => ['analytics', 'enabled'],
+    'intelligence_dashboard.enabled' => ['intelligence_dashboard','enabled'],
+    'intelligence_dashboard.csv_enabled' => ['intelligence_dashboard','csv_enabled'],
+    'communications.batch_import_enabled' => ['communications','batch_import_enabled'],
+    'reconciliation.enabled' => ['reconciliation','enabled'],
+    'seo.history_retention_enabled' => ['seo','history_retention_enabled'],
+    'media_upload.gbp_media_check_enabled' => ['media_upload','gbp_media_check_enabled'],
+    'seo.live_crawl_enabled' => ['seo','live_crawl_enabled'],
+    'seo.search_console.history_enabled' => ['seo','search_console','history_enabled'],
+    'seo.search_console.enabled' => ['seo','search_console','enabled'],
+    'communications.reviews_enabled' => ['communications','reviews_enabled'],
+    'media_upload.threads_mixed_carousel_enabled' => ['media_upload','threads_mixed_carousel_enabled'],
+    'media_upload.instagram_mixed_carousel_enabled' => ['media_upload','instagram_mixed_carousel_enabled'],
+    'communications.twilio_retention_enabled' => ['communications','twilio_retention_enabled'],
+    'communications.whatsapp_retention_enabled' => ['communications','whatsapp_retention_enabled'],
+    'communications.twilio_inbound.sms.enabled' => ['communications','twilio_inbound','sms','enabled'],
+    'communications.twilio_inbound.calls.enabled' => ['communications','twilio_inbound','calls','enabled'],
+    'communications.whatsapp_inbound.enabled' => ['communications','whatsapp_inbound','enabled'],
+    'media_upload.telegram_album_enabled' => ['media_upload','telegram_album_enabled'],
+    'communications.native_usage_enabled' => ['communications','native_usage_enabled'],
+    'communications.bridge_enabled' => ['communications','bridge_enabled'],
+    'communications.retention_enabled' => ['communications','retention_enabled'],
+    'communications.gmail.renewal.enabled' => ['communications','gmail','renewal','enabled'],
     'discovery.enabled' => ['discovery','enabled'],
+    'creative.batch_enabled' => ['creative','batch_enabled'],
     'creative.enabled' => ['creative','enabled'],
     'social.enabled' => ['social','enabled'],
     'social.telegram_channel.enabled' => ['social','telegram_channel','enabled'],
+    'discovery.recovery_enabled' => ['discovery','recovery_enabled'],
+    'discovery.cadence_enabled' => ['discovery','cadence_enabled'],
+    'discovery.scheduler_enabled' => ['discovery','scheduler_enabled'],
     'discovery.feeds_enabled' => ['discovery','feeds_enabled'],
 ];
 foreach ($flags as $name => $keys) {
@@ -176,7 +202,14 @@ if (setValue($config, ['growth','enabled']) === true) {
 }
 if (setValue($config,['discovery','enabled']) === true) {
     outcome('Discovery requires enabled growth and database', setValue($config,['growth','enabled'])===true && setValue($config,['database','enabled'])===true);
-    warning('Discovery only imports evidence; external discovery and sending are not connected');
+    warning('Discovery imports evidence only; provider authorization, actual feed acceptance and scheduling require separate verification; no sending');
+}
+if (setValue($config,['discovery','scheduler_enabled']) === true) {
+    try {
+        require_once __DIR__.'/discovery-feed-lib.php';
+        feedConfiguredSources($config,true);
+        outcome('Discovery scheduler explicitly authorized and cadence-limited', true);
+    } catch (Throwable $e) { outcome('Discovery scheduler explicitly authorized and cadence-limited', false); }
 }
 if ($checkDb) {
     if (setValue($config, ['database', 'enabled']) !== true || !extension_loaded('pdo_mysql')) {
@@ -204,6 +237,7 @@ if ($checkDb) {
 } else {
     warning('No database connection attempted. Use --check-db on staging with restricted DB access');
 }
+warning('For the current 49-table column contract and paused growth check, run release-check.php --check-db separately. This does not validate backups or provider acceptance.');
 warning('Check HTTPS, SMTP delivery, real roles/CSRF and lead lifecycle in an approved staging acceptance session');
 echo ($failures === 0 ? 'LOCAL PREFLIGHT: CHECKS PASSED' : 'LOCAL PREFLIGHT: BLOCKERS FOUND') . "\n";
 exit($failures === 0 ? 0 : 1);
