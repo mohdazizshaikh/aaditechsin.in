@@ -48,6 +48,7 @@ function tenderIntelPlan(PDO $db,array $cfg,string $raw,bool $lock=false,?DateTi
     if((string)$db->query('SELECT paused FROM growth_control WHERE id=1'.$suffix)->fetchColumn()!=='0')throw new RuntimeException('Growth paused');
     $find=$db->prepare("SELECT id,service_id,status,revision,draft FROM growth_tasks WHERE task_type='research' AND title=? ORDER BY id LIMIT 2".$suffix);
     $audit=$db->prepare("SELECT COUNT(*) FROM growth_audit WHERE task_id=? AND revision=1 AND action='tender_review_created'");
+    $changeAudit=$db->prepare("SELECT COUNT(*) FROM growth_audit WHERE task_id=? AND revision=1 AND action='tender_change_review_created'");
     $items=[];$unverified=0;
     foreach($scope['rows'] as $row){
         $find->execute(['Tender review: '.$row['key']]);$found=$find->fetchAll(PDO::FETCH_ASSOC);
@@ -61,6 +62,7 @@ function tenderIntelPlan(PDO $db,array $cfg,string $raw,bool $lock=false,?DateTi
         $title='Tender change: '.$row['key'].' '.substr($fingerprint,0,24);
         $find->execute([$title]);$existing=$find->fetchAll(PDO::FETCH_ASSOC);
         if(count($existing)>1||($existing&&$existing[0]['service_id']!==$task['service_id']))throw new RuntimeException('Ambiguous change task');
+        if($existing){$changeAudit->execute([$existing[0]['id']]);if((int)$changeAudit->fetchColumn()!==1)throw new RuntimeException('Unverified change task');}
         $items[]=['key'=>$row['key'],'original_id'=>(int)$task['id'],'original_revision'=>(int)$task['revision'],'original_status'=>$task['status'],'original_sha256'=>hash('sha256',$task['draft']),'service_id'=>$task['service_id'],'changes'=>$changes,'fingerprint'=>$fingerprint,'title'=>$title,'existing'=>$existing?[ 'id'=>(int)$existing[0]['id'],'revision'=>(int)$existing[0]['revision'],'status'=>$existing[0]['status'],'draft_sha256'=>hash('sha256',$existing[0]['draft'])]:null,'operation'=>$existing?'preserve':'create'];
     }
     $plan=['scope'=>$scope,'items'=>$items,'unverified_originals'=>$unverified];
