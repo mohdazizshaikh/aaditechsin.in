@@ -79,6 +79,7 @@ jobs:
           php tests/oauth_health_rules.php
           php tests/oauth_rotation_rules.php
           php tests/google_capture_rules.php
+          php tests/native_review_rules.php
           php tests/linkedin_video_rules.php
           php tests/x_video_rules.php
           php tests/carousel_rules.php
@@ -170,6 +171,7 @@ jobs:
           php tests/search_console_rules.php --database
           php tests/seo_history_rules.php --database
           php tests/google_capture_rules.php --database
+          php tests/native_review_rules.php --database
           php tests/competitor_review_rules.php --database
           php tests/runtime_retention_rules.php --database
           php tests/intelligence_rules.php --database
