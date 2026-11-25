@@ -29,7 +29,9 @@ function metaRenewGrant(array $cfg,string $provider,int $now):array{
     if($userExpiry<=$now+660||!is_string($r['user_id']??null)||!preg_match('/^[1-9][0-9]{0,30}$/D',$r['user_id']))throw new RuntimeException('User grant expiry');
     $required=$provider==='facebook'?['pages_manage_posts','pages_read_engagement','pages_show_list']:['instagram_basic','instagram_content_publish','pages_read_engagement','pages_show_list'];
     $scopes=$r['reviewed_scopes']??null;
-    if(!is_array($scopes)||!array_is_list($scopes)||count($scopes)>count($required)+1||count(array_unique($scopes,SORT_REGULAR))!==count($scopes)||array_diff($required,$scopes)||array_diff($scopes,array_merge($required,['public_profile'])))throw new RuntimeException('Exact reviewed scope set');
+    if(!is_array($scopes)||!array_is_list($scopes)||count($scopes)>count($required)+1)throw new RuntimeException('Scope list');
+    foreach($scopes as $scope)if(!is_string($scope))throw new RuntimeException('Scope type');
+    if(count(array_unique($scopes,SORT_REGULAR))!==count($scopes)||array_diff($required,$scopes)||array_diff($scopes,array_merge($required,['public_profile'])))throw new RuntimeException('Exact reviewed scope set');
     sort($scopes,SORT_STRING);
     return $g+['user_token'=>$r['user_access_token'],'user_expiry'=>$userExpiry,'user_id'=>$r['user_id'],'app_id'=>$r['app_id'],'app_secret'=>$r['app_secret'],'scopes'=>$scopes];
 }
