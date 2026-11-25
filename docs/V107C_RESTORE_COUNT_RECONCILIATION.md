@@ -17,3 +17,7 @@ Backup verifier now opens with nonblocking flags before checking regular file ty
 
 ## Verification
 98 synthetic table-specific count drift/missing inventory cases, independent digest and decimal boundary tests, disposable DB count drift when fixture clear, pause/worker refusal and FIFO fixture authored. CI pending. No actual hosted backup or restoration performed. P0 isolated staging and actual restore acceptance remain open.
+
+
+## V10.7D — keyed restore content fingerprints (source only)
+Private bounded read-only content fingerprint comparison across 49 tables; keyed per-table HMAC with primary-key order, binary field framing, metadata/backup binding and canonical reference. 98 table cases and same-count mutation regression authored. Prior V10.7C CI passed; new CI and actual isolated restore pending. See [V10.7D](V107D_RESTORE_CONTENT_FINGERPRINTS.md).

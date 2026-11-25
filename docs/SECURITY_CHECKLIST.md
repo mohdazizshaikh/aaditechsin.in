@@ -237,3 +237,7 @@ Private default-OFF competitor-to-SEO review handoff, 1–84 selected cells, exa
 
 ## V10.7C — restore row-count reconciliation (source only)
 Private read-only count capture/compare across 49 contract tables; exact metadata/backup binding, canonical reference, table-specific match/drift, pause and worker gates, backup FIFO/size safeguards. 98 table-specific scenarios and disposable DB count checks authored. Prior V10.7B CI passed; new CI and actual isolated restore pending. See [V10.7C](V107C_RESTORE_COUNT_RECONCILIATION.md).
+
+
+## V10.7D — keyed restore content fingerprints (source only)
+Private bounded read-only content fingerprint comparison across 49 tables; keyed per-table HMAC with primary-key order, binary field framing, metadata/backup binding and canonical reference. 98 table cases and same-count mutation regression authored. Prior V10.7C CI passed; new CI and actual isolated restore pending. See [V10.7D](V107D_RESTORE_CONTENT_FINGERPRINTS.md).
