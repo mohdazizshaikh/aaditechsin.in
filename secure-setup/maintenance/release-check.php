@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 if(PHP_SAPI!=='cli'){http_response_code(404);exit;}
-require_once __DIR__.'/release-gate-lib.php';
+require_once __DIR__.'/restore-content-lib.php';
 try{
     $mode=$argv[1]??'';
-    $modes=['--source-only'=>2,'--check-db'=>2,'--capture-schema'=>2,'--compare-schema'=>3,'--capture-counts'=>3,'--compare-counts'=>4];
+    $modes=['--source-only'=>2,'--check-db'=>2,'--capture-schema'=>2,'--compare-schema'=>3,'--capture-counts'=>3,'--compare-counts'=>4,'--capture-content'=>3,'--compare-content'=>4];
     if(!isset($modes[$mode])||count($argv)!==$modes[$mode])throw new RuntimeException('Explicit mode required');
     $contract=json_decode((string)file_get_contents(__DIR__.'/release-contract.json'),true,32,JSON_THROW_ON_ERROR);
     if(($contract['version']??null)!==1||!is_array($contract['tables']??null)||!is_array($contract['migrations']??null))throw new RuntimeException('Contract invalid');
@@ -20,6 +20,23 @@ try{
     }
     require $root.'/public_html/api/operations.php';
     $cfg=opsConfig();$db=opsDb($cfg);
+    if(in_array($mode,['--capture-content','--compare-content'],true)){
+        releaseSourceIntegrity($root,$contract);
+        $key=restoreContentKey((string)getenv('AADITECHS_RESTORE_HMAC_KEY_HEX'));
+        if(!releaseCountDigest($argv[2]))throw new RuntimeException('Backup digest required');
+        $db->exec("SET time_zone='+00:00'");
+        $db->exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
+        $db->beginTransaction();
+        $manifest=restoreContentCapture($db,$contract,$argv[2],$key);
+        $db->rollBack();
+        if($mode==='--capture-content'){echo restoreContentBytes($manifest);exit;}
+        $raw=stream_get_contents(STDIN,65537);
+        if(!is_string($raw))throw new RuntimeException('Reference unavailable');
+        $result=restoreContentCompare($manifest,$raw,$argv[3]);
+        foreach($result as $table=>$ok)echo $table.': '.($ok?'MATCH':'DRIFT')."\n";
+        if(in_array(false,$result,true))exit(1);
+        echo "READ ONLY: keyed table fingerprints match. Backup provenance, external media, grants, worker-stop and production acceptance NOT verified.\n";exit;
+    }
     if(in_array($mode,['--capture-counts','--compare-counts'],true)){
         releaseSourceIntegrity($root,$contract);
         if(!releaseCountDigest($argv[2]))throw new RuntimeException('Backup digest required');
