@@ -209,3 +209,7 @@
 ## V10.6V security (pending runtime)
 
 - [ ] Validate aggregate reverse audit classifications, sample truncation, memory/read bounds and private outputs; stop workers and verify backup and policy before paused quarantine planning. No automated removal or bulk apply. Actual retention acceptance pending.
+
+## V10.6W security (pending runtime)
+
+- [ ] Confirm explicit boolean revocation metadata, independent batch flag, private plan digest, stopped workers/paused growth, actual provider consent and no secret output. No auto-refresh/revocation or publish. See V106W_OAUTH_HEALTH_BATCH.md.

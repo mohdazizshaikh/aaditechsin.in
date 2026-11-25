@@ -237,3 +237,5 @@ V10.6T: no migration/new flag. Verify every approved media revision and complete
 V10.6U: no migration. New inbox_batch_enabled OFF; authorize isolated staging first. Use --batch-plan then --batch-apply SHA256 for 1–12 individually approved scopes; preserve source and inspect partial destination files after failure. See docs/V106U_REVIEWED_SERVER_IMPORT.md.
 
 V10.6V: no migration/new flag. Private --reference-audit is bounded and read-only; --quarantine-plan requires approved retention, paused growth and 1–50 explicit names. No bulk move or deletion. See docs/V106V_MEDIA_INTEGRITY_AUDIT.md.
+
+V10.6W: no migration. New oauth_lifecycle.batch_health_enabled OFF. Explicit private --batch-plan and --batch-check reviewed digest for authorized providers only with workers stopped and growth paused. No renewal or revocation. See docs/V106W_OAUTH_HEALTH_BATCH.md.
