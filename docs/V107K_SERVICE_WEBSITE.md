@@ -18,3 +18,7 @@ Performance source changes: remove render-blocking Google Fonts request and use 
 - Major source deliverable is dedicated service page coverage: 5/14 to 14/14. This is a measurable sub-workstream, not a percentage of entire project. No agreed weighted total project baseline exists.
 
 First source commit offline job passed (45686653328), including 14 static routes; disposable DB job failed at dashboard test's former 7-page assertion. Follow-up updates the expected 16-page dashboard dimension, adds service-specific CTA links and verifies them in source tests. Final head CI pending.
+
+
+## V10.7L — competitor-informed service conversion (source)
+Public editorial benchmark of 10 pages (7 page-text, 3 indexed excerpts), 14 service-specific proposal checklists (56 topics), 14 local discussion brief builders and related navigation. No fabricated claims, no automated sending or new collection. V10.7K final CI passed; V10.7L CI and hosted acceptance pending. See [V10.7L](V107L_COMPETITOR_RESEARCH_AND_CONVERSION.md).
