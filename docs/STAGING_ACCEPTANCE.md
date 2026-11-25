@@ -356,3 +356,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify final CI and independently authorized Google Business and YouTube exact scope grants, target identity, review expiry and private candidate directory.
 - [ ] Verify due/skip/pause/revocation gates, fixed HTTPS exchange, candidate private permissions, no overwrite or active credential mutation on isolated staging.
 - [ ] Review V10.7J HMAC rotation candidate and separately authorize active rotation; verify no token logging, no automatic activation, no publication, and no unsupervised cron during live operations. Other providers remain pending.
+
+
+## V10.7W Meta renewal (pending live acceptance)
+- [ ] Verify final CI and independent Meta app/user/Page or Threads long-lived consent, exact target, scope, provider expiry and private storage.
+- [ ] Verify paused maintenance, distinct candidate, scope/identity and grant drift refusal, no overwrite, and no active credential mutation. Threads same-token response and missing debug fields require manual review.
+- [ ] Verify separate V10.7J rotation approval, no token logging and no publication. Actual provider responses, hosted cron and LinkedIn/X remain open.

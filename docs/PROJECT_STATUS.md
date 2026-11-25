@@ -336,3 +336,7 @@ V10.7T final CI passed. Native candidate transfer now supports reviewed destinat
 
 ## V10.7V — Google social OAuth replacement candidates (source)
 New default-OFF scheduled refresh-token acquisition for Google Business and YouTube; exact reviewed scopes, destination, grant expiry and pause, ephemeral identity check and non-overwriting private rotation-candidate output compatible with V10.7J. 42 provider cases and disposable DB scheduling/reauthorization gates authored; final CI pending. No active token activation, initial consent, actual Google calls, installed cron or hosting. Remaining five providers require separate renewal adapters. See [V10.7V](V107V_GOOGLE_SOCIAL_RENEWAL.md).
+
+
+## V10.7W — Meta OAuth replacement candidates (source)
+Adds independent default-OFF Threads long-lived refresh and exact Facebook/Instagram Page credential retrieval from authorized user grants, app/scope/expiry and target identity checks, per-request pause and grant gates, private non-overwriting V10.7J-compatible candidates. 53 provider cases and disposable scheduling tests authored; final CI pending. Five of seven provider candidate adapters now implemented at source level. No active credential rotation, actual provider calls, installed cron or hosting; LinkedIn/X and actual consent remain open. See [V10.7W](V107W_META_RENEWAL.md).
