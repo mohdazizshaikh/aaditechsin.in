@@ -290,3 +290,5 @@ Public editorial benchmark of 10 pages (7 page-text, 3 indexed excerpts), 14 ser
 Eight dated public observations (six listed candidates, one unconfirmed, one archived); fixed official source registry, offline 14-service tender shortlist and selected pending research-task bridge. Default OFF, no actual bid/outreach or live import. V10.7L all three CI passed; new CI and automated authorized ingestion pending. See [V10.7M](V107M_TENDER_DISCOVERY.md).
 
 | V10.7M | Source committed; CI pending | Real public tender observations, deadline-aware offline triage and selected owner research tasks; authorized automated source ingestion pending |
+
+V10.7M owner `/tenders` command and historical observation fixture classification added; source only, final CI pending.

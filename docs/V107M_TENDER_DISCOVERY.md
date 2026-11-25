@@ -30,3 +30,5 @@ Plan rolls back; apply locks growth control and existing matching research task 
 ## Verification and next steps
 
 Test 43 additional aliases, deadline and state classification, duplicate and malformed input, synthetic DB reviewed plan/apply/pause/expiry/dedup/rollback. CI pending. Actual source-provider permission, automated scheduled ingestion, official document recheck, real owner review, and hosted operation remain pending. Source coverage of all 14 services is not a percentage of whole project.
+
+Owner command `/tenders` lists up to ten pending tender research tasks with readable source/reference and `/task ID`. This is stored review inventory, not current bid status; owner must revisit official source. Dated public fixture added to CI to verify six review candidates, one unconfirmed and one archived, none preselected; later date confirms staleness. Archive listing cannot be supplied as active. Canonical references reject leading/trailing and repeated spaces. No actual owner bot delivery.

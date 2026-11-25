@@ -60,7 +60,9 @@ function tenderShortlist(string $raw,?DateTimeImmutable $now=null):array{
         if(!$o instanceof stdClass)throw new InvalidArgumentException('Notice object');
         $v=get_object_vars($o);$keys=array_keys($v);sort($keys);
         if($keys!==['deadline_ist','location','observed_on','reference','selected_service','source','state','title']||!is_string($v['source'])||!isset($sources[$v['source']])||!is_string($v['reference'])||!preg_match('/^[A-Z0-9][A-Z0-9 ._\/-]{1,79}$/D',$v['reference'])||!is_string($v['state'])||!in_array($v['state'],['listed','unconfirmed','archived','cancelled'],true)||!is_string($v['observed_on']))throw new InvalidArgumentException('Notice contract');
-        $ref=$v['reference'];$key=$v['source'].':'.$ref;
+        $ref=$v['reference'];if(trim($ref)!==$ref||str_contains($ref,'  '))throw new InvalidArgumentException('Canonical reference required');
+        if($v['source']==='mumbai-port-edp-archive'&&$v['state']!=='archived')throw new InvalidArgumentException('Archive source only');
+        $key=$v['source'].':'.$ref;
         if(isset($seen[$key]))throw new InvalidArgumentException('Duplicate notice');$seen[$key]=true;
         $title=tenderText($v['title'],500);$location=tenderText($v['location'],120);
         $observed=tenderTime($v['observed_on'],'Y-m-d',$tz);
@@ -101,7 +103,7 @@ function tenderReviewPlan(PDO $db,array $cfg,string $raw,bool $lock=false,?DateT
     foreach($scope['rows'] as $row){
         if($row['selected_service']===null)continue;
         if($row['state']!=='review_candidate')throw new RuntimeException('Selected notice no longer eligible');
-        $title='Tender review: '.hash('sha256',$row['key']);
+        $title='Tender review: '.$row['key'];
         $q->execute([$title]);$found=$q->fetchAll(PDO::FETCH_ASSOC);
         if(count($found)>1)throw new RuntimeException('Ambiguous existing task');
         $old=$found[0]??null;

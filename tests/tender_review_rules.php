@@ -22,7 +22,13 @@ foreach([['state'=>'archived','expected'=>'archived'],['state'=>'cancelled','exp
 foreach([['source'=>'unknown'],['reference'=>'bad?ref'],['title'=>'Call person@example.com'],['selected_service'=>'data-recovery'],['deadline_ist'=>'2026-02-30T01:30:00'],['observed_on'=>'2026-11-27'],['extra'=>true]] as $patch){trBlocked(static fn()=>tenderShortlist($encode([array_replace($base,$patch)]),$now));++$cases;}
 trBlocked(static fn()=>tenderShortlist($encode([$base,$base]),$now));
 trBlocked(static fn()=>tenderShortlist(str_replace('"version":1','"version":0,"version":1',$encode([$base])),$now));
-echo "Tender matching and deadline cases: ".$cases." PASS\n";
+$sample=(string)file_get_contents(dirname(__DIR__).'/docs/examples/tender-observations-2026-11-26.json');
+$rows=tenderShortlist($sample,$now)['rows'];$states=array_count_values(array_column($rows,'state'));
+trCheck(count($rows)===8&&$states['review_candidate']===6&&$states['requires_official_confirmation']===1&&$states['archived']===1,'Dated public observations');
+foreach($rows as $r)trCheck($r['selected_service']===null,'No preselection');
+trCheck(!in_array('review_candidate',array_column(tenderShortlist($sample,$now->modify('+3 days'))['rows'],'state'),true),'Old sample stale');
+trBlocked(static fn()=>tenderShortlist($encode([array_replace($base,['source'=>'mumbai-port-edp-archive'])]),$now));
+echo "Tender matching and deadline cases: ".$cases." PASS; dated public sample 6/1/1 PASS\n";
 if(($argv[1]??'')!=='--database')exit;
 if(getenv('AADITECHS_DISPOSABLE_TEST')!=='yes'||getenv('CI_DB_NAME')!=='aaditechs_ci'||getenv('CI_DB_USER')!=='aaditechs_ci'||getenv('CI_DB_HOST')!=='127.0.0.1'||getenv('CI_DB_PASSWORD')!=='ci_only_not_real_password')exit(2);
 $db=new PDO('mysql:host=127.0.0.1;port='.(int)getenv('CI_DB_PORT').';dbname=aaditechs_ci;charset=utf8mb4','aaditechs_ci',getenv('CI_DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false]);
@@ -35,6 +41,7 @@ try{
     $r=tenderReviewApply($db,$cfg,$raw,$p['digest'],$now);trCheck($r['created']===1&&!$r['bid_authorized'],'Create');
     $q=$db->prepare('SELECT status,task_type,draft FROM growth_tasks WHERE id=?');$q->execute([$r['task_ids'][0]]);$row=$q->fetch(PDO::FETCH_ASSOC);
     trCheck($row['status']==='pending_review'&&$row['task_type']==='research'&&str_contains($row['draft'],$base['deadline_ist']),'Private research task');
+    trCheck(str_contains(growthCommand($db,'/tenders',$cfg),'nicsi:TEST/2026/A')&&str_contains(growthCommand($db,'/tenders',$cfg),'/task '.$r['task_ids'][0]),'Owner tender queue');
     trBlocked(static fn()=>tenderReviewApply($db,$cfg,$raw,$p['digest'],$now));
     $p=tenderReviewPlan($db,$cfg,$raw,false,$now);trCheck($p['create_count']===0,'Preserve');
     $r=tenderReviewApply($db,$cfg,$raw,$p['digest'],$now);trCheck($r['preserved']===1,'Idempotent');
