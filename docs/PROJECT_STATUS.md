@@ -351,7 +351,7 @@ V10.7W cumulative CI passed. Added all-seven-provider private status inventory, 
 
 
 ## V10.7Z — reviewed staging OAuth activation (source)
-Adds all-seven-provider explicit HMAC activation with exact static private configuration and candidate binding, LinkedIn/X refresh response reconciliation, independent read-only identity checks, pause and global/provider locks, verified private backup and exact replacement. Threads renewal suspended until new grant metadata independently reviewed. 127 provider subsets and disposable fixture replacement/backup tests authored; CI pending. No actual staging config mutation, provider calls, automatic rollback, unpause or deployment. See [V10.7Z](V107Z_OAUTH_ACTIVATION.md).
+Adds all-seven-provider explicit HMAC activation with exact static private configuration and candidate binding, LinkedIn/X refresh response reconciliation, independent read-only identity checks, pause and global/provider locks, verified private backup and exact replacement. Threads renewal suspended until new grant metadata independently reviewed. 127 provider subsets and disposable fixture replacement/backup tests authored; [final CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45717209235). No actual staging config mutation, provider calls, automatic rollback, unpause or deployment. See [V10.7Z](V107Z_OAUTH_ACTIVATION.md).
 
 
 ## V10.8A — authorized competitor editorial capture (source)
@@ -360,3 +360,7 @@ V10.7X cumulative CI passed. Adds reviewed exact HTTPS service-page capture acro
 
 ## V10.8B — bounded competitor monitoring and historical change review (source)
 V10.7Y cumulative CI passed. Adds exact HMAC reviewed, expiring monitoring policy, 1–30 day cadence, private fail-stop capture history, maximum 84-page comparison, exact byte digest and structural deltas; 168 historical page/change cases and cadence/expiry/interruption fixtures authored. No real collection, installed cron, semantic competitor claims, publication or hosted acceptance. CI pending. See [V10.8B](V108B_COMPETITOR_MONITOR.md).
+
+
+## V10.8C — offline competitor content analysis and reviewed recommendations (source)
+V10.7Z cumulative CI passed. Adds exact digest-bound local HTML analysis, bounded six-signal lexical suggestions, optional offline trusted NLI classifier, no raw excerpt output, independent editorial recommendation and scoped task bridge. 168 cue, 84 confirmed gap and 84 missing-peer cases authored. No actual model, live collection, automatic claims, tasks or publishing; CI pending. See [V10.8C](V108C_COMPETITOR_ANALYSIS.md).
