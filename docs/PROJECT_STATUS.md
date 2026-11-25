@@ -311,4 +311,8 @@ Private owner oldest-first website inquiry response queue, status-based internal
 ## V10.7P — Google OAuth continuity (source)
 Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search Console read-only capture; no active credential file mutation, reviewed grant expiry/revoke and exact scope, per-provider lock and freshness skip. Both default OFF; V10.7O all CI passed. Actual consent, live Google capture and hosted cron pending. See [V10.7P](V107P_GOOGLE_OAUTH_CONTINUITY.md).
 
-| V10.7P | Source committed; CI pending | Scheduled ephemeral OAuth refresh for Gmail and Search Console; live consent and cron pending |
+| V10.7P | [Both PR-triggered CI runs passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45695332318) | Scheduled ephemeral OAuth refresh for Gmail and Search Console; live consent and cron pending |
+
+
+## V10.7Q — Google scheduled capture safety (source)
+V10.7P both PR-triggered CI runs passed. V10.7Q guards every individual Google read against pause, revocation, grant/database drift, backward clock movement and expired token safety window; CLI binds the database connection to reloaded config. Twelve disposable integration scenarios verify no second read, no snapshot mutation and lock/transaction cleanup. V10.7Q CI pending. Actual provider authorization, hosted cron, Hostinger staging and database/media restoration remain pending. See [V10.7Q](V107Q_GOOGLE_CAPTURE_SAFETY.md).
