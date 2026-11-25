@@ -66,3 +66,18 @@ with tempfile.TemporaryDirectory() as tmp:
     report=m.analyze(revised,chosen,p,today)
     assert all(v["state"]=="unknown" and v["matches"]==[] for v in report["pages"][0]["suggestions"].values())
 print("Competitor analysis: 168 service/host/signal cue cases, local scorer fixture, source tamper, hidden text, privacy and unknown evidence checks PASS")
+
+decisions=m.c.template(packet,today)
+for i,service in enumerate(ids):
+    for signal in m.e.SIGNALS:
+        reviewed=copy.deepcopy(decisions)
+        reviewed["subjects"][0]["observations"][i]["signals"][signal]="absent"
+        reviewed["subjects"][1]["observations"][i]["signals"][signal]="present"
+        chosen=scope([pages[i],pages[14+i]])
+        report=m.recommendations(packet,chosen,reviewed,today)
+        assert report["task_scope"]["items"]==[{"service_id":service,"signal":signal}]
+        assert report["recommendations"][0]["reviewed_peer_count"]==1
+        assert m.recommendations(packet,scope([pages[i]]),reviewed,today)["task_scope"]["items"]==[]
+        assert not report["publication_authorized"]
+assert m.recommendations(packet,scope(pages[:12]),decisions,today)["task_scope"]["items"]==[]
+print("Competitor recommendations: 84 individually reviewed gaps and 84 missing-peer selection refusals PASS")
