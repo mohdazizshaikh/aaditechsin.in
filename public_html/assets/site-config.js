@@ -6,6 +6,7 @@ window.AADITECHS_PUBLIC_CONFIG = Object.freeze({
   googleReviewRequestUrl: '',
   features: Object.freeze({
     googleReviewsApi: false, // Enable only after API access and usage approval.
+    technicalGuide: false, // Optional static all-service technical guide.
     analytics: false, // Optional consent-based website analytics; keep OFF until acceptance.
     leadSubmission: false, // Enable only after DB schema, privacy notice, SMTP (optional), security and staging validation.
   }),
