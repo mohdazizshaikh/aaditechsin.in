@@ -14,15 +14,18 @@ if (PHP_SAPI !== 'cli') {
     http_response_code(404);
     exit;
 }
+require_once __DIR__.'/preflight-rules.php';
+$baseline = ($argv[1]??'')==='--staging-baseline';
+if($baseline&&count($argv)!==3){fwrite(STDERR,"Usage: php preflight.php --staging-baseline https://isolated.example\n");exit(2);}
 $allowed = ['--check-db', '--source-only'];
-foreach (array_slice($argv, 1) as $argument) {
+foreach ($baseline?[]:array_slice($argv, 1) as $argument) {
     if (!in_array($argument, $allowed, true)) {
         fwrite(STDERR, "Usage: php preflight.php [--check-db] [--source-only]\n");
         exit(2);
     }
 }
-$sourceOnly = in_array('--source-only', $argv, true);
-$checkDb = in_array('--check-db', $argv, true);
+$sourceOnly = !$baseline&&in_array('--source-only', $argv, true);
+$checkDb = !$baseline&&in_array('--check-db', $argv, true);
 if ($sourceOnly && $checkDb) {
     fwrite(STDERR, "Choose --source-only OR --check-db.\n");
     exit(2);
@@ -77,6 +80,12 @@ if ($sourceOnly) {
     outcome('Private example config present', is_file($root . '/secure-setup/aaditechs-config.php.example'));
     outcome('V8.4 queued-mail schema migration present', is_file($root . '/secure-setup/migrations/2026-11-23-v84.sql'));
     outcome('Private notification worker source present', is_file($root . '/secure-setup/maintenance/notification-worker.php'));
+    try{
+        $tables=preflightContract(__DIR__.'/release-contract.json');
+        outcome('Full release table inventory',count($tables)===49);
+        $example=require $root.'/secure-setup/aaditechs-config.php.example';
+        outcome('Example flags explicitly OFF',!array_filter(preflightFlags($example),static fn($state)=>$state!=='OFF'));
+    }catch(Throwable $e){outcome('Release contract or example flags',false);}
     warning('Source-only check: no Hostinger, SQL, HTTPS or SMTP readiness is asserted');
     exit($failures === 0 ? 0 : 1);
 }
@@ -110,25 +119,16 @@ outcome('Configured HTTPS origin', is_string($origin) && (bool)preg_match('~^htt
 if (is_string($origin) && $origin === 'https://aaditechs.in') {
     warning('Public origin is aaditechs.in; use staging HTTPS origin while testing staging');
 }
-$flags = [
-    'database.enabled' => ['database', 'enabled'],
-    'leads.enabled' => ['leads', 'enabled'],
-    'portal.enabled' => ['portal', 'enabled'],
-    'google.enabled' => ['google', 'enabled'],
-    'mail.enabled' => ['mail', 'enabled'],
-    'growth.enabled' => ['growth', 'enabled'],
-    'growth.telegram.enabled' => ['growth', 'telegram', 'enabled'],
-    'growth.telegram.reports_enabled' => ['growth','telegram','reports_enabled'],
-    'analytics.enabled' => ['analytics', 'enabled'],
-    'discovery.enabled' => ['discovery','enabled'],
-    'creative.enabled' => ['creative','enabled'],
-    'social.enabled' => ['social','enabled'],
-    'social.telegram_channel.enabled' => ['social','telegram_channel','enabled'],
-    'discovery.feeds_enabled' => ['discovery','feeds_enabled'],
-];
-foreach ($flags as $name => $keys) {
-    $enabled = setValue($config, $keys) === true;
-    echo 'STATE: ' . $name . ' = ' . ($enabled ? 'ON' : 'OFF') . "\n";
+foreach(preflightFlags($config) as $name=>$state){
+    echo 'STATE: '.$name.' = '.$state."\n";
+    if($state==='INVALID_OR_MISSING')outcome('Explicit boolean required: '.$name,false);
+}
+foreach(preflightDependencyFailures($config) as $failure)outcome($failure,false);
+if($baseline){
+    foreach(preflightBaseline($config,$argv[2]) as $failure)outcome($failure,false);
+    warning('Baseline only: no database, network, DNS, isolation or provider acceptance proved');
+    echo ($failures===0?'STAGING BASELINE: CHECKS PASSED':'STAGING BASELINE: BLOCKERS FOUND')."\n";
+    exit($failures===0?0:1);
 }
 if (setValue($config, ['leads', 'enabled']) === true) {
     outcome('Leads require enabled database', setValue($config, ['database', 'enabled']) === true);
@@ -176,7 +176,14 @@ if (setValue($config, ['growth','enabled']) === true) {
 }
 if (setValue($config,['discovery','enabled']) === true) {
     outcome('Discovery requires enabled growth and database', setValue($config,['growth','enabled'])===true && setValue($config,['database','enabled'])===true);
-    warning('Discovery only imports evidence; external discovery and sending are not connected');
+    warning('Discovery imports evidence only; provider authorization, actual feed acceptance and scheduling require separate verification; no sending');
+}
+if (setValue($config,['discovery','scheduler_enabled']) === true) {
+    try {
+        require_once __DIR__.'/discovery-feed-lib.php';
+        feedConfiguredSources($config,true);
+        outcome('Discovery scheduler explicitly authorized and cadence-limited', true);
+    } catch (Throwable $e) { outcome('Discovery scheduler explicitly authorized and cadence-limited', false); }
 }
 if ($checkDb) {
     if (setValue($config, ['database', 'enabled']) !== true || !extension_loaded('pdo_mysql')) {
@@ -191,11 +198,12 @@ if ($checkDb) {
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
             outcome('Read-only DB SELECT 1', $pdo->query('SELECT 1')->fetchColumn() !== false);
-            foreach (['leads', 'partners', 'jobs', 'job_activity', 'notification_outbox', 'growth_tasks', 'growth_audit', 'growth_control', 'growth_telegram_updates', 'growth_analytics_events', 'growth_analytics_budget', 'growth_opportunities', 'growth_source_runs', 'growth_creative', 'growth_creative_results', 'growth_publications', 'growth_report_preferences', 'growth_report_runs'] as $table) {
-                $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?');
-                $stmt->execute([$table]);
-                outcome('Database table present: ' . $table, (int)$stmt->fetchColumn() >= 1);
-            }
+            $expected=preflightContract(__DIR__.'/release-contract.json');
+            $actual=[];
+            foreach($pdo->query('SELECT TABLE_NAME,COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()')->fetchAll(PDO::FETCH_ASSOC) as $row)$actual[$row['TABLE_NAME']][$row['COLUMN_NAME']]=true;
+            $missing=preflightSchemaFailures($expected,$actual);
+            foreach($missing as $item)outcome('Missing required schema: '.$item,false);
+            outcome('Required columns across all 49 contract tables',!$missing);
         } catch (Throwable $e) {
             // Never print SQL errors with connection details or credentials.
             outcome('Read-only DB connectivity and schema', false);
@@ -204,6 +212,7 @@ if ($checkDb) {
 } else {
     warning('No database connection attempted. Use --check-db on staging with restricted DB access');
 }
+warning('For the current 49-table column contract and paused growth check, run release-check.php --check-db separately. This does not validate backups or provider acceptance.');
 warning('Check HTTPS, SMTP delivery, real roles/CSRF and lead lifecycle in an approved staging acceptance session');
 echo ($failures === 0 ? 'LOCAL PREFLIGHT: CHECKS PASSED' : 'LOCAL PREFLIGHT: BLOCKERS FOUND') . "\n";
 exit($failures === 0 ? 0 : 1);
