@@ -95,7 +95,7 @@ def send(cfg,prepared,reviewed_plan,directory,run=subprocess.run):
                     if name not in delivered:
                         # OpenSSH hardlink extension fails if final name exists.
                         lines.extend(["put "+name+" "+partial,"chmod 600 "+partial,"ln "+partial+" "+name,"rm "+partial])
-                    lines.append("get "+name+" "+readback")
+                    lines.append("get "+name+" "+readback)
                     readbacks.append((stage/readback,a))
                 run([exe,*args],input="\n".join(lines)+"\n",text=True,cwd=tmp,timeout=180,check=True,capture_output=True)
                 for path,a in readbacks:
