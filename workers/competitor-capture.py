@@ -172,7 +172,7 @@ def review(packet,expected,decisions,today=None):
         for row in subject["observations"]:
             e.exact(row,("service_id","source_url","observed_on","body_sha256","features","signals"))
             s=row["service_id"]
-            if s in services or s not in checked[host] or not hash_ok(row["body_sha256"]) or row["signals"]!=dict.fromkeys(e.SIGNALS,"unknown"):raise ValueError("Capture row")
+            if row["observed_on"]!=today.isoformat() or s in services or s not in checked[host] or not hash_ok(row["body_sha256"]) or row["signals"]!=dict.fromkeys(e.SIGNALS,"unknown"):raise ValueError("Capture row")
             e.exact(row['features'],('heading_count','link_count'))
             if any(type(x) is not int or not 0<=x<=MAX_BODY for x in row['features'].values()):raise ValueError('Feature bounds')
             services.add(s);v=checked[host][s]
