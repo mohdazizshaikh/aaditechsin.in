@@ -70,3 +70,9 @@ calls.clear()
 blocked(lambda:run(d,reader=lambda host,ip,path,cap:("text/plain",b"changed")))
 assert not calls
 print("Competitor capture: 84 reviewed editorial cells, 140 URL refusals, 56 review drift checks and bounded robots/DNS fixtures PASS")
+
+for h in range(2):
+    for i in range(14):
+        bad=copy.deepcopy(packet);bad["subjects"][h]["observations"][i]["observed_on"]=(today-dt.timedelta(days=1)).isoformat()
+        blocked(lambda:m.template(bad,today))
+print("Exact-day capture: 28 older observation row refusals PASS")
