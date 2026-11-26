@@ -26,3 +26,6 @@ This is an unweighted inventory of outstanding acceptance gates, not an estimate
 | R20 | Reviewed production deployment, smoke and rollback readiness | Pending |
 
 No gate is marked closed without its own required evidence. Equal weighting is not assumed; this inventory covers final acceptance, not all historical development or the entirety of effort.
+
+
+V10.8F update: R01 still open; V10.8E disposable DB passed, offline preflight flag-order failure corrected in source. R02 remains open pending cumulative CI and reviewed consolidation. R03 package preparation automated at source level; actual staging target, transfer and HTTPS isolation unverified. No gate closed by packaging alone. See [release readiness](V108F_RELEASE_READINESS.md).
