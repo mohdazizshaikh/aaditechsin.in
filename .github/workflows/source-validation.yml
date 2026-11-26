@@ -61,6 +61,7 @@ jobs:
           php tests/preflight_rules.php
           php tests/strict_json_rules.php
           python3 tests/deployment_integrity.py
+          python3 tests/staging_package.py
           php tests/reconciliation_rules.php
           php tests/native_usage_rules.php
           php tests/albums_inbound_rules.php
