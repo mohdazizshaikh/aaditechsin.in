@@ -410,3 +410,9 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify corrected cumulative CI, actual service mapping and owner-only HTTPS/session/CSRF; partner/anonymous denied.
 - [ ] Verify explicit qualification, stale form, duplicate/history preservation, paused creation refusal and private reminder disposition.
 - [ ] Verify inactive inquiries excluded from active counts, bounded reports, no customer data in owner notifications and no automatic contact. Actual hosted delivery and staging remain pending.
+
+
+## V10.8F split release package (pending acceptance)
+- [ ] Verify corrected cumulative CI and consolidated reviewed commit.
+- [ ] Build split private local packages, independently record receipt digest, verify exact contents; transfer to authorized isolated roots only.
+- [ ] Verify deployed parity, initial all-off flags, isolated database and media restore, provider and runtime evidence separately. No package is deployment authorization.
