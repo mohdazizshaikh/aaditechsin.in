@@ -317,3 +317,7 @@ Private owner oldest-first website inquiry response queue, status-based internal
 
 ## V10.7P — Google OAuth continuity (source)
 Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search Console read-only capture; no active credential file mutation, reviewed grant expiry/revoke and exact scope, per-provider lock and freshness skip. Both default OFF; V10.7O all CI passed. Actual consent, live Google capture and hosted cron pending. See [V10.7P](docs/V107P_GOOGLE_OAUTH_CONTINUITY.md).
+
+
+## V10.8F — exact split staging package (source)
+Deterministic commit-bound public/private maintenance archives, local private receipt verification, corrected flag ordering and exact-day capture checks. See [release readiness runbook](docs/V108F_RELEASE_READINESS.md). This does not deploy or include private credentials/database/media.
