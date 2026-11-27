@@ -62,6 +62,7 @@ jobs:
           php tests/strict_json_rules.php
           python3 tests/deployment_integrity.py
           python3 tests/staging_package.py
+          python3 tests/release_candidate.py
           php tests/reconciliation_rules.php
           php tests/native_usage_rules.php
           php tests/albums_inbound_rules.php
@@ -210,8 +211,15 @@ jobs:
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'
 
   release-package:
-    # Source-only artifact for the consolidated candidate, never a deployment.
-    if: github.ref == 'refs/heads/development/v108f-release-readiness' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    # Same-repo consolidated PR only; verify tested merge tree equals candidate.
+    if: >-
+      (github.ref == 'refs/heads/development/v108f-release-readiness' &&
+       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.number == 111 &&
+       github.event.pull_request.base.ref == 'main' &&
+       github.event.pull_request.head.ref == 'development/v108f-release-readiness' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
     needs: [offline-checks, disposable-mariadb-integration]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -221,33 +229,50 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 2
           persist-credentials: false
+      - name: Bind exact validated release tree
+        id: candidate
+        shell: bash
+        env:
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            commit="$(python3 workers/release-candidate.py --tested "$GITHUB_SHA" --candidate "$PR_HEAD" --base "$PR_BASE")"
+          else
+            commit="$(python3 workers/release-candidate.py --tested "$GITHUB_SHA" --candidate "$GITHUB_SHA")"
+          fi
+          echo "sha=$commit" >> "$GITHUB_OUTPUT"
       - name: Package exact validated commit and rehearse disposable staged copy
         shell: bash
+        env:
+          CANDIDATE: ${{ steps.candidate.outputs.sha }}
         run: |
           set -euo pipefail
           umask 077
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           parent="$RUNNER_TEMP/aaditechs-packages"
           mkdir -m 700 "$parent"
-          python3 workers/staging-package.py pack --commit "$GITHUB_SHA" --directory "$parent"
-          receipt="$(sha256sum "$parent/$GITHUB_SHA/package-receipt.json" | cut -d ' ' -f 1)"
-          python3 workers/staging-package.py rehearse --directory "$parent/$GITHUB_SHA" --receipt-sha256 "$receipt"
+          python3 workers/staging-package.py pack --commit "$CANDIDATE" --directory "$parent"
+          receipt="$(sha256sum "$parent/$CANDIDATE/package-receipt.json" | cut -d ' ' -f 1)"
+          python3 workers/staging-package.py rehearse --directory "$parent/$CANDIDATE" --receipt-sha256 "$receipt"
           {
             echo '### Verified source-only release package'
-            echo "Commit: $GITHUB_SHA"
+            echo "Validated commit: $GITHUB_SHA"
+            echo "Candidate commit: $CANDIDATE"
             echo "Package receipt SHA-256: $receipt"
             echo 'Disposable copy parity only. Hosting, restore, provider and production acceptance remain pending.'
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Publish verified source-only package
         uses: actions/upload-artifact@v4
         with:
-          name: aaditechs-staging-source-${{ github.sha }}
+          name: aaditechs-staging-source-${{ steps.candidate.outputs.sha }}
           path: |
-            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/public.zip
-            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/private-maintenance.zip
-            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/deployment-reference.json
-            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/package-receipt.json
+            ${{ runner.temp }}/aaditechs-packages/${{ steps.candidate.outputs.sha }}/public.zip
+            ${{ runner.temp }}/aaditechs-packages/${{ steps.candidate.outputs.sha }}/private-maintenance.zip
+            ${{ runner.temp }}/aaditechs-packages/${{ steps.candidate.outputs.sha }}/deployment-reference.json
+            ${{ runner.temp }}/aaditechs-packages/${{ steps.candidate.outputs.sha }}/package-receipt.json
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
