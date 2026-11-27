@@ -321,3 +321,6 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 
 ## V10.8F — exact split staging package (source)
 Deterministic commit-bound public/private maintenance archives, local private receipt verification, corrected flag ordering and exact-day capture checks. See [release readiness runbook](docs/V108F_RELEASE_READINESS.md). This does not deploy or include private credentials/database/media.
+
+
+V10.8F follow-up: [cumulative CI passed at 6e425807](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093). Release branch CI adds source-only split package artifact after both jobs and disposable file-copy parity. No deployment. See [release readiness](docs/V108F_RELEASE_READINESS.md).
