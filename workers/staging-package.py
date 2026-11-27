@@ -12,6 +12,7 @@ from pathlib import Path
 import stat
 import subprocess
 import sys
+import tempfile
 import zipfile
 
 spec=importlib.util.spec_from_file_location("deployment_integrity",Path(__file__).with_name("deployment-integrity.py"))
@@ -111,11 +112,45 @@ def verify(target,expected):
         count=verify_archive(archive,manifest,name)
         if entry!={"name":name,"sha256":digest(archive),"size":len(archive),"files":count}:raise ValueError("Archive receipt binding")
     return {"commit":manifest["commit"],"receipt_sha256":expected,"reference_sha256":receipt["reference_sha256"],"public_files":len(rows_for(manifest,NAMES[0])),"private_maintenance_files":len(rows_for(manifest,NAMES[1])),"local_package_verified":True,"deployment_authorized":False}
+
+def rehearse(target,expected):
+    """Reconstruct only a disposable local file tree from the verified package."""
+    target=private_dir(target)
+    result=verify(target,expected)
+    # Re-read exact receipt and reference; bind the bytes used for reconstruction.
+    receipt_raw=read_private(target/"package-receipt.json",65536)
+    if digest(receipt_raw)!=expected:raise ValueError("Receipt changed")
+    receipt=json.loads(receipt_raw.decode("ascii"))
+    manifest=d.load(read_private(target/"deployment-reference.json",d.MAX_MANIFEST),receipt["reference_sha256"])
+    if manifest["commit"]!=result["commit"]:raise ValueError("Commit changed")
+    with tempfile.TemporaryDirectory(prefix="aaditechs-package-rehearsal-") as tmp:
+        root=Path(tmp).resolve(strict=True)
+        (root/"public_html").mkdir(mode=0o755)
+        (root/"secure").mkdir(mode=0o700)
+        (root/"secure/maintenance").mkdir(mode=0o700)
+        for name,entry in zip(NAMES,receipt["archives"]):
+            raw=read_private(target/name,CAP)
+            if digest(raw)!=entry["sha256"] or len(raw)!=entry["size"]:raise ValueError("Archive changed")
+            verify_archive(raw,manifest,name)
+            with zipfile.ZipFile(io.BytesIO(raw),"r") as z:
+                for row in rows_for(manifest,name):
+                    # Use only validated manifest paths; never extract untrusted ZIP paths.
+                    path=root/row["path"]
+                    path.parent.mkdir(parents=True,exist_ok=True)
+                    data=z.read(row["path"])
+                    if len(data)!=row["size"] or digest(data)!=row["sha256"]:raise ValueError("Content changed")
+                    exclusive(path,data)
+                    if name==NAMES[0]:path.chmod(0o644)
+        parity=d.verify(root,manifest)
+        if not parity["match"]:raise ValueError("Disposable staged-copy drift")
+        return result|{"disposable_copy_verified":True,"matched_files":len(parity["files"]),"unexpected_files":parity["unexpected_count"],"hosting_verified":False}
+
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument("mode",choices=("pack","verify"));p.add_argument("--directory",type=Path,required=True);p.add_argument("--commit");p.add_argument("--receipt-sha256");a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument("mode",choices=("pack","verify","rehearse"));p.add_argument("--directory",type=Path,required=True);p.add_argument("--commit");p.add_argument("--receipt-sha256");a=p.parse_args()
     try:
         if a.mode=="pack" and a.commit and not a.receipt_sha256:r=pack(d.ROOT,a.commit,a.directory)
         elif a.mode=="verify" and a.receipt_sha256 and not a.commit:r=verify(a.directory,a.receipt_sha256)
+        elif a.mode=="rehearse" and a.receipt_sha256 and not a.commit:r=rehearse(a.directory,a.receipt_sha256)
         else:raise ValueError("Exact mode")
         print(json.dumps(r,sort_keys=True))
     except Exception:p.exit(1,"BLOCKED: private output, exact source, archive inventory or reviewed receipt. Do not reuse an interrupted package.\n")
