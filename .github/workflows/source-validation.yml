@@ -208,3 +208,46 @@ jobs:
           php tests/report_rules.php --database
       - name: Scope statement
         run: echo 'Synthetic container integration only; Hostinger staging/SMTP/Google API/backup still require separate acceptance.'
+
+  release-package:
+    # Source-only artifact for the consolidated candidate, never a deployment.
+    if: github.ref == 'refs/heads/development/v108f-release-readiness' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: [offline-checks, disposable-mariadb-integration]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Package exact validated commit and rehearse disposable staged copy
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          parent="$RUNNER_TEMP/aaditechs-packages"
+          mkdir -m 700 "$parent"
+          python3 workers/staging-package.py pack --commit "$GITHUB_SHA" --directory "$parent"
+          receipt="$(sha256sum "$parent/$GITHUB_SHA/package-receipt.json" | cut -d ' ' -f 1)"
+          python3 workers/staging-package.py rehearse --directory "$parent/$GITHUB_SHA" --receipt-sha256 "$receipt"
+          {
+            echo '### Verified source-only release package'
+            echo "Commit: $GITHUB_SHA"
+            echo "Package receipt SHA-256: $receipt"
+            echo 'Disposable copy parity only. Hosting, restore, provider and production acceptance remain pending.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish verified source-only package
+        uses: actions/upload-artifact@v4
+        with:
+          name: aaditechs-staging-source-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/public.zip
+            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/private-maintenance.zip
+            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/deployment-reference.json
+            ${{ runner.temp }}/aaditechs-packages/${{ github.sha }}/package-receipt.json
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
