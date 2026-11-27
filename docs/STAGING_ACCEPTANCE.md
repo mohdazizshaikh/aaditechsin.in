@@ -419,3 +419,6 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 
 
 27 November: [V10.8F cumulative CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093) at 6e425807. New release artifact job and disposable copy rehearsal require a successful current-head run. Actual isolated hosting, restore and all runtime acceptance remain pending. Download source-only artifact into private 0700 commit-named directory, set four files to 0600 and independently verify receipt before staging. See [V10.8F](V108F_RELEASE_READINESS.md).
+
+
+27 November follow-up: [45920763895](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45920763895) validated synthetic merge but package skipped. Require successful current-head release-package job, artifact name containing exact candidate SHA, exact tested-tree equivalence, receipt verification and independently authorized staging. No artifact yet. See [release readiness](V108F_RELEASE_READINESS.md).
