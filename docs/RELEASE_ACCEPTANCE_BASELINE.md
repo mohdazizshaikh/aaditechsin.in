@@ -4,7 +4,7 @@ This is an unweighted inventory of outstanding acceptance gates, not an estimate
 
 | ID | Acceptance gate | Status at V10.8E |
 |---|---|---|
-| R01 | Latest cumulative CI passes both jobs | Pending corrected run |
+| R01 | Latest cumulative CI passes both jobs | Verified at 6e425807 (run 45819867093); new head revalidation pending |
 | R02 | Consolidated branch reviewed and merged | Pending |
 | R03 | Independently isolated Hostinger staging and HTTPS | Pending |
 | R04 | Actual staging database restore and content fingerprints | Pending |
@@ -29,3 +29,6 @@ No gate is marked closed without its own required evidence. Equal weighting is n
 
 
 V10.8F update: R01 still open; V10.8E disposable DB passed, offline preflight flag-order failure corrected in source. R02 remains open pending cumulative CI and reviewed consolidation. R03 package preparation automated at source level; actual staging target, transfer and HTTPS isolation unverified. No gate closed by packaging alone. See [release readiness](V108F_RELEASE_READINESS.md).
+
+
+27 November 2026: R01 passed at exact V10.8F commit 6e4258075909bf9cc42616c91028b36ff614e1cd, [CI 45819867093](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093). Subsequent artifact workflow changes require a new successful run; do not carry CI acceptance across changed commits. R02 review/merge and R03 actual isolated hosting remain open. A disposable reconstruction is not hosted restoration. See [release readiness](V108F_RELEASE_READINESS.md).
