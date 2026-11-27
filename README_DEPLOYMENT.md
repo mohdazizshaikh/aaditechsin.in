@@ -324,3 +324,6 @@ Deterministic commit-bound public/private maintenance archives, local private re
 
 
 V10.8F follow-up: [cumulative CI passed at 6e425807](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093). Release branch CI adds source-only split package artifact after both jobs and disposable file-copy parity. No deployment. See [release readiness](docs/V108F_RELEASE_READINESS.md).
+
+
+V10.8F PR package correction: same-repo consolidated PR #111 can generate candidate source package only when its tested merge tree is identical to the candidate tree and exact parents match. Prior PR CI passed but artifact was skipped. See [release readiness](docs/V108F_RELEASE_READINESS.md).
