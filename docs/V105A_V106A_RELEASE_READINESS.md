@@ -1,0 +1,25 @@
+# V10.5A/V10.6A advanced reporting and release readiness
+
+Source only. No new SQL migration, no live provider access, no deployment. Previous V10.5 CI passed. New CSV and communication batch flags OFF.
+
+## Advanced analytics and private export
+
+The existing owner-only /portal/intelligence.php adds 7/30 completed IST-day stored consented website activity: page views, day-scoped tab estimates, automation-signal views, service interactions, phone/email/chat clicks. IST analytics dates deliberately differ from UTC inquiry and communication dates. No recorded events is shown as no recorded data (may indicate retention, collection off or no events). Tab estimates are not unique people; clicks are not calls/messages; no cross-source attribution. Existing analytics consent and salt gate required. Page uses native meters and tables without external scripts.
+
+Set intelligence_dashboard.csv_enabled=true only after authorized staging review, in addition to existing dashboard/portal/growth flags. /portal/intelligence-export.php?days=7 or 30 is an owner-only HTTPS GET attachment using same inactivity/fingerprint, no-store/noindex/CSP and strict period gates. Bounded 256 KiB long-form CSV: section, window_start, window_end_exclusive, day, category, metric, value. Exports inquiry cohort current status, task/opportunity inventories and service aggregates, communications totals/coverage and reported daily rows, consented IST daily activity and publication attention counts where enabled. Empty communication value means missing; zero is distinct; web recorded_data marks missing days. No customer or organization names, contact fields, task IDs/drafts, source URLs, event/session hashes, mailbox or token fields. Formula-like strings escaped before CSV writing. No raw data export, server-side saved copy or automated delivery. Owner must handle downloaded files privately and review retention.
+
+## Communications bulk import
+
+communications.batch_import_enabled independently OFF; communications and growth must also be enabled. Private CLI php secure/maintenance/communications-import.php --batch < /private/authorized-counts.json. Exact version 1, items list of 1–120 existing aggregate records; 64 KiB cap. Only channel/day_utc/received/answered/missed; completed UTC days within 90 days. Duplicate channel/day within payload invalid. Exact existing record is no-op; conflicting record aborts all writes in that batch, including audit rows, via savepoint and CLI transaction. Pause blocks import. No inbox or telephony connector, webhook, automatic provider fetch or message content. Existing single-record --import unchanged. Authorize sources and privacy/retention before use.
+
+## Release schema checks
+
+secure-setup/maintenance/release-contract.json records 28 migration filenames in release order (not lexical), historical V9.6 main commit 7582be3c9beafa7335c1ced9bc9c6369b4360daf and 40-table required column contract. This inventory is not an applied migration ledger; verify actual deployed baseline, backup and restore before deciding which migrations are missing. Fresh isolated install uses schema.sql; never blindly reimport over live data.
+
+tests/fixtures/schema-v96.sql is the historical main schema fetched at that commit. Disposable CI test tests/migration_replay.py starts on empty loopback aaditechs_ci with exact synthetic credentials, imports baseline and synthetic lead/task, applies only subsequent migrations in order, checks synthetic record and pause preservation, compares actual required columns, and compares fresh schema table metadata, column types/defaults/nullability, indexes and foreign keys. Test resets only known tables in the explicitly disposable DB; never run against hosting or existing data. Earlier V7–V9.6 upgrades are inventoried but not replayed in this test. CI pending at writing; parity may reveal migration drift requiring correction.
+
+Local source inventory: php secure-setup/maintenance/release-check.php --source-only. Copy release-contract.json and release-check.php together to private secure/maintenance on approved staging; stop workers and pause growth. php secure/maintenance/release-check.php --check-db checks required tables/columns and paused growth, using read-only SELECTs. Does not check live type/index/FK parity, backups, grants, engine, applied version, scheduler or provider readiness. Existing preflight --check-db and staging acceptance also required. No automatic migration, rollback, destructive action, deployment or activation.
+
+Remaining priorities: final CI, fix any migration drift, authorized real staging clone and backup/restore, merge/release approval, live WhatsApp/SMS/telephony/discovery/provider consent, GBP media and mixed carousels, OAuth refresh and credential lifecycle, retention and production acceptance.
+
+V10.6R adds separately invoked read-only metadata reference capture/comparison and backup artifact safeguards. Existing --check-db remains a required-column check. See [V106R_SCHEMA_RESTORE_GATE.md](V106R_SCHEMA_RESTORE_GATE.md).
