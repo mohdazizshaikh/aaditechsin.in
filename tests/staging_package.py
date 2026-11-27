@@ -33,6 +33,9 @@ with tempfile.TemporaryDirectory() as tmp:
     assert result["public_files"]==50 and result["private_maintenance_files"]==50
     assert not result["deployment_authorized"]
     assert m.verify(target,result["receipt_sha256"])==result
+    rehearsal=m.rehearse(target,result["receipt_sha256"])
+    assert rehearsal["matched_files"]==100 and rehearsal["unexpected_files"]==0
+    assert rehearsal["disposable_copy_verified"] and not rehearsal["hosting_verified"] and not rehearsal["deployment_authorized"]
     manifest=m.d.load((target/"deployment-reference.json").read_bytes(),result["reference_sha256"])
     def read(path):
         return git("show",commit+":"+("secure-setup/"+path[len("secure/"):] if path.startswith("secure/") else path))
@@ -61,7 +64,7 @@ with tempfile.TemporaryDirectory() as tmp:
     blocked(lambda:m.verify(target,"0"*64))
     extra=target/"extra";extra.write_text("fixture");blocked(lambda:m.verify(target,result["receipt_sha256"]));extra.unlink()
     public=target/"public.zip";raw=public.read_bytes()
-    public.write_bytes(raw+b"x");blocked(lambda:m.verify(target,result["receipt_sha256"]));public.write_bytes(raw)
+    public.write_bytes(raw+b"x");blocked(lambda:m.verify(target,result["receipt_sha256"]));blocked(lambda:m.rehearse(target,result["receipt_sha256"]));public.write_bytes(raw)
     public.chmod(0o644);blocked(lambda:m.verify(target,result["receipt_sha256"]));public.chmod(0o600)
     alias=p/"alias";os.link(public,alias);blocked(lambda:m.verify(target,result["receipt_sha256"]));alias.unlink()
     public.unlink();public.symlink_to(target/"private-maintenance.zip");blocked(lambda:m.verify(target,result["receipt_sha256"]));public.unlink()
