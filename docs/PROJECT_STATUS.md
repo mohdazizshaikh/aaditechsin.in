@@ -376,3 +376,7 @@ V10.8B CI passed. V10.8C/D offline CI failed at missing bs4; both disposable DB 
 
 ## V10.8F — consolidated release readiness (source)
 V10.8E database passed; offline failed at flag ordering after dependency interpreter correction. Fixed explicit flag ordering and exact capture day, added split deterministic staging package and receipt verification. 200 package and 28 capture regression scenarios authored. Baseline V10.8E 280 commits ahead of main, zero behind; consolidated draft review planned, no merge or deployment. New CI pending. See [V10.8F](V108F_RELEASE_READINESS.md).
+
+
+## V10.8F release verification and package rehearsal follow-up
+[Both cumulative CI jobs passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093) at 6e4258075909bf9cc42616c91028b36ff614e1cd. No outstanding failures at that exact head. Consolidated draft [PR #111](https://github.com/mohdazizshaikh/aaditechsin.in/pull/111) remains unmerged. Added CI artifact generation gated on both jobs, disposable exact-file reconstruction and receipt verification; new run pending. No hosted deployment/restore. R01 verified for prior head only. See [release readiness](V108F_RELEASE_READINESS.md).
