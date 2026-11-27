@@ -32,3 +32,6 @@ V10.8F update: R01 still open; V10.8E disposable DB passed, offline preflight fl
 
 
 27 November 2026: R01 passed at exact V10.8F commit 6e4258075909bf9cc42616c91028b36ff614e1cd, [CI 45819867093](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093). Subsequent artifact workflow changes require a new successful run; do not carry CI acceptance across changed commits. R02 review/merge and R03 actual isolated hosting remain open. A disposable reconstruction is not hosted restoration. See [release readiness](V108F_RELEASE_READINESS.md).
+
+
+27 November follow-up: both validation jobs passed on [PR merge run 45920763895](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45920763895), candidate 588bfba; artifact job skipped, inventory empty. Same-repo PR exact-tree package trigger corrected, current head pending. R01 evidence remains exact-commit/checkout specific; R02 review and merge remain open (no reviews submitted); R03 actual staging remains open.
