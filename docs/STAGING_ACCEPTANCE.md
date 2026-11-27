@@ -416,3 +416,6 @@ Automatic ephemeral access-token refresh for scheduled Gmail metadata and Search
 - [ ] Verify corrected cumulative CI and consolidated reviewed commit.
 - [ ] Build split private local packages, independently record receipt digest, verify exact contents; transfer to authorized isolated roots only.
 - [ ] Verify deployed parity, initial all-off flags, isolated database and media restore, provider and runtime evidence separately. No package is deployment authorization.
+
+
+27 November: [V10.8F cumulative CI passed](https://github.com/mohdazizshaikh/aaditechsin.in/actions/runs/45819867093) at 6e425807. New release artifact job and disposable copy rehearsal require a successful current-head run. Actual isolated hosting, restore and all runtime acceptance remain pending. Download source-only artifact into private 0700 commit-named directory, set four files to 0600 and independently verify receipt before staging. See [V10.8F](V108F_RELEASE_READINESS.md).
